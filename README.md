@@ -35,6 +35,6 @@ devtools::install_github("rorynolan/filesstrings")
 devtools::install_github("rorynolan/nandb")
 ```
 
-To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page \[github.com/rorynolan/filesstrings\] (you're probably there right now) and look for the version in the description file.
+To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page https://github.com/rorynolan/filesstrings (you're probably there right now) and look for the version in the description file.
 
 If you don't want to bother checking and you just want to make sure you have the latest version, just run those two lines of code.
