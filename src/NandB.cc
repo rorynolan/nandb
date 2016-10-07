@@ -146,11 +146,11 @@ NumericMatrix MedianPillars(NumericVector mat3d) {
 //' Image median filter with options for dealing with NAs
 //'
 //' This is an alternative to \link[EBImage]{EBImage}'s
-//' \code{\link[EBImage]{medianFilter}}. It has more options for dealing with
-//' NA values. Whilst \code{\link[EBImage]{medianFilter}} can either ignore NAs
-//' or set the output of any median calculation involving an \code{NA} to
-//' \code{NA}, \code{MedianFilterB} can deal with \code{NA}s depending on how many of them
-//' there are in a given median calculation.
+//' \code{\link[EBImage]{medianFilter}}. \code{MedianFilterB} has more options
+//' for dealing with NA values. Whilst \code{\link[EBImage]{medianFilter}} can
+//' either ignore NAs or set the output of any median calculation involving an
+//' \code{NA} to \code{NA}, \code{MedianFilterB} can deal with \code{NA}s
+//' depending on how many of them there are in a given median calculation.
 //'
 //' The behavior at image boundaries is such as the source image has been padded
 //' with pixels whose values equal the nearest border pixel value.
