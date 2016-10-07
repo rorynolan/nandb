@@ -1,0 +1,17 @@
+Package: nandb
+Type: Package
+Title: Molucular Number and Brightness Calculations
+Version: 0.0.0.9000
+Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", role = c("aut", "cre"))
+Maintainer: Rory Nolan <rorynoolan@gmail.com>
+Description: This package is gives functions for calculation of molecular number and brightness from images, as detailed in 
+License: GPL-3
+LazyData: TRUE
+LinkingTo: Rcpp,
+    BH
+Imports:
+    Rcpp,
+    filesstrings,
+    magrittr,
+    readr
+RoxygenNote: 5.0.1
