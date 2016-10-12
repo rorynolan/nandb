@@ -54,22 +54,24 @@ BrightnessVec <- function(vec) {
   if (AllEqual(vec, 0)) return(0)
   var(vec) / mean(vec)
 }
-MCLapply <- function(x, fun, ..., mcc = min(length(x), parallel::detectCores())) {
+MCLapply <- function(x, fun, ..., mcc = parallel::detectCores()) {
   dots <- list(...)
+  if (.Platform$OS.type == "windows") mcc <- 1
   if (length(dots)) {
     args <- list(X = x, FUN = fun, ... = ..., mc.cores = mcc)
   } else {
     args <- list(X = x, FUN = fun, mc.cores = mcc)
   }
-  return(do.call(parallel::mclapply, args))
+  do.call(parallel::mclapply, args)
 }
-MCMapply <- function(fun, ..., mcc = min(length(x), parallel::detectCores())) {
+MCMapply <- function(fun, ..., mcc = parallel::detectCores()) {
   dots <- list(...)
   x <- dots[[1]]
+  if (.Platform$OS.type == "windows") mcc <- 1
   args <- list(FUN = fun, ... = ..., mc.cores = mcc)
-  return(do.call(mcmapply, args))
+  do.call(parallel::mcmapply, args)
 }
-MCSapply <- function(x, fun, ..., mcc = min(length(x), parallel::detectCores())) {
+MCSapply <- function(x, fun, ..., mcc = parallel::detectCores()) {
   simplify2array(MCLapply(x, fun, ..., mcc = mcc))
 }
 PillarIJ <- function(mat3d, i.or.ij, j = NA) {
