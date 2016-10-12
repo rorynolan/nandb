@@ -17,7 +17,9 @@ restored, however the resulting array still has a "bits" attribute, which
 it wouldn't with \code{\link[EBImage]{readImage}}.}
 }
 \value{
-An array with a "bits" attribute.
+An array with a "bits" attribute and a further attribute
+  "counts restored" which tells you whether or not the counts were restored
+  when reading in the image.
 }
 \description{
 Read in an image file from the disk as an array of pixel intensities. Give it

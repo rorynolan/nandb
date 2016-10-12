@@ -15,9 +15,9 @@ KmersFromBrightnesses(brightnesses, monomer.med)
   al. (2008) paper, this is \eqn{1 + \epsilon}.
 
   This function takes the brightnesses in the range (1, 1 + 2 *
-  \code{monomer.med}] to be monomers, those in the range (1 + 2 *
-  \code{monomer.med}, 1 + 4 * \code{monomer.med}]] to be dimers, (1 + 4 *
-  \code{monomer.med}, 1 + 6 * \code{monomer.med}]] to be trimers and so on.}
+  \code{monomer.med} to be monomers, those in the range (1 + 2 *
+  \code{monomer.med}, 1 + 4 * \code{monomer.med} to be dimers, (1 + 4 *
+  \code{monomer.med}, 1 + 6 * \code{monomer.med} to be trimers and so on.}
 }
 \value{
 A named vector (named "1mers" "2mers" "3mers" and so on) with each

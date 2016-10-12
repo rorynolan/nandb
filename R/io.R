@@ -26,12 +26,15 @@
 #'   restored, however the resulting array still has a "bits" attribute, which
 #'   it wouldn't with \code{\link[EBImage]{readImage}}.
 #'
-#' @return An array with a "bits" attribute.
+#' @return An array with a "bits" attribute and a further attribute
+#'   "counts restored" which tells you whether or not the counts were restored
+#'   when reading in the image.
+#' @export
 ReadImageData <- function(image.name, restore.counts = TRUE) {
   image.data <- suppressWarnings(EBImage::imageData(
     EBImage::readImage(image.name)))
-  file.info <- paste("file", image.name) %>% system(intern = TRUE)
-  bits <- stringr::str_split_fixed(file.info, "bps", 2)[2] %>% filesstrings::NthNumber(1)
+  file.info <- paste0("identify -quiet \"", image.name, "\" | head -n 1") %>% system(intern = TRUE)
+  bits <- stringr::str_split_fixed(file.info[1], "-bit ", 2)[1] %>% filesstrings::NthNumber(-1)
   if (restore.counts) {
     if (!bits %in% c(8, 16)) {
       stop("restore.counts only works with 8- or 16-bit images.")
@@ -39,6 +42,7 @@ ReadImageData <- function(image.name, restore.counts = TRUE) {
     image.data <- image.data * (2 ^ bits - 1)
   }
   attr(image.data, "bits") <- bits
+  attr(image.data, "counts restored") <- restore.counts
   image.data
 }
 

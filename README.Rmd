@@ -1,7 +1,5 @@
 ---
 title: "nandb"
-author: "Rory Nolan"
-date: "7 October 2016"
 output: github_document
 ---
 

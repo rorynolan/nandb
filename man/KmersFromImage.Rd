@@ -5,7 +5,8 @@
 \alias{KmersFromImagesFolder}
 \title{Calculate numbers of kmers based on an image time-series}
 \usage{
-KmersFromImage(img, monomer.med, tau = NA, verbose = TRUE)
+KmersFromImage(img, monomer.med, tau = NA, med.filter = TRUE,
+  verbose = TRUE)
 
 KmersFromImagesFolder(folder.path, tau, monomer.med, out.name = "results",
   ext = "\\\\.tif$", verbose = TRUE)
@@ -22,6 +23,9 @@ al. (2008) paper, this is \eqn{1 + \epsilon}.}
 \item{tau}{The time constant for the exponential filtering (see
 \code{\link{Brightness}}).}
 
+\item{med.filter}{Do you want to apply median filtering to the brightness
+image before calculating kmers (to "remove outliers")?}
+
 \item{verbose}{Do you want to print the image name as you process it?}
 
 \item{out.name}{The name of the results csv file.}
@@ -35,7 +39,8 @@ take them out of the folder.}
 A named vector (named "1mers" "2mers" "3mers" and so on) with each
   element detailing the number of that kmer found, or for
   \code{KmersFromImagesFolder}, a csv file is written to disk detailing one
-  of these vectors for each image.
+  of these vectors for each image. This vector also has an attribute
+  "mean.intensity" giving the mean intensity of the input image.
 }
 \description{
 Given an image (as a file path or an array), \code{KmersFromImage} does the

@@ -12,9 +12,9 @@
 #'   al. (2008) paper, this is \eqn{1 + \epsilon}.
 #'
 #'   This function takes the brightnesses in the range (1, 1 + 2 *
-#'   \code{monomer.med}] to be monomers, those in the range (1 + 2 *
-#'   \code{monomer.med}, 1 + 4 * \code{monomer.med}]] to be dimers, (1 + 4 *
-#'   \code{monomer.med}, 1 + 6 * \code{monomer.med}]] to be trimers and so on.
+#'   \code{monomer.med} to be monomers, those in the range (1 + 2 *
+#'   \code{monomer.med}, 1 + 4 * \code{monomer.med} to be dimers, (1 + 4 *
+#'   \code{monomer.med}, 1 + 6 * \code{monomer.med} to be trimers and so on.
 #'
 #' @return A named vector (named "1mers" "2mers" "3mers" and so on) with each
 #'   element detailing the number of that kmer found.
@@ -28,10 +28,15 @@ KmersFromBrightnesses <- function(brightnesses, monomer.med) {
   if (monomer.med <= 1) stop("monomer.med must be greater than 1")
   window.size <- 2 * (monomer.med - 1)
   mb <- max(brightnesses, na.rm = T)
-  window.breaks <- c(seq(1, mb, by = window.size), mb)  # these values delimit the windows in which we'll count the kmers
-  cuts <- cut(brightnesses, window.breaks)
-  kmers <- as.vector(table(cuts))
-  names(kmers) <- paste0(seq_along(kmers), "mers")
+  if (mb <= 1) {
+    kmers <- 0
+    names(kmers) <- "1mers"
+  } else {
+    window.breaks <- c(seq(1, mb, by = window.size), mb)  # these values delimit the windows in which we'll count the kmers
+    cuts <- cut(brightnesses, window.breaks)
+    kmers <- as.vector(table(cuts))
+    names(kmers) <- paste0(seq_along(kmers), "mers")
+  }
   kmers
 }
 
@@ -51,22 +56,28 @@ KmersFromBrightnesses <- function(brightnesses, monomer.med) {
 #'   al. (2008) paper, this is \eqn{1 + \epsilon}.
 #' @param tau The time constant for the exponential filtering (see
 #'   \code{\link{Brightness}}).
+#' @param med.filter Do you want to apply median filtering to the brightness
+#'   image before calculating kmers (to "remove outliers")?
 #' @param verbose Do you want to print the image name as you process it?
 #'
 #' @return A named vector (named "1mers" "2mers" "3mers" and so on) with each
 #'   element detailing the number of that kmer found, or for
 #'   \code{KmersFromImagesFolder}, a csv file is written to disk detailing one
-#'   of these vectors for each image.
+#'   of these vectors for each image. This vector also has an attribute
+#'   "mean.intensity" giving the mean intensity of the input image.
 #' @export
-KmersFromImage <- function(img, monomer.med, tau = NA, verbose = TRUE) {
+KmersFromImage <- function(img, monomer.med, tau = NA,
+                           med.filter = TRUE, verbose = TRUE) {
   if (is.character(img)) {
     if (verbose) print(paste0("Now processing: ", img, "."))
     img <- ReadImageData(img)
   }
   bright <- Brightness(img, tau = tau)
-  median.filtered <- MedianFilter(bright, size = 1,
+  if (med.filter) bright <- MedianFilterB(bright, size = 1,
                                   na_rm = TRUE, na_count = TRUE)
-  KmersFromBrightnesses(median.filtered, monomer.med)
+  kmers <- KmersFromBrightnesses(bright, monomer.med)
+  attr(kmers, "mean.intensity") <- mean(img)
+  kmers
 }
 
 #' @rdname KmersFromImage
@@ -76,6 +87,7 @@ KmersFromImage <- function(img, monomer.med, tau = NA, verbose = TRUE) {
 #'   with this extension; if there are files that you don't want to process,
 #'   take them out of the folder.
 #' @param out.name The name of the results csv file.
+#' @export
 KmersFromImagesFolder <- function(folder.path, tau, monomer.med,
                                   out.name = "results", ext = "\\.tif$",
                                   verbose = TRUE) {
@@ -84,6 +96,7 @@ KmersFromImagesFolder <- function(folder.path, tau, monomer.med,
   tif.names <- list.files(pattern = ext)
   kmerss <- tif.names %>% lapply(KmersFromImage, tau, monomer.med,
                                  verbose = verbose)
+  means <- sapply(kmerss, function(x) attr(x, "mean"))
   max.ks <- kmerss %>% sapply(length)  # for each image, the maximum k for which that image contains at least one kmer
   kmers.table <- matrix(0, nrow = length(tif.names), ncol = max(max.ks))
   colnames(kmers.table) <- names(kmerss[[which.max(max.ks)]])
@@ -92,7 +105,7 @@ KmersFromImagesFolder <- function(folder.path, tau, monomer.med,
       kmers.table[i, j] <- kmerss[[i]][j]
     }
   }
-  results <- data.frame(ImageName = tif.names) %>% cbind(kmers.table)
+  results <- data.frame(ImageName = tif.names, MeanIntensity = means) %>% cbind(kmers.table)
   out.name <- filesstrings::MakeExtName(out.name, "csv")
   write_csv(results, out.name)
   setwd(init.dir)
