@@ -56,7 +56,7 @@ BrightnessVec <- function(vec) {
 }
 MCLapply <- function(x, fun, ..., mcc = parallel::detectCores()) {
   dots <- list(...)
-  if (.Platform$OS.type == "windows") mcc <- 1
+  if (tolower(.Platform$OS.type) == "windows") mcc <- 1
   if (length(dots)) {
     args <- list(X = x, FUN = fun, ... = ..., mc.cores = mcc)
   } else {
@@ -67,7 +67,7 @@ MCLapply <- function(x, fun, ..., mcc = parallel::detectCores()) {
 MCMapply <- function(fun, ..., mcc = parallel::detectCores()) {
   dots <- list(...)
   x <- dots[[1]]
-  if (.Platform$OS.type == "windows") mcc <- 1
+  if (tolower(.Platform$OS.type) == "windows") mcc <- 1
   args <- list(FUN = fun, ... = ..., mc.cores = mcc)
   do.call(parallel::mcmapply, args)
 }

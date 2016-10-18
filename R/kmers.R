@@ -1,4 +1,3 @@
-
 #' Calculate numbers of kmers based on brightnesses
 #'
 #' Calculate the number pixels occupied of molecules in each oligomeric state
@@ -90,12 +89,12 @@ KmersFromImage <- function(img, monomer.med, tau = NA,
 #' @export
 KmersFromImagesFolder <- function(folder.path, tau, monomer.med,
                                   out.name = "results", ext = "\\.tif$",
-                                  verbose = TRUE) {
+                                  mcc = parallel::detectCores(), verbose = TRUE) {
   init.dir <- getwd()
   setwd(folder.path)
   tif.names <- list.files(pattern = ext)
-  kmerss <- tif.names %>% lapply(KmersFromImage, tau, monomer.med,
-                                 verbose = verbose)
+  kmerss <- tif.names %>% MCLapply(KmersFromImage, tau, monomer.med,
+                                   mcc = mcc, verbose = verbose)
   means <- sapply(kmerss, function(x) attr(x, "mean"))
   max.ks <- kmerss %>% sapply(length)  # for each image, the maximum k for which that image contains at least one kmer
   kmers.table <- matrix(0, nrow = length(tif.names), ncol = max(max.ks))
