@@ -39,7 +39,7 @@ ReadImageData <- function(image.name, restore.counts = TRUE) {
     if (!bits %in% c(8, 16)) {
       stop("restore.counts only works with 8- or 16-bit images.")
     }
-    image.data <- image.data * (2 ^ bits - 1)
+    image.data <- round(image.data * (2 ^ bits - 1))
   }
   attr(image.data, "bits") <- bits
   attr(image.data, "counts restored") <- restore.counts
