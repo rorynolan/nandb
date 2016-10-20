@@ -52,6 +52,7 @@ NumericVector ExpSmooth(NumericVector obs, double tau) {
 // [[Rcpp::export]]
 NumericVector ExpSmoothPillars(NumericVector mat3d, double tau) {
 	// mat3d is actually passed in as a 1d vector
+	NumericVector smoothed_pillars(clone(mat3d));
 	IntegerVector dim = mat3d.attr("dim");
 	int n_pillars = dim[0] * dim[1];
 	int pillar_len = dim[2];
@@ -62,11 +63,10 @@ NumericVector ExpSmoothPillars(NumericVector mat3d, double tau) {
 		}
 		pillar_i = ExpSmooth(pillar_i, tau);
 		for (int j = 0; j < pillar_len; j++) {
-			mat3d[i + j * n_pillars] = pillar_i[j];
+			smoothed_pillars[i + j * n_pillars] = pillar_i[j];
 		}
 	}
-	mat3d.attr("dim") = dim;
-	return mat3d;
+	return smoothed_pillars;
 }
 
 //' Get the means/medians/variances of pillars of a 3d array
@@ -106,6 +106,7 @@ NumericMatrix MeanPillars(NumericVector mat3d) {
 }
 
 //' @rdname MeanPillars
+//' @export
 // [[Rcpp::export]]
 NumericMatrix VarPillars(NumericVector mat3d) {
   IntegerVector dim = mat3d.attr("dim");

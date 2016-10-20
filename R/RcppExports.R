@@ -58,6 +58,7 @@ MeanPillars <- function(mat3d) {
 }
 
 #' @rdname MeanPillars
+#' @export
 VarPillars <- function(mat3d) {
     .Call('nandb_VarPillars', PACKAGE = 'nandb', mat3d)
 }
