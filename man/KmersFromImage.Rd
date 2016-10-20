@@ -28,12 +28,15 @@ image before calculating kmers (to "remove outliers")?}
 
 \item{verbose}{Do you want to print the image name as you process it?}
 
+\item{folder.path}{The path (relative or absolute) to the folder you wish to
+process.}
+
 \item{out.name}{The name of the results csv file.}
 
 \item{ext}{the file extension of the images in the folder that you wish to
-process (rooted in regular expression). You must wish to process all files
-with this extension; if there are files that you don't want to process,
-take them out of the folder.}
+process (can be rooted in regular expression for extra-safety, as in the
+default). You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder.}
 }
 \value{
 A named vector (named "1mers" "2mers" "3mers" and so on) with each

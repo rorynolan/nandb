@@ -1,16 +1,29 @@
 #' Calculate brightness from image series.
 #'
-#' Given a time stack of images, this function performs a calculation of the
-#' molecular brightness for each pixel. If \code{tau} is specified, bleaching
-#' correction is performed via \code{\link{CorrectForBleaching}}.
+#' Given a time stack of images, this \code{Brightness} performs a calculation
+#' of the molecular brightness for each pixel. If \code{tau} is specified,
+#' bleaching correction is performed via \code{\link{CorrectForBleaching}}.
+#' \code{BrightnessTxtFolder} does this calculation for an entire folder,
+#' writing the results as text files via \code{\link{WriteImageTxt}}.
 #'
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
-#'   slice is the \eqn{n}th image in the time series.
+#'   slice is the \eqn{n}th image in the time series. To perform this on a file
+#'   that has not yet been read in, set this argument to the path to that file
+#'   (a string).
 #' @param tau The time constant for the exponential filtering.
+#' @param verbose If mat3d is specified as a file name, print a message to tell
+#'   the user that that file is now being processed (useful for
+#'   \code{BrightnessFolder}, does not work with multiple cores).
 #'
-#' @return A matrix, the brightness image.
+#' @return \code{Brightness} returns a matrix, the brightness image. The result
+#'   of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
+#'   same folder as the input images).
 #' @export
-Brightness <- function(mat3d, tau = NA) {
+Brightness <- function(mat3d, tau = NA, verbose = TRUE) {
+  if (is.character(mat3d)) {
+    if (verbose) print(paste0("Now processing: ", mat3d, "."))
+    mat3d <- ReadImageData(mat3d)
+  }
   d <- dim(mat3d)
   if (length(d) != 3) stop("mat3d must be a three-dimensional array")
   if (!is.na(tau)) mat3d <- CorrectForBleaching(mat3d, tau)
@@ -52,4 +65,27 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA) {
     brightnesses <- abind::abind(brightnesses, along = 3)
   }
   brightnesses
+}
+
+#' @rdname Brightness
+#'
+#' @param folder.path The path (relative or absolute) to the folder you wish to
+#'   process.
+#' @param ext the file extension of the images in the folder that you wish to
+#'   process (can be rooted in regular expression for extra-safety, as in the
+#'   default). You must wish to process all files with this extension; if there
+#'   are files that you don't want to process, take them out of the folder.
+#'
+#' @export
+BrightnessTxtFolder <- function(folder.path, tau = NA, ext = "\\.tif$",
+                                mcc = parallel::detectCores(), verbose = TRUE) {
+  init.dir <- getwd()
+  on.exit(setwd(init.dir))
+  setwd(folder.path)
+  file.names <- list.files(pattern = ext)
+  brightnesses <- MCLapply(file.names, Brightness, tau = tau,
+                           mcc = mcc, verbose = verbose)
+  names.noext.brightness <- sapply(file.names, filesstrings::StrBeforeNth,
+                      stringr::coll("."), -1) %>% paste0("_brightness")
+  mapply(WriteImageTxt, brightnesses, names.noext.brightness) %>% invisible
 }

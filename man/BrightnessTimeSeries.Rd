@@ -8,7 +8,9 @@ BrightnessTimeSeries(mat3d, frames.per.set, tau = NA)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series.}
+slice is the \eqn{n}th image in the time series. To perform this on a file
+that has not yet been read in, set this argument to the path to that file
+(a string).}
 
 \item{frames.per.set}{The number of frames with which to calculate the
 successive brightnesses.}

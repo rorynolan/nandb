@@ -81,10 +81,12 @@ KmersFromImage <- function(img, monomer.med, tau = NA,
 
 #' @rdname KmersFromImage
 #'
+#' @param folder.path The path (relative or absolute) to the folder you wish to
+#'   process.
 #' @param ext the file extension of the images in the folder that you wish to
-#'   process (rooted in regular expression). You must wish to process all files
-#'   with this extension; if there are files that you don't want to process,
-#'   take them out of the folder.
+#'   process (can be rooted in regular expression for extra-safety, as in the
+#'   default). You must wish to process all files with this extension; if there
+#'   are files that you don't want to process, take them out of the folder.
 #' @param out.name The name of the results csv file.
 #' @export
 KmersFromImagesFolder <- function(folder.path, tau, monomer.med,

@@ -2,22 +2,44 @@
 % Please edit documentation in R/Brightness.R
 \name{Brightness}
 \alias{Brightness}
+\alias{BrightnessTxtFolder}
 \title{Calculate brightness from image series.}
 \usage{
-Brightness(mat3d, tau = NA)
+Brightness(mat3d, tau = NA, verbose = TRUE)
+
+BrightnessTxtFolder(folder.path, tau = NA, ext = "\\\\.tif$",
+  mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series.}
+slice is the \eqn{n}th image in the time series. To perform this on a file
+that has not yet been read in, set this argument to the path to that file
+(a string).}
 
 \item{tau}{The time constant for the exponential filtering.}
+
+\item{verbose}{If mat3d is specified as a file name, print a message to tell
+the user that that file is now being processed (useful for
+\code{BrightnessFolder}, does not work with multiple cores).}
+
+\item{folder.path}{The path (relative or absolute) to the folder you wish to
+process.}
+
+\item{ext}{the file extension of the images in the folder that you wish to
+process (can be rooted in regular expression for extra-safety, as in the
+default). You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder.}
 }
 \value{
-A matrix, the brightness image.
+\code{Brightness} returns a matrix, the brightness image. The result
+  of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
+  same folder as the input images).
 }
 \description{
-Given a time stack of images, this function performs a calculation of the
-molecular brightness for each pixel. If \code{tau} is specified, bleaching
-correction is performed via \code{\link{CorrectForBleaching}}.
+Given a time stack of images, this \code{Brightness} performs a calculation
+of the molecular brightness for each pixel. If \code{tau} is specified,
+bleaching correction is performed via \code{\link{CorrectForBleaching}}.
+\code{BrightnessTxtFolder} does this calculation for an entire folder,
+writing the results as text files via \code{\link{WriteImageTxt}}.
 }
 

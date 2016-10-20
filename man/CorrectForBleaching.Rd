@@ -8,7 +8,9 @@ CorrectForBleaching(mat3d, tau)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series.}
+slice is the \eqn{n}th image in the time series. To perform this on a file
+that has not yet been read in, set this argument to the path to that file
+(a string).}
 
 \item{tau}{The time constant for the exponential filtering.}
 }

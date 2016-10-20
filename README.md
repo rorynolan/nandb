@@ -68,7 +68,9 @@ we can see that it is 50 slices each of which is a 256x256 image. We can view th
 EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png) Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via
+![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+
+Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via
 
 ``` r
 img_brightness <- Brightness(img, tau = 10)
