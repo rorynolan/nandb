@@ -15,8 +15,15 @@
 #' pixel values to be in units of "counts". This functionality is enabled by
 #' default, but can be disabled with \code{restore.counts = FALSE}.
 #'
-#' This function deals with reading in image stacks in the same way as
-#' \code{\link[EBImage]{EBImage}}.
+#' Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
+#' }\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
+#' j]} where the \eqn{x} axis points right and the \eqn{y} axis points down.
+#' This is in accordance with how \code{\link[EBImage]{EBImage}}'s
+#' \code{\link[EBImage]{readImage}} (which this function wraps). However, when
+#' one prints a matrix in a console (or views it in a program such as excel),
+#' the value in position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from
+#' \code{mat[j, i]}, so if you're confused about a phantom transposition, this
+#' is why.
 #'
 #' @param image.name The path to the image file on disk. The file extension must
 #'   be one of ".jpeg", ".png", ".tiff" or ".tif".
@@ -26,9 +33,9 @@
 #'   restored, however the resulting array still has a "bits" attribute, which
 #'   it wouldn't with \code{\link[EBImage]{readImage}}.
 #'
-#' @return An array with a "bits" attribute and a further attribute
-#'   "counts restored" which tells you whether or not the counts were restored
-#'   when reading in the image.
+#' @return An array with a "bits" attribute and a further attribute "counts
+#'   restored" which tells you whether or not the counts were restored when
+#'   reading in the image.
 #' @export
 ReadImageData <- function(image.name, restore.counts = TRUE) {
   image.data <- suppressWarnings(EBImage::imageData(
