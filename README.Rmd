@@ -11,7 +11,13 @@ An R package for performing number and brightness analysis as in Digman et al. 2
 
 ## Installation
 
-This is slightly painful but you'll only have to do it once. Open R and run:
+This is slightly painful but you'll only have to do it once. First of all, if you're on Ubuntu (similarly for other linux), you need to do:
+```
+sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev libcurl4-openssl-dev libxml2-dev
+```
+
+
+Open R and run:
 
 ```{r, eval=FALSE}
 install.packages("devtools")
@@ -21,8 +27,11 @@ biocLite("EBImage")
 If you get a message saying `Update all/some/none? [a/s/n]: `, type `a`. 
 Then run
 ```{r, eval=FALSE}
-devtools::install_github("rorynolan/filesstrings")
-devtools::install_github("rorynolan/nandb")
+devtools::install_github("rorynolan/filesstrings",
+                         auth_token = "e20de79c9f76474b1c2c94f018f71f4e898f9ca5")
+devtools::install_github("rorynolan/nandb",
+                         auth_token = "e20de79c9f76474b1c2c94f018f71f4e898f9ca5",
+                         build_vignettes = TRUE)
 ```
 Done.
 
@@ -53,7 +62,7 @@ tif_file_location <- system.file("extdata",
                                  package = "nandb")
 img <- ReadImageData(tif_file_location)
 ```
-This img is a 3-dimensional array of image slices, where each element corresponds to a pixel with a value of integer counts. Looking at the dimensions of this object:
+This `img` is a 3-dimensional array of image slices, where each element corresponds to a pixel with a value of integer counts. Looking at the dimensions of this object:
 ```{r}
 dim(img)
 ```
@@ -67,7 +76,7 @@ Now we can calculate the brightness image based on this image series, with an ex
 img_brightness <- Brightness(img, tau = 10)
 ```
 Now we can see the (median filtered) version of the output. 
-```{r}
+```{r Brightness plot}
 img_brightness %>% MedianFilterB %>% 
   MatrixRasterPlot(scale.name = "brightness", limits = c(0.9, 1.5))
 ```

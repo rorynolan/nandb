@@ -1,0 +1,49 @@
+---
+title: "Number and Brightness Image Analysis in R"
+author: "Rory Nolan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+```
+
+First, let's load the `nandb` library and `magrittr`, which we'll use.
+```{r load library}
+library("nandb")
+library("magrittr")
+```
+
+Now let's read in an image:
+```{r read image}
+img <- system.file("extdata", "FKBP-mClover_before_0.5nM_AP1510.tif", 
+                   package = "nandb") %>% ReadImageData
+dim(img)  # get img's dimensions
+```
+So we can see that `img` is a 3-dimensional array of 50 slices each of which is a 256x256 image. We can view the first slice:
+```{r}
+EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
+```
+
+Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via 
+```{r Brightness calculation with bleaching correction}
+img_brightness <- Brightness(img, tau = 10)
+```
+and we can see the (median filtered) version of the output. 
+```{r Brightness Plot, fig.width=4.5}
+img_brightness %>% MedianFilterB %>% 
+  MatrixRasterPlot(scale.name = "brightness", limits = c(0.9, 1.5))
+```
+We can save the brightness image (let's do it without median filtering this time). It saves as a text csv file (not as a tiff image, since the brightness values can be any non-negative real number, but tiff images can only store pixel values as integers).
+```{r Brightness write to txt}
+WriteImageTxt(img_brightness, "BrightnessImage")
+list.files(pattern = "\\.csv$")  # check that the csv file was written to the folder
+```
+```{r, echo=FALSE, results="hide"}
+file.remove("BrightnessImage.csv")  # remove that file (clean up)
+```

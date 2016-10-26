@@ -6,7 +6,11 @@ An R package for performing number and brightness analysis as in Digman et al. 2
 Installation
 ------------
 
-This is slightly painful but you'll only have to do it once. Open R and run:
+This is slightly painful but you'll only have to do it once. First of all, if you're on Ubuntu (similarly for other linux), you need to do:
+
+    sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev libcurl4-openssl-dev libxml2-dev
+
+Open R and run:
 
 ``` r
 install.packages("devtools")
@@ -55,7 +59,7 @@ tif_file_location <- system.file("extdata",
 img <- ReadImageData(tif_file_location)
 ```
 
-This img is a 3-dimensional array of image slices, where each element corresponds to a pixel with a value of integer counts. Looking at the dimensions of this object:
+This `img` is a 3-dimensional array of image slices, where each element corresponds to a pixel with a value of integer counts. Looking at the dimensions of this object:
 
 ``` r
 dim(img)
@@ -83,4 +87,4 @@ img_brightness %>% MedianFilterB %>%
   MatrixRasterPlot(scale.name = "brightness", limits = c(0.9, 1.5))
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](README_files/figure-markdown_github/Brightness%20plot-1.png)

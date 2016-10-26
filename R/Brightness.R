@@ -28,6 +28,8 @@ Brightness <- function(mat3d, tau = NA, verbose = TRUE) {
   if (length(d) != 3) stop("mat3d must be a three-dimensional array")
   if (!is.na(tau)) mat3d <- CorrectForBleaching(mat3d, tau)
   brightness <- VarPillars(mat3d) / MeanPillars(mat3d)
+  attr(brightness, "frames") <- d[3]
+  attr(brightness, "tau") <- tau
   brightness
 }
 
@@ -77,7 +79,7 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA) {
 #'   are files that you don't want to process, take them out of the folder.
 #'
 #' @export
-BrightnessTxtFolder <- function(folder.path, tau = NA, ext = "\\.tif$",
+BrightnessTxtFolder <- function(folder.path = ".", tau = NA, ext = "\\.tif$",
                                 mcc = parallel::detectCores(), verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
@@ -85,7 +87,10 @@ BrightnessTxtFolder <- function(folder.path, tau = NA, ext = "\\.tif$",
   file.names <- list.files(pattern = ext)
   brightnesses <- MCLapply(file.names, Brightness, tau = tau,
                            mcc = mcc, verbose = verbose)
+  frames <- sapply(brightnesses, function(x) attr(x, "frames"))
+  tau <- sapply(brightnesses, function(x) attr(x, "tau"))
   names.noext.brightness <- sapply(file.names, filesstrings::StrBeforeNth,
-                      stringr::coll("."), -1) %>% paste0("_brightness")
+                      stringr::coll("."), -1) %>%
+    paste0("_brightness_frames=", frames, "_tau=", tau)
   mapply(WriteImageTxt, brightnesses, names.noext.brightness) %>% invisible
 }
