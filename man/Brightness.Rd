@@ -7,7 +7,7 @@
 \usage{
 Brightness(mat3d, tau = NA, verbose = TRUE)
 
-BrightnessTxtFolder(folder.path, tau = NA, ext = "\\\\.tif$",
+BrightnessTxtFolder(folder.path = ".", tau = NA, ext = "\\\\.tif$",
   mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{

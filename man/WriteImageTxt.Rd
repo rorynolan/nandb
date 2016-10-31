@@ -21,6 +21,10 @@ for each slice, numbering it with the slice number.
 }
 \details{
 This function does not yet work for 4-dimensional arrays (e.g. a z stack with
-several channels).
+several channels). The image slices are transposed prior to being written to
+disk to ensure that displaying an image with \code{\link[EBImage]{display}}
+in R will yield the same result (as opposed to a transposed image) as
+displaying the written text file in ImageJ (i.e. I've made a modification to
+ensure the files display correctly in ImageJ).
 }
 

@@ -4,7 +4,7 @@
 \alias{ReadImageData}
 \title{Read image as array object.}
 \usage{
-ReadImageData(image.name, restore.counts = TRUE)
+ReadImageData(image.name, restore.counts = TRUE, fix.lut = NULL)
 }
 \arguments{
 \item{image.name}{The path to the image file on disk. The file extension must
@@ -15,11 +15,19 @@ are read in as integers in the range [0, 2 ^ bits - 1]. If set to
 \code{FALSE}, the default behaviour of \code{\link[EBImage]{readImage}} is
 restored, however the resulting array still has a "bits" attribute, which
 it wouldn't with \code{\link[EBImage]{readImage}}.}
+
+\item{fix.lut}{When reading in images (via \code{\link[EBImage]{readImage}}),
+R can give an array of different dimensionality than you expect. If you
+suspect this happening, set the value of this parameter to the \emph{number
+of dimensions} that you expect your read image to have and this function
+will try to automatically give you the image array in the form you want.
+Read \code{\link{FixLUTError}} to find out more.}
 }
 \value{
 An array with a "bits" attribute and a further attribute "counts
   restored" which tells you whether or not the counts were restored when
-  reading in the image.
+  reading in the
+  image.
 }
 \description{
 Read in an image file from the disk as an array of pixel intensities. Give it

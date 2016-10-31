@@ -32,8 +32,14 @@ AllEqual <- function(a, b = NA, allow = T, cn = F) {
     return(length(unique(a)) == 1)
   } else {
     if (allow) {
-      if (length(a) == 1) a <- rep(a, length(b))
-      if (length(b) == 1) b <- rep(b, length(a))
+      if (length(a) == 1) {
+        a <- rep(a, length(b))
+        if (is.array(b)) b <- as.vector(b)
+      }
+      if (length(b) == 1) {
+        b <- rep(b, length(a))
+        if (is.array(a)) a <- as.vector(a)
+      }
     }
     return(isTRUE(all.equal(a, b, check.names = cn)))
   }
@@ -113,4 +119,54 @@ MyMedianFilter <- function(img.mat, size) {
   EBImage::medianFilter(img.mat, size) * m
 }
 
+Depth <- function(lst) {
+  ifelse(is.list(lst), 1L + max(sapply(lst, depth)), 0L)
+}
 
+#' Fix lookup table error when reading images.
+#'
+#' Even if an image stored on disk has 1 channel only, if it has an associated
+#' LUT (lookup table, to tell programs like ImageJ to display them in (for
+#' example) green rather than grey, then \code{\link[EBImage]{readImage}} and
+#' hence \code{\link{ReadImageData}} will read in the image as a 3-channel rgb
+#' colour image, where two of the channels have all-zero intensity values and
+#' one of them has the values you wanted. This function deletes the zero
+#' channels from the array. If there were no such LUT errors and the image read
+#' in as you desired, then this function does nothing.
+#'
+#' @param arr An array, representing the read image.
+#' @param dim.out How many dimensions do you want the output array to have?
+#'
+#' @return An array. If the function implemented a "fix", then the output array
+#'   will have one less dimension than the input array.
+#' @export
+FixLUTError <- function(arr, ndim.out) {
+  d <- dim(arr)
+  nd <- length(d)
+  if (nd == ndim.out) return(arr)
+  error.msg <- "Modification is needed to get the output array to have the output array have the number of dimensions that you require, however this function does not know how to make those modifications."
+  if (nd - 1 != ndim.out) {
+    error.msg <- paste0("This function can only modify your image to reduce its dimensionality by 1, however R is reading in your image as having ",
+                        nd,
+                        " dimensions, whereas you wish your image to be in a form whereby it has ",
+                        ndim.out,
+                        " dimensions, this is a dimension reduction of ",
+                        nd - ndim.out,
+                        ".")
+    stop(error.msg)
+  }
+  if (d[3] != 3) {
+    err.msg <- paste0("This function expects that in the read image, the third array slot is the rgb colour slot and hence that the third dimension has value 3, however in the read image, this slot had dimension value ",
+                      d[3], ".")
+    stop(err.msg)
+  }
+  third.solos <- lapply(seq_len(d[3]), function(x) {
+    R.utils::extract(arr, seq_len(d[1]), seq_len(d[2]), x, drop = TRUE)
+  })
+  nonzero <- !sapply(third.solos, AllEqual, 0)
+  if (sum(nonzero) != 1) {
+    err.msg <- paste0("This function expects that in the read image, the third array slot is the rgb colour slot and that all but one of these color channels is zero, however in the read image, ", sum(nonzero), " of these were nonzero.")
+    stop(err.msg)
+  }
+  R.utils::extract(arr, seq_len(d[1]), seq_len(d[2]), nonzero, drop = TRUE)
+}

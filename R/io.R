@@ -32,12 +32,20 @@
 #'   \code{FALSE}, the default behaviour of \code{\link[EBImage]{readImage}} is
 #'   restored, however the resulting array still has a "bits" attribute, which
 #'   it wouldn't with \code{\link[EBImage]{readImage}}.
+#' @param fix.lut When reading in images (via \code{\link[EBImage]{readImage}}),
+#'   R can give an array of different dimensionality than you expect. If you
+#'   suspect this happening, set the value of this parameter to the \emph{number
+#'   of dimensions} that you expect your read image to have and this function
+#'   will try to automatically give you the image array in the form you want.
+#'   Read \code{\link{FixLUTError}} to find out more.
 #'
 #' @return An array with a "bits" attribute and a further attribute "counts
 #'   restored" which tells you whether or not the counts were restored when
-#'   reading in the image.
+#'   reading in the
+#'   image.
 #' @export
-ReadImageData <- function(image.name, restore.counts = TRUE) {
+ReadImageData <- function(image.name, restore.counts = TRUE,
+                          fix.lut = NULL) {
   image.data <- suppressWarnings(EBImage::imageData(
     EBImage::readImage(image.name)))
   file.info <- paste0("identify -quiet \"", image.name, "\" | head -n 1") %>% system(intern = TRUE)
@@ -47,6 +55,12 @@ ReadImageData <- function(image.name, restore.counts = TRUE) {
       stop("restore.counts only works with 8- or 16-bit images.")
     }
     image.data <- round(image.data * (2 ^ bits - 1))
+  }
+  if (!is.null(fix.lut)) {
+    if (isTRUE(fix.lut)) {
+      stop("If fix.lut is not set to false, it must be specified as an integer (not as TRUE). Read the documentation for ReadImageData.")
+    }
+    image.data <- FixLUTError(image.data, fix.lut)
   }
   attr(image.data, "bits") <- bits
   attr(image.data, "counts restored") <- restore.counts
@@ -62,7 +76,11 @@ ReadImageData <- function(image.name, restore.counts = TRUE) {
 #' for each slice, numbering it with the slice number.
 #'
 #' This function does not yet work for 4-dimensional arrays (e.g. a z stack with
-#' several channels).
+#' several channels). The image slices are transposed prior to being written to
+#' disk to ensure that displaying an image with \code{\link[EBImage]{display}}
+#' in R will yield the same result (as opposed to a transposed image) as
+#' displaying the written text file in ImageJ (i.e. I've made a modification to
+#' ensure the files display correctly in ImageJ).
 #'
 #' @param img.arr An image, represented by a 2- or 3-dimensional array.
 #' @param file.name The name you wish to associate with the output files,
@@ -76,10 +94,12 @@ WriteImageTxt <- function(img.arr, file.name) {
     stop("img.arr must be 2- or 3-dimensional")
   }
   if (nd == 2) {
+    img.arr <- t(img.arr)
     as.data.frame(img.arr) %>%
       readr::write_csv(filesstrings::MakeExtName(file.name, "csv"),
                        col_names = FALSE)
   } else {
+    img.arr <- aperm(img.arr, c(2, 1, 3))
     slices.dfs <- lapply(seq_len(d[3]), Slices, img.arr) %>%
       lapply(as.data.frame)
     file.names <- paste0(file.name, seq_len(d[3])) %>%

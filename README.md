@@ -21,8 +21,11 @@ biocLite("EBImage")
 If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. Then run
 
 ``` r
-devtools::install_github("rorynolan/filesstrings")
-devtools::install_github("rorynolan/nandb")
+devtools::install_github("rorynolan/filesstrings",
+                         auth_token = "e20de79c9f76474b1c2c94f018f71f4e898f9ca5")
+devtools::install_github("rorynolan/nandb",
+                         auth_token = "e20de79c9f76474b1c2c94f018f71f4e898f9ca5",
+                         build_vignettes = TRUE)
 ```
 
 Done.
