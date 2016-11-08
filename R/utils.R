@@ -25,7 +25,8 @@ WhichInterval <- function(number, interval.mat) {
   if (!all(tim[-length(tim)] <= tim[-1]) && all(interval.mat[, 1] < interval.mat[, 2])) {
     stop("interval.mat must be a two-column matrix where the rows are increasing, non-intersecting, half-open intervals on the real line")
   }
-  interval <- (number >= interval.mat[, 1] & number <= interval.mat[, 2]) %>% match(T, .)
+  interval <- (number >= interval.mat[, 1] & number <= interval.mat[, 2]) %>%
+    match(T, .)
 }
 AllEqual <- function(a, b = NA, allow = T, cn = F) {
   if (is.na(b[1])) {
@@ -169,4 +170,8 @@ FixLUTError <- function(arr, ndim.out) {
     stop(err.msg)
   }
   R.utils::extract(arr, seq_len(d[1]), seq_len(d[2]), nonzero, drop = TRUE)
+}
+
+Closest <- function(x, vec) {
+  which.min(abs(x - vec)) %>% {vec[.]}
 }

@@ -5,10 +5,10 @@
 \alias{BrightnessTxtFolder}
 \title{Calculate brightness from image series.}
 \usage{
-Brightness(mat3d, tau = NA, verbose = TRUE)
+Brightness(mat3d, tau = NA, mst = NULL, filt = NULL, verbose = TRUE)
 
-BrightnessTxtFolder(folder.path = ".", tau = NA, ext = "\\\\.tif$",
-  mcc = parallel::detectCores(), verbose = TRUE)
+BrightnessTxtFolder(folder.path = ".", tau = NA, pbt = NULL,
+  ext = "\\\\.tif$", mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -17,6 +17,12 @@ that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{tau}{The time constant for the exponential filtering.}
+
+\item{mst}{Do you want to apply an intensity threshold prior to calculating
+brightness (via \code{\link{MedStackThresh}})? If so, set your
+thresholding \emph{method} here.}
+
+\item{filt}{Do you want to median/smooth filter (with a radius of 1) the brightness image using \code{\link{MedianFilterB}} or \code{\link{SmoothFilter}}?}
 
 \item{verbose}{If mat3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
@@ -41,5 +47,14 @@ of the molecular brightness for each pixel. If \code{tau} is specified,
 bleaching correction is performed via \code{\link{CorrectForBleaching}}.
 \code{BrightnessTxtFolder} does this calculation for an entire folder,
 writing the results as text files via \code{\link{WriteImageTxt}}.
+}
+\examples{
+library(EBImage)
+img <- ReadImageData(system.file("extdata",
+"FKBP-mClover_before_0.5nM_AP1510.tif",
+package = "nandb"))
+display(normalize(img[, , 1]), method = "raster")
+brightness <- Brightness(img, tau = 10, mst = "Huang", med.filt = TRUE)
+KmerPlot(brightness, 1.16)
 }
 

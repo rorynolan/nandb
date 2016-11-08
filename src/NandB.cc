@@ -126,6 +126,7 @@ NumericMatrix VarPillars(NumericVector mat3d) {
 }
 
 //' @rdname MeanPillars
+//' @export
 // [[Rcpp::export]]
 NumericMatrix MedianPillars(NumericVector mat3d) {
   IntegerVector dim = mat3d.attr("dim");
@@ -144,14 +145,12 @@ NumericMatrix MedianPillars(NumericVector mat3d) {
 	return meds;
 }
 
-//' Image median filter with options for dealing with NAs
+//' Smooth and median filters with options for handling NAs.
 //'
-//' This is an alternative to \link[EBImage]{EBImage}'s
-//' \code{\link[EBImage]{medianFilter}}. \code{MedianFilterB} has more options
-//' for dealing with NA values. Whilst \code{\link[EBImage]{medianFilter}} can
-//' either ignore NAs or set the output of any median calculation involving an
-//' \code{NA} to \code{NA}, \code{MedianFilterB} can deal with \code{NA}s
-//' depending on how many of them there are in a given median calculation.
+//' These is an alternative to \link[EBImage]{EBImage}'s
+//' \code{\link[EBImage]{filter2}} and \code{\link[EBImage]{medianFilter}} for
+//' smooth and median filtering respectively. These functions have many options
+//' for dealing with \code{NA} values which \code{EBImage}'s functions lack.
 //'
 //' The behavior at image boundaries is such as the source image has been padded
 //' with pixels whose values equal the nearest border pixel value.
@@ -216,3 +215,70 @@ NumericMatrix MedianFilterB(NumericMatrix mat, int size = 1,
 	}
 	return median_filtered;
 }
+
+//' @rdname MedianFilterB
+//' @export
+// [[Rcpp::export]]
+NumericMatrix SmoothFilterB(NumericMatrix mat, int size = 1,
+                            bool na_rm = false, bool na_count = false) {
+  int nr = mat.nrow();
+  int nc = mat.ncol();
+  NumericMatrix smoothed(nr, nc);
+  int square_side_len = 2 * size + 1;
+  int square_size = pow(square_side_len, 2);
+  NumericMatrix square(square_side_len, square_side_len);
+  int row;
+  int col;
+  for (int i = 0; i < nr; i++) {
+    for (int j = 0; j < nc; j++) {
+      for (int k = -size; k <= size; k++) {
+        for (int l = -size; l <= size; l++) {
+          row = i + k;
+          col = j + l;
+          /* The behavior at image boundaries is such as the source image
+          has been padded with pixels whose values equal the nearest
+          border pixel value. */
+          while (row < 0 || row >= nr) {
+            row -= boost::math::sign(row);
+          }
+          while (col < 0 || col >= nc) {
+            col -= boost::math::sign(col);
+          }
+          square(k + size, l + size) = mat(row, col);
+        }
+      }
+      double filtered_ij;
+      if (na_count) {
+        if (sum(is_na(square)) > square_size / 2.0)
+          filtered_ij = NA_REAL;
+        else {
+          NumericVector no_nas(sum(!is_na(square)));
+          int j = 0;
+          for (int i = 0; i < square_size; i++) {
+            if (!is_na(square)[i]) {
+              no_nas[j] = square[i];
+              j++;
+            }
+          }
+          filtered_ij = mean(no_nas);
+        }
+      }
+      else if (na_rm) {
+        NumericVector no_nas(sum(!is_na(square)));
+        int j = 0;
+        for (int i = 0; i < square_size; i++) {
+          if (!is_na(square)[i]) {
+            no_nas[j] = square[i];
+            j++;
+          }
+        }
+        filtered_ij = mean(no_nas);
+      }
+      else
+        filtered_ij = mean(square);
+      smoothed(i, j) = filtered_ij;
+    }
+  }
+  return smoothed;
+}
+

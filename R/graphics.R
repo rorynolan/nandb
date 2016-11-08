@@ -66,9 +66,19 @@
 #' @return In the graphics console, a raster plot (via
 #'   \code{\link[ggplot2]{geom_raster}}) will appear with the matrix values
 #'   represented as pixel colours, with a named scale bar.
+#'
+#' @examples
+#' library(EBImage)
+#' img <- ReadImageData(system.file("extdata",
+#' "FKBP-mClover_before_0.5nM_AP1510.tif",
+#' package = "nandb"))
+#' display(normalize(img[, , 1]), method = "raster")
+#' brightness <- Brightness(img, tau = 10, mst = "Huang")
+#' MatrixRasterPlot(brightness, scale.name = "brightness",
+#' ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, "mer"))
 #' @export
 MatrixRasterPlot <- function(mat, scale.name = "scale",
-                             limits = NULL, ranges = NULL,
+                             limits = NULL, ranges = NULL, range.names = NULL,
                              colours = NULL, cont.colours = c("blue", "red"),
                              na.colour = "black", clip = FALSE,
                              clip.low = FALSE, clip.high = FALSE) {
@@ -87,7 +97,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
   }
   if (is.numeric(colours)) {
     if (length(colours) != 1) stop("If colours is numeric it must have length 1")
-    topocols <- topo.colors(colours)
+    colours <- topo.colors(colours)
   }
   if (!is.null(colours)) {
     if (is.null(ranges)) {
@@ -101,9 +111,17 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
                             function(x) paste(round(x, 2), collapse = "-"))
     colours.ranges <- factor(df$value %>% sapply(WhichInterval, ranges)) %T>%
     {levels(.) = ranges.typeset}
-    df <- df %>% dplyr::mutate(colour = colours.ranges)
+    df <- dplyr::mutate(df, colour = colours.ranges)
+    if (!is.null(range.names)) {
+      if (length(range.names) != nrow(ranges)) {
+        stop("The number of range.names must be equal to the number of ranges (specified directly via ranges or indirectly via colours.")
+      }
+    } else {
+      range.names <- levels(colours.ranges)
+    }
     ggplot2::ggplot(df, ggplot2::aes(x, y, fill = colour)) +
-      ggplot2::scale_fill_manual(scale.name, values = topocols) +
+      ggplot2::scale_fill_manual(scale.name, values = colours,
+                                 na.value = na.colour, labels = range.names) +
       ggplot2::geom_raster() +
       plain.theme
   } else {
@@ -118,8 +136,45 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
       ggplot2::scale_fill_gradient(scale.name, limits = limits,
                                    low = cont.colours[1], high = cont.colours[2],
                                    na.value = na.colour) +
-      ggplot2::geom_raster() +
-      plain.theme
+      ggplot2::geom_raster() + plain.theme
   }
+}
+
+#' A brightness image with a different colour for each kmer.
+#'
+#' Make a colour image based on a brightness image where each kmer has its own
+#' colour. This requires you te specify the brightness of a monomer (which
+#' should be greater than 1).
+#'
+#' @param brightness.mat The brightness matrix.
+#' @param monomer.brightness The (median) brightness of a monomer.
+#'
+#' @examples
+#' library(EBImage)
+#' img <- ReadImageData(system.file("extdata",
+#' "FKBP-mClover_before_0.5nM_AP1510.tif",
+#' package = "nandb"))
+#' display(normalize(img[, , 1]), method = "raster")
+#' brightness <- Brightness(img, tau = 10, mst = "Huang")
+#' KmerPlot(brightness, 1.16)
+#'
+#' @export
+KmerPlot <- function(brightness.mat, monomer.brightness) {
+  stopifnot(monomer.brightness > 1)
+  max.b <- max(brightness.mat, na.rm = TRUE)
+  if (max.b > monomer.brightness) {
+    ranges <- c(0, seq(1 + 0.5 * monomer.brightness,
+                     max.b, monomer.brightness - 1),
+              max.b) %>% unique  # the unique avoids the unlikely possibility of repeating the max at the end
+    lrm2 <- length(ranges) - 2
+    range.names <- c("Immobile", paste0(seq_len(lrm2), "mers"))
+    colours <- c("slategray4", topo.colors(lrm2))
+  } else {
+    ranges <- c(0, max.b)
+    range.names <- "Immobile"
+    colours = "slategray4"
+  }
+  MatrixRasterPlot(brightness.mat, scale.name = "Brightness", ranges = ranges,
+                   range.names = range.names, colours = colours)
 }
 

@@ -5,8 +5,9 @@
 \title{Make a raster plot of a matrix.}
 \usage{
 MatrixRasterPlot(mat, scale.name = "scale", limits = NULL, ranges = NULL,
-  colours = NULL, cont.colours = c("blue", "red"), na.colour = "black",
-  clip = FALSE, clip.low = FALSE, clip.high = FALSE)
+  range.names = NULL, colours = NULL, cont.colours = c("blue", "red"),
+  na.colour = "black", clip = FALSE, clip.low = FALSE,
+  clip.high = FALSE)
 }
 \arguments{
 \item{mat}{The matrix you wish to plot.}
@@ -87,5 +88,15 @@ EBImage's \code{\link[EBImage]{readImage}}). However, when one prints a
 matrix in a console (or views it in a program such as excel), the value in
 position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from \code{mat[j, i]}, so
 if you're confused about a transposed plot, this is why.
+}
+\examples{
+library(EBImage)
+img <- ReadImageData(system.file("extdata",
+"FKBP-mClover_before_0.5nM_AP1510.tif",
+package = "nandb"))
+display(normalize(img[, , 1]), method = "raster")
+brightness <- Brightness(img, tau = 10, mst = "Huang")
+MatrixRasterPlot(brightness, scale.name = "brightness",
+ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, "mer"))
 }
 

@@ -76,3 +76,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SmoothFilterB
+NumericMatrix SmoothFilterB(NumericMatrix mat, int size, bool na_rm, bool na_count);
+RcppExport SEXP nandb_SmoothFilterB(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_rm(na_rmSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_count(na_countSEXP);
+    rcpp_result_gen = Rcpp::wrap(SmoothFilterB(mat, size, na_rm, na_count));
+    return rcpp_result_gen;
+END_RCPP
+}

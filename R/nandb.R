@@ -1,4 +1,4 @@
 #' @useDynLib nandb
 #' @importFrom Rcpp sourceCpp
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%>%" "%T>%"
 NULL

@@ -16,7 +16,8 @@ Imports:
     readr,
     reshape2,
     tidyverse,
-    R.utils
+    R.utils,
+    autothresholdr
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown

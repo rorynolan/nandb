@@ -4,7 +4,7 @@
 \alias{BrightnessTimeSeries}
 \title{Create a Brightness time-series.}
 \usage{
-BrightnessTimeSeries(mat3d, frames.per.set, tau = NA)
+BrightnessTimeSeries(mat3d, frames.per.set, pbt = NULL, tau = NA)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
