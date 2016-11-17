@@ -1,19 +1,14 @@
 #' Read image as array object.
 #'
-#' Read in an image file from the disk as an array of pixel intensities. Give it
-#' an attribute "bits" detailing how many bits per sample there were in the file
-#' on disk. optionally allows the user to read in pixel intensities as integers
-#' in the range [0, 2 ^ bits - 1]. See "Details".
+#' Read in an image file from the disk as an array of pixel intensities.
 #'
 #' This function wraps \code{\link[EBImage]{readImage}} and
 #' \code{\link[EBImage]{imageData}} from the \code{\link[EBImage]{EBImage}}
 #' package. By default, \code{readImage} reads in pixel intensities in the range
-#' [0, 1]. \code{ReadImageData} optionally allows the user to read in pixel
-#' intensities as integers in the range [0, 2 ^ bits - 1], as would be seen when
-#' viewing the file in an application such as imagej. This is sometimes
-#' necessary, for example, when calculating number and brightness, where we need
-#' pixel values to be in units of "counts". This functionality is enabled by
-#' default, but can be disabled with \code{restore.counts = FALSE}.
+#' [0, 1]. \code{ReadImageData} reads in pixel intensities as integers as they
+#' would be represented in a tiff file and displayed therefrom in ImageJ. This
+#' is necessary when calculating number and brightness, where we need pixel
+#' values to be in units of "counts".
 #'
 #' Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
 #' }\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
@@ -27,11 +22,6 @@
 #'
 #' @param image.name The path to the image file on disk. The file extension must
 #'   be one of ".jpeg", ".png", ".tiff" or ".tif".
-#' @param restore.counts If this is \code{TRUE} (the default), pixel intensities
-#'   are read in as integers in the range [0, 2 ^ bits - 1]. If set to
-#'   \code{FALSE}, the default behaviour of \code{\link[EBImage]{readImage}} is
-#'   restored, however the resulting array still has a "bits" attribute, which
-#'   it wouldn't with \code{\link[EBImage]{readImage}}.
 #' @param fix.lut When reading in images (via \code{\link[EBImage]{readImage}}),
 #'   R can give an array of different dimensionality than you expect. If you
 #'   suspect this happening, set the value of this parameter to the \emph{number
@@ -39,31 +29,21 @@
 #'   will try to automatically give you the image array in the form you want.
 #'   Read \code{\link{FixLUTError}} to find out more.
 #'
-#' @return An array with a "bits" attribute and a further attribute "counts
-#'   restored" which tells you whether or not the counts were restored when
-#'   reading in the
-#'   image.
+#' @return An array of integers representing the image.
 #' @export
-ReadImageData <- function(image.name, restore.counts = TRUE,
+ReadImageData <- function(image.name,
                           fix.lut = NULL) {
   image.data <- suppressWarnings(EBImage::imageData(
-    EBImage::readImage(image.name)))
-  file.info <- paste0("identify -quiet \"", image.name, "\" | head -n 1") %>% system(intern = TRUE)
-  bits <- stringr::str_split_fixed(file.info[1], "-bit ", 2)[1] %>% filesstrings::NthNumber(-1)
-  if (restore.counts) {
-    if (!bits %in% c(8, 16)) {
-      stop("restore.counts only works with 8- or 16-bit images.")
-    }
-    image.data <- round(image.data * (2 ^ bits - 1))
-  }
+    EBImage::readImage(image.name, as.is = TRUE)))
   if (!is.null(fix.lut)) {
     if (isTRUE(fix.lut)) {
       stop("If fix.lut is not set to false, it must be specified as an integer (not as TRUE). Read the documentation for ReadImageData.")
     }
     image.data <- FixLUTError(image.data, fix.lut)
   }
-  attr(image.data, "bits") <- bits
-  attr(image.data, "counts restored") <- restore.counts
+  if (!all(CanBeInteger(image.data))) {
+    stop("Failed to read in the image as an array of integers.")
+  }
   image.data
 }
 
@@ -90,7 +70,7 @@ ReadImageData <- function(image.name, restore.counts = TRUE,
 WriteImageTxt <- function(img.arr, file.name) {
   d <- dim(img.arr)
   nd <- length(d)
-  if (! nd %in% c(2, 3)) {
+  if (!nd %in% c(2, 3)) {
     stop("img.arr must be 2- or 3-dimensional")
   }
   if (nd == 2) {

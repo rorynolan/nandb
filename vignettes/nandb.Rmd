@@ -4,7 +4,7 @@ author: "Rory Nolan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Number and Brightness analysis in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,11 +13,15 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 ```
 
+### Loading the library
+
 First, let's load the `nandb` library and `magrittr`, which we'll use.
 ```{r load library}
 library("nandb")
 library("magrittr")
 ```
+
+### Reading and Displaying Images
 
 Now let's read in an image:
 ```{r read image}
@@ -30,15 +34,20 @@ So we can see that `img` is a 3-dimensional array of 50 slices each of which is 
 EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
 ```
 
-Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via 
+### Preprocessing, Brightness Calculation and Post-Filtering
+
+Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames and using the Huang thresholding method via 
 ```{r Brightness calculation with bleaching correction}
-img_brightness <- Brightness(img, tau = 10)
+img_brightness <- Brightness(img, tau = 10, mst = "Huang")
 ```
 and we can see the (median filtered) version of the output. 
 ```{r Brightness Plot, fig.width=4.5}
 img_brightness %>% MedianFilterB %>% 
   MatrixRasterPlot(scale.name = "brightness", limits = c(0.9, 1.5))
 ```
+
+### Saving Text Images
+
 We can save the brightness image (let's do it without median filtering this time). It saves as a text csv file (not as a tiff image, since the brightness values can be any non-negative real number, but tiff images can only store pixel values as integers).
 ```{r Brightness write to txt}
 WriteImageTxt(img_brightness, "BrightnessImage")
@@ -47,3 +56,28 @@ list.files(pattern = "\\.csv$")  # check that the csv file was written to the fo
 ```{r, echo=FALSE, results="hide"}
 file.remove("BrightnessImage.csv")  # remove that file (clean up)
 ```
+
+### Studying the Distribution of Brightnesses
+
+We can take a look at the distribution of brightnesses in that image:
+```{r brightness density}
+density(brightness) %>% plot(ylab = "frequency", xlab = "brightness", col = "blue")
+```
+
+and we can compare it to the distribution of brightnesses from immobile particles:
+```{r immobile plot}
+density(immobile_brightnesses) %>% {lines(.$x, .$y, col = "orange")} 
+```
+
+### Calculating the Brightness of a Monomer
+
+Say we know that our monomeric brightness is 1.10. Then we can create a plot of all kmers present:
+```{r kmer plot}
+KmerPlot(img_brightness, 1.10)
+```
+
+Instead, say that you know that you have only monomers (no dimers, trimers, etc) in your images but you don't know what your monomeric brightness is. Then you can use 
+```{r}
+# this
+```
+However, if you don't have an image of monomers only, then I can't help you to determine the brightness of your monomer.

@@ -27,10 +27,10 @@ biocLite("EBImage")
 If you get a message saying `Update all/some/none? [a/s/n]: `, type `a`. 
 Then run
 ```{r, eval=FALSE}
-devtools::install_github("rorynolan/filesstrings",
-                         auth_token = "e20de79c9f76474b1c2c94f018f71f4e898f9ca5")
+devtools::install_github("rorynolan/filesstrings")
+devtools::install_github("rorynolan/autothresholdr")
 devtools::install_github("rorynolan/nandb",
-                         auth_token = "e20de79c9f76474b1c2c94f018f71f4e898f9ca5",
+                         auth_token = "408d46a07a8fc44c6a97c0ccc0175154a3bb2864",
                          build_vignettes = TRUE)
 ```
 Done.
@@ -38,10 +38,13 @@ Done.
 
 ### Updates
 
-To update the package, you just need
+To update the package, you just need to do the same thing:
 ```{r, eval=FALSE}
 devtools::install_github("rorynolan/filesstrings")
-devtools::install_github("rorynolan/nandb")
+devtools::install_github("rorynolan/autothresholdr")
+devtools::install_github("rorynolan/nandb",
+                         auth_token = "408d46a07a8fc44c6a97c0ccc0175154a3bb2864",
+                         build_vignettes = TRUE)
 ```
 To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page [github.com/rorynolan/filesstrings] (you're probably there right now) and look for the version in the description file.
 
@@ -50,7 +53,7 @@ If you don't want to bother checking and you just want to make sure you have the
 
 ## Use
 
-For the lowdown on how to use this package, you should read the package vignette; however, here's a quick example. First load the libraries:
+For the lowdown on how to use this package, you should read the package vignette (using `vignette("nandb")`); however, here's a quick example. First load the libraries:
 ```{r}
 library("nandb")
 library("magrittr")
@@ -73,7 +76,7 @@ EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
 
 Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via 
 ```{r}
-img_brightness <- Brightness(img, tau = 10)
+img_brightness <- Brightness(img, tau = 10, mst = "Huang")
 ```
 Now we can see the (median filtered) version of the output. 
 ```{r Brightness plot}
