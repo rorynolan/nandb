@@ -105,13 +105,13 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, pbt = NULL, tau = NA) {
 #'   are files that you don't want to process, take them out of the folder.
 #'
 #' @export
-BrightnessTxtFolder <- function(folder.path = ".", tau = NA, pbt = NULL, ext = "\\.tif$",
+BrightnessTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL, ext = "\\.tif$",
                                 mcc = parallel::detectCores(), verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
   file.names <- list.files(pattern = ext)
-  brightnesses <- MCLapply(file.names, Brightness, tau = tau, pbt = pbt,
+  brightnesses <- MCLapply(file.names, Brightness, tau = tau, mst = mst,
                            mcc = mcc, verbose = verbose)
   frames <- sapply(brightnesses, function(x) attr(x, "frames"))
   tau <- sapply(brightnesses, function(x) attr(x, "tau"))

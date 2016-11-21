@@ -21,6 +21,7 @@ biocLite("EBImage")
 If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. Then run
 
 ``` r
+options(unzip = "internal")
 devtools::install_github("rorynolan/filesstrings")
 devtools::install_github("rorynolan/autothresholdr")
 devtools::install_github("rorynolan/nandb",

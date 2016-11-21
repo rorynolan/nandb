@@ -4,17 +4,11 @@
 \alias{ReadImageData}
 \title{Read image as array object.}
 \usage{
-ReadImageData(image.name, restore.counts = TRUE, fix.lut = NULL)
+ReadImageData(image.name, fix.lut = NULL)
 }
 \arguments{
 \item{image.name}{The path to the image file on disk. The file extension must
 be one of ".jpeg", ".png", ".tiff" or ".tif".}
-
-\item{restore.counts}{If this is \code{TRUE} (the default), pixel intensities
-are read in as integers in the range [0, 2 ^ bits - 1]. If set to
-\code{FALSE}, the default behaviour of \code{\link[EBImage]{readImage}} is
-restored, however the resulting array still has a "bits" attribute, which
-it wouldn't with \code{\link[EBImage]{readImage}}.}
 
 \item{fix.lut}{When reading in images (via \code{\link[EBImage]{readImage}}),
 R can give an array of different dimensionality than you expect. If you
@@ -24,27 +18,19 @@ will try to automatically give you the image array in the form you want.
 Read \code{\link{FixLUTError}} to find out more.}
 }
 \value{
-An array with a "bits" attribute and a further attribute "counts
-  restored" which tells you whether or not the counts were restored when
-  reading in the
-  image.
+An array of integers representing the image.
 }
 \description{
-Read in an image file from the disk as an array of pixel intensities. Give it
-an attribute "bits" detailing how many bits per sample there were in the file
-on disk. optionally allows the user to read in pixel intensities as integers
-in the range [0, 2 ^ bits - 1]. See "Details".
+Read in an image file from the disk as an array of pixel intensities.
 }
 \details{
 This function wraps \code{\link[EBImage]{readImage}} and
 \code{\link[EBImage]{imageData}} from the \code{\link[EBImage]{EBImage}}
 package. By default, \code{readImage} reads in pixel intensities in the range
-[0, 1]. \code{ReadImageData} optionally allows the user to read in pixel
-intensities as integers in the range [0, 2 ^ bits - 1], as would be seen when
-viewing the file in an application such as imagej. This is sometimes
-necessary, for example, when calculating number and brightness, where we need
-pixel values to be in units of "counts". This functionality is enabled by
-default, but can be disabled with \code{restore.counts = FALSE}.
+[0, 1]. \code{ReadImageData} reads in pixel intensities as integers as they
+would be represented in a tiff file and displayed therefrom in ImageJ. This
+is necessary when calculating number and brightness, where we need pixel
+values to be in units of "counts".
 
 Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
 }\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
