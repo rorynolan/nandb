@@ -61,7 +61,7 @@ file.remove("BrightnessImage.csv")  # remove that file (clean up)
 
 We can take a look at the distribution of brightnesses in that image:
 ```{r brightness density}
-density(brightness) %>% plot(ylab = "frequency", xlab = "brightness", col = "blue")
+density(img_brightness, na.rm = TRUE) %>% plot(ylab = "frequency", xlab = "brightness", col = "blue")
 ```
 
 and we can compare it to the distribution of brightnesses from immobile particles:

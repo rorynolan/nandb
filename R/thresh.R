@@ -33,7 +33,6 @@
 #' @export
 MedStackThresh <- function(mat3d, method = "Huang") {
   medpillared.rounded <- MedianPillars(mat3d) %>% round
-  attr(medpillared.rounded, "bits") <- attr(mat3d, "bits")
   thresh.mask <- autothresholdr::auto_thresh_mask(medpillared.rounded, method)
   mat3d * as.vector(thresh.mask)
 }
