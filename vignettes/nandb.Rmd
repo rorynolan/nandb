@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 First, let's load the `nandb` library and `magrittr`, which we'll use.
 ```{r load library}
 library("nandb")
-library("magrittr")
+library("tidyverse", quietly = TRUE)
 ```
 
 ### Reading and Displaying Images
@@ -61,12 +61,20 @@ file.remove("BrightnessImage.csv")  # remove that file (clean up)
 
 We can take a look at the distribution of brightnesses in that image:
 ```{r brightness density}
-density(img_brightness, na.rm = TRUE) %>% plot(ylab = "frequency", xlab = "brightness", col = "blue")
+db <- density(img_brightness, na.rm = TRUE) %>% 
+  {data.frame(x = .$x, y = .$y)}
+ggplot(db, aes(x, y)) + geom_line() + 
+  labs(x = "brightness", y = "frequency")
 ```
 
 and we can compare it to the distribution of brightnesses from immobile particles:
 ```{r immobile plot}
-density(immobile_brightnesses) %>% {lines(.$x, .$y, col = "orange")} 
+immobile_brightnesses <- replicate(512^2, rpois(50, 50) %>% {var(.) / mean(.)})
+di <- density(immobile_brightnesses) %>% {data.frame(x = .$x, y = .$y)}
+rbind(mutate(db, mobility = "mobile"), mutate(di, mobility = "immobile")) %>%     mutate(mobility = factor(mobility)) %>% 
+  ggplot(aes(x, y)) + geom_line(aes(colour = mobility)) + 
+  labs(x = "brightness", y = "frequency")
+  
 ```
 
 ### Calculating the Brightness of a Monomer
