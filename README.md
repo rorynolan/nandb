@@ -21,7 +21,7 @@ On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools
 Then, everyone, open R and run:
 
 ``` r
-install.packages("devtools")
+install.packages(c("devtools", "knitr", "rmarkdown"))
 source("https://bioconductor.org/biocLite.R")
 biocLite("EBImage")
 ```
