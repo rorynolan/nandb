@@ -18,7 +18,8 @@ Imports:
     tidyverse,
     R.utils,
     autothresholdr,
-    assertthat
+    assertthat,
+    abind
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown

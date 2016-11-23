@@ -117,7 +117,7 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL, ext = "
   tau <- sapply(brightnesses, function(x) attr(x, "tau"))
   names.noext.brightness <- sapply(file.names, filesstrings::StrBeforeNth,
                                    stringr::coll("."), -1) %>%
-    paste0("_brightness_frames=", frames, "_tau=", tau)
+    paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=", mst)
   mapply(WriteImageTxt, brightnesses, names.noext.brightness) %>% invisible
   if (verbose) print("Done. Please check folder.")
 }

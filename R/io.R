@@ -88,3 +88,42 @@ WriteImageTxt <- function(img.arr, file.name) {
     mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE)
   }
 }
+
+#' Fix an image that didn't recognise channels while reading
+#'
+#' Sometimes, when you open an image in imagej, it displays the channels as you
+#' would like, but when you read it into R, it has just mashed all the channels
+#' (which you would like to be separated somehow) into a stack. In my
+#' expreience, it always does so in a way that, say you have a stack of 3
+#' channels and 5 z positions, then the red images would occupy \code{[, , 1]},
+#' \code{[, , 6]} and \code{[, , 11]}. This is the type of fixing that this
+#' function performs. So in that example it would have a 3d array as input and a
+#' 4d as output with dimensions (assuming our images are 256x256 pixels)
+#' \code{256, 256, 3, 5}.
+#'
+#' @param img.arr An array, the read image.
+#' @param n.ch The number of channels that you want the read image to have.
+#'
+#' @return An array, channel indices in the third slot, slice indices in the
+#'   fourth.
+#'
+#' @examples
+#' library(magrittr)
+#' x <- lapply(1:300, function(x) matrix(runif(4), nrow = 2)) %>%
+#' Reduce(function(x, y) abind(x, y, along = 3), .)
+#' str(x)
+#' ForceChannels(x, 6) %>% str
+#'
+#' @export
+ForceChannels <- function(img.arr, n.ch) {
+  d <- dim(img.arr)
+  if (length(d) != 3) stop("img.arr must be a 3-dimensional array")
+  if (d[3] %% n.ch != 0) {
+    message <- paste0("The number of slices in the input array must be a multiple of n.ch, however you have ", d[3], " slices in your input array and n.ch = ", n.ch, ".")
+    stop(message)
+  }
+  index.groups <- lapply(seq_len(n.ch), function(x) seq(x, d[3], n.ch))
+  ch.groups <- lapply(index.groups, function(x) img.arr[, , x])
+  to.be.apermed <- Reduce(function(x, y) abind::abind(x, y, along = 4), ch.groups)
+  aperm(to.be.apermed, c(1, 2, 4, 3))
+}
