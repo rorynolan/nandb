@@ -110,7 +110,7 @@ WriteImageTxt <- function(img.arr, file.name) {
 #' @examples
 #' library(magrittr)
 #' x <- lapply(1:300, function(x) matrix(runif(4), nrow = 2)) %>%
-#' Reduce(function(x, y) abind(x, y, along = 3), .)
+#' Reduce(function(x, y) abind::abind(x, y, along = 3), .)
 #' str(x)
 #' ForceChannels(x, 6) %>% str
 #'
@@ -126,4 +126,27 @@ ForceChannels <- function(img.arr, n.ch) {
   ch.groups <- lapply(index.groups, function(x) img.arr[, , x])
   to.be.apermed <- Reduce(function(x, y) abind::abind(x, y, along = 4), ch.groups)
   aperm(to.be.apermed, c(1, 2, 4, 3))
+}
+
+#' Put individual tif files into one tif stack.
+#'
+#' Say you have saved what you would like to be one 3D tif stack as a series of 2D tif files. This helps you stack them into one file.
+#'
+#' @param file.names The names of the files to stack (in order).
+#' @param out.name The name of the output .tif file.
+#'
+#' @export
+Stack2DTifs <- function(file.names, out.name) {
+  out.name <- filesstrings::MakeExtName(out.name, "tif")
+  images <- MCLapply(file.names, EBImage::readImage)
+  dims <- lapply(images, dim)
+  u <- unique(dims)
+  if (length(u) != 1) {
+    stop("All the images to be stacked must have the same dimensions")
+  }
+  if (length(u[[1]]) != 2) {
+    stop("The images must all be 2-dimensional")
+  }
+  stacked <- Reduce(function(x, y) abind::abind(x, y, along = 3), images)
+  EBImage::writeImage(stacked, out.name)
 }

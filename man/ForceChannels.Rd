@@ -29,7 +29,7 @@ function performs. So in that example it would have a 3d array as input and a
 \examples{
 library(magrittr)
 x <- lapply(1:300, function(x) matrix(runif(4), nrow = 2)) \%>\%
-Reduce(function(x, y) abind(x, y, along = 3), .)
+Reduce(function(x, y) abind::abind(x, y, along = 3), .)
 str(x)
 ForceChannels(x, 6) \%>\% str
 

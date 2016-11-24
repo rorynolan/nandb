@@ -16,9 +16,9 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 ### Loading the library
 
 First, let's load the `nandb` library and `magrittr`, which we'll use.
-```{r load library}
+```{r load library, results='hide', message=FALSE}
 library("nandb")
-library("tidyverse", quietly = TRUE)
+library("tidyverse")
 ```
 
 ### Reading and Displaying Images
