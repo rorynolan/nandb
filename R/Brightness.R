@@ -12,12 +12,15 @@
 #'   (a string).
 #' @param tau The time constant for the exponential filtering.
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via \code{\link{MedStackThresh}})? If so, set your
-#'   thresholding \emph{method} here.
-#' @param filt Do you want to median/smooth filter (with a radius of 1) the brightness image using \code{\link{MedianFilterB}} or \code{\link{SmoothFilter}}?
+#'   brightness (via \code{\link{MedStackThresh}})? If so, set your thresholding
+#'   \emph{method} here.
+#' @param filt Do you want to median/smooth filter (with a radius of 1) the
+#'   brightness image using \code{\link{MedianFilterB}} or
+#'   \code{\link{SmoothFilterB}}? If \code{filt = "median"}, \code{\link{MedianFilterB}} is invoked with the option \code{na_count = TRUE}.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   \code{BrightnessFolder}, does not work with multiple cores).
+#'   \code{BrightnessFolder}, does not work with multiple cores) and to tell
+#'   when \code{MeanIntensityTxtFolder} is done.
 #'
 #' @return \code{Brightness} returns a matrix, the brightness image. The result
 #'   of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
@@ -26,10 +29,10 @@
 #' @examples
 #' library(EBImage)
 #' img <- ReadImageData(system.file("extdata",
-#' "FKBP-mClover_before_0.5nM_AP1510.tif",
+#' "low_oligomers.tif",
 #' package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
-#' brightness <- Brightness(img, tau = 10, mst = "Huang", med.filt = TRUE)
+#' brightness <- Brightness(img, tau = 10, mst = "Huang", filt = "median")
 #' KmerPlot(brightness, 1.16)
 #' @export
 Brightness <- function(mat3d, tau = NA, mst = NULL, filt = NULL, verbose = TRUE) {
@@ -54,8 +57,12 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, filt = NULL, verbose = TRUE)
       brightness <- SmoothFilterB(brightness, na_count = TRUE)
     }
   }
-  attr(brightness, "frames") <- d[3]
-  attr(brightness, "tau") <- tau
+  attributes(brightness) <- c(attributes(brightness),
+                              list(frames = d[3], tau = tau,
+                                 filter = ifelse(is.null(filt), NA, filt),
+                                 mst = ifelse(is.null(mst), NA, mst)
+                                 )
+  )
   brightness
 }
 
@@ -105,19 +112,20 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, pbt = NULL, tau = NA) {
 #'   are files that you don't want to process, take them out of the folder.
 #'
 #' @export
-BrightnessTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL, ext = "\\.tif$",
+BrightnessTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
+                                filt = NULL, ext = "\\.tif$",
                                 mcc = parallel::detectCores(), verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
   file.names <- list.files(pattern = ext)
-  brightnesses <- MCLapply(file.names, Brightness, tau = tau, mst = mst,
-                           mcc = mcc, verbose = verbose)
+  brightnesses <- MCLapply(file.names, Brightness, mst = mst, tau = tau,
+                           filt = filt, mcc = mcc, verbose = verbose)
   frames <- sapply(brightnesses, function(x) attr(x, "frames"))
-  tau <- sapply(brightnesses, function(x) attr(x, "tau"))
   names.noext.brightness <- sapply(file.names, filesstrings::StrBeforeNth,
                                    stringr::coll("."), -1) %>%
-    paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=", mst)
+    paste0("_brightness_frames=", frames, "_tau=", tau,
+           "_mst=", mst, "_filter=", filt)
   mapply(WriteImageTxt, brightnesses, names.noext.brightness) %>% invisible
   if (verbose) print("Done. Please check folder.")
 }

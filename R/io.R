@@ -47,15 +47,15 @@ ReadImageData <- function(image.name,
   image.data
 }
 
-#' Write an image array to disk as text file(s)
+#' Read/write an image array to/from disk as text file(s).
 #'
 #' If (as with brightness) you wish for the pixel values in an image to be
 #' represented by real numbers that aren't necessarily integers, the tiff format
-#' won't work. As a workaround we write images (arrays) as comma-separated value
-#' (csv) files, where for image stacks (3-dimensional arrays), we write one file
+#' won't work. As a workaround we represent images (arrays) as comma-separated value
+#' (csv) files on disk, where for image stacks (3-dimensional arrays), we write one file
 #' for each slice, numbering it with the slice number.
 #'
-#' This function does not yet work for 4-dimensional arrays (e.g. a z stack with
+#' These functions do not work for 4-dimensional arrays (e.g. a z stack with
 #' several channels). The image slices are transposed prior to being written to
 #' disk to ensure that displaying an image with \code{\link[EBImage]{display}}
 #' in R will yield the same result (as opposed to a transposed image) as
@@ -63,7 +63,7 @@ ReadImageData <- function(image.name,
 #' ensure the files display correctly in ImageJ).
 #'
 #' @param img.arr An image, represented by a 2- or 3-dimensional array.
-#' @param file.name The name you wish to associate with the output files,
+#' @param file.name The name of the input/output output file(s),
 #'   \emph{without} a file extension.
 #'
 #' @export
@@ -87,6 +87,13 @@ WriteImageTxt <- function(img.arr, file.name) {
       (filesstrings::NiceNums)
     mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE)
   }
+}
+
+#' @rdname WriteImageTxt
+#' @export
+ReadImageTxt <- function(file.name) {
+  suppressMessages(readr::read_csv(file.name, col_names = FALSE, progress = FALSE)) %>%
+    as.matrix %>% magrittr::set_colnames(value = NULL)
 }
 
 #' Fix an image that didn't recognise channels while reading

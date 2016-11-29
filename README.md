@@ -10,7 +10,10 @@ Installation
 
 This is slightly painful but you'll only have to do it once. First of all, if you're on **Ubuntu** (similarly for other debian **linux**), you need to do:
 
-    sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev libcurl4-openssl-dev libxml2-dev
+    sudo apt-get update
+    sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev 
+    sudo apt-get install libcurl4-openssl-dev libxml2-dev 
+    sudo apt-get install default-jre default-jdk
 
 On **mac**, you need to go to <https://support.apple.com/kb/dl1572?locale=en_US> and download and install Java 6 (don't ask me why this is necessary).
 
@@ -21,7 +24,7 @@ On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools
 Then, everyone, open R and run:
 
 ``` r
-install.packages(c("devtools", "knitr", "rmarkdown"))
+install.packages(c("devtools", "knitr", "rmarkdown", "XML", "xml2"))
 source("https://bioconductor.org/biocLite.R")
 biocLite("EBImage")
 ```
@@ -30,14 +33,19 @@ If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. Then run
 
 ``` r
 options(unzip = "internal")
-devtools::install_github("rorynolan/filesstrings")
-devtools::install_github("rorynolan/autothresholdr")
-devtools::install_github("rorynolan/nandb",
-                         auth_token = "408d46a07a8fc44c6a97c0ccc0175154a3bb2864",
-                         build_vignettes = TRUE)
+library(devtools)
+install_github("rorynolan/filesstrings")
+install_github("rorynolan/autothresholdr")
+install_github("rorynolan/nandb",
+               auth_token = "50627d2ca9badc802ed993cb2b9a914034ab2246",
+               build_vignettes = TRUE)
 ```
 
 Done.
+
+#### Problems
+
+If you run into problems during your installation, it's most likely that your installation of `rJava` didn't work. Try running `install.packages("rJava")` and try to work through the errors there. If that still doesn't work, try googling "install rJava" for your operating system e.g. "install rJava Ubuntu". The second most likely culprit is `EBImage` so similarly have a google of "install EBImage". If you get these to work, then try the installation instructions again. If you still can't get it to work, feel free to contact us via the issues page associated with this repo.
 
 ### Updates
 
@@ -45,11 +53,12 @@ To update the package, you just need to do the same thing:
 
 ``` r
 options(unzip = "internal")
-devtools::install_github("rorynolan/filesstrings")
-devtools::install_github("rorynolan/autothresholdr")
-devtools::install_github("rorynolan/nandb",
-                         auth_token = "408d46a07a8fc44c6a97c0ccc0175154a3bb2864",
-                         build_vignettes = TRUE)
+library(devtools)
+install_github("rorynolan/filesstrings")
+install_github("rorynolan/autothresholdr")
+install_github("rorynolan/nandb",
+               auth_token = "50627d2ca9badc802ed993cb2b9a914034ab2246",
+               build_vignettes = TRUE)
 ```
 
 To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page \[github.com/rorynolan/filesstrings\] (you're probably there right now) and look for the version in the description file.

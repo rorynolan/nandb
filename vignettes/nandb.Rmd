@@ -15,23 +15,23 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 
 ### Loading the library
 
-First, let's load the `nandb` library and `magrittr`, which we'll use.
+First, let's load the `nandb` and `EBImage` libraries and the tidyverse (we'll need them).
 ```{r load library, results='hide', message=FALSE}
-library("nandb")
-library("tidyverse")
+required <- c("nandb", "EBImage", "tidyverse")
+sapply(required, library, character.only = TRUE)
 ```
 
 ### Reading and Displaying Images
 
 Now let's read in an image:
 ```{r read image}
-img <- system.file("extdata", "FKBP-mClover_before_0.5nM_AP1510.tif", 
+img <- system.file("extdata", "low_oligomers.tif", 
                    package = "nandb") %>% ReadImageData
 dim(img)  # get img's dimensions
 ```
 So we can see that `img` is a 3-dimensional array of 50 slices each of which is a 256x256 image. We can view the first slice:
 ```{r}
-EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
+display(normalize(img[, , 1]), method = "raster")
 ```
 
 ### Preprocessing, Brightness Calculation and Post-Filtering
@@ -39,10 +39,11 @@ EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
 Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames and using the Huang thresholding method via 
 ```{r Brightness calculation with bleaching correction}
 img_brightness <- Brightness(img, tau = 10, mst = "Huang")
+MatrixRasterPlot(img_brightness)
 ```
-and we can see the (median filtered) version of the output. 
+and we can see what happens when we median filter. 
 ```{r Brightness Plot, fig.width=4.5}
-img_brightness %>% MedianFilterB %>% 
+Brightness(img, tau = 10, mst = "Huang", filt = "median") %>% 
   MatrixRasterPlot(scale.name = "brightness", limits = c(0.9, 1.5))
 ```
 
@@ -60,21 +61,22 @@ file.remove("BrightnessImage.csv")  # remove that file (clean up)
 ### Studying the Distribution of Brightnesses
 
 We can take a look at the distribution of brightnesses in that image:
-```{r brightness density}
+```{r brightness density, message=FALSE}
 db <- density(img_brightness, na.rm = TRUE) %>% 
   {data.frame(x = .$x, y = .$y)}
 ggplot(db, aes(x, y)) + geom_line() + 
-  labs(x = "brightness", y = "frequency")
+  labs(x = "brightness", y = "frequency") +
+  xlim(0.5, 2)
 ```
 
 and we can compare it to the distribution of brightnesses from immobile particles:
 ```{r immobile plot}
-immobile_brightnesses <- replicate(512^2, rpois(50, 50) %>% {var(.) / mean(.)})
+immobile_brightnesses <- replicate(10^6, rpois(50, 50) %>% {var(.) / mean(.)})
 di <- density(immobile_brightnesses) %>% {data.frame(x = .$x, y = .$y)}
 rbind(mutate(db, mobility = "mobile"), mutate(di, mobility = "immobile")) %>%     mutate(mobility = factor(mobility)) %>% 
   ggplot(aes(x, y)) + geom_line(aes(colour = mobility)) + 
-  labs(x = "brightness", y = "frequency")
-  
+  labs(x = "brightness", y = "frequency") +
+  xlim(0.5, 2)
 ```
 
 ### Calculating the Brightness of a Monomer

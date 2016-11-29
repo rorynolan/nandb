@@ -5,9 +5,8 @@
 \title{Make a raster plot of a matrix.}
 \usage{
 MatrixRasterPlot(mat, scale.name = "scale", limits = NULL, ranges = NULL,
-  range.names = NULL, colours = NULL, cont.colours = c("blue", "red"),
-  na.colour = "black", clip = FALSE, clip.low = FALSE,
-  clip.high = FALSE)
+  range.names = NULL, colours = NULL, na.colour = "black", clip = FALSE,
+  clip.low = FALSE, clip.high = FALSE, log.trans = FALSE, breaks = NULL)
 }
 \arguments{
 \item{mat}{The matrix you wish to plot.}
@@ -16,7 +15,8 @@ MatrixRasterPlot(mat, scale.name = "scale", limits = NULL, ranges = NULL,
 certain range to their nearest value within that range (if \code{clip =
 TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
 values outside the range [1.5, 2.6) to \code{NA}, use \code{limits = c(1.5,
-2.6), clip = FALSE}.}
+2.6), clip = FALSE}. The colour range will cover all values within these
+specified limits.}
 
 \item{ranges}{A numeric vector. If you want specific ranges of values to have
 the same color, specify these ranges via an increasing numeric vector. For
@@ -31,19 +31,14 @@ are set by the \code{clip} arguments as in the \code{limits} argument.}
 
 \item{colours}{If you have set \code{ranges}, here you may specify which
 colors you wish to colour each range. It must have the same length as the
-number of intervals you have specified in \code{ranges}. It is specified as
-a character vector, with the colors specified either as the values in
-\code{\link{colors}} or as in the value of the \code{\link{rgb}} function.
-Note that this allows the use of \code{\link[grDevices]{rainbow}} and
-friends. The default uses \code{\link{topo.colors}}.}
-
-\item{cont.colours}{If ranges is not set, the colours of the pixels are
-determined on a continuous colout scale. This scale will have a "low
-colour" and a "high colour" (e.g. the default is low values in blue and
-high values in red). Again, colours can be specified either as the values
-in \code{\link{colors}} or as in the value of the \code{\link{rgb}}
-function. For example, to have low values in green and high values in
-black, use \code{cont.colours = c("green", "black")}.}
+number of intervals you have specified in \code{ranges}.  If you have not
+specified \code{ranges}, here you may specify the colours (to be passed to
+\code{\link[ggplot2]{scale_fill_gradientn}}) to create the continuous
+colour band. It is specified as a character vector, with the colors
+specified either as the values in \code{\link{colors}} or as in the value
+of the \code{\link{rgb}} function. Note that this allows the use of
+\code{\link[grDevices]{rainbow}} and friends. The default uses
+\code{\link[viridis]{viridis}}.}
 
 \item{na.colour}{Which colour should the \code{NA} pixels be? Default is
 black.}
@@ -65,6 +60,10 @@ above those limits/ranges will be set to \code{NA}.}
 FALSE}, \code{clip.low = FALSE}) will set all values falling above the
 specified limits/ranges to their nearest value within them, but all values
 falling below those limits/ranges will be set to \code{NA}.}
+
+\item{log.trans}{Do you want to log-transform the colour scaling?}
+
+\item{breaks}{Where do you want tick marks to appear on the legend colour scale?}
 
 \item{scale}{A string. The title of the color scale on the right of the plot.}
 }
@@ -92,10 +91,14 @@ if you're confused about a transposed plot, this is why.
 \examples{
 library(EBImage)
 img <- ReadImageData(system.file("extdata",
-"FKBP-mClover_before_0.5nM_AP1510.tif",
+"low_oligomers.tif",
 package = "nandb"))
 display(normalize(img[, , 1]), method = "raster")
 brightness <- Brightness(img, tau = 10, mst = "Huang")
+MatrixRasterPlot(brightness, scale.name = "brightness")
+MatrixRasterPlot(brightness, scale.name = "brightness", log.trans = TRUE)
+MatrixRasterPlot(brightness, scale.name = "brightness", log.trans = TRUE,
+breaks = 1:3)
 MatrixRasterPlot(brightness, scale.name = "brightness",
 ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, "mer"))
 }

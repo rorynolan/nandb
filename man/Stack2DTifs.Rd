@@ -6,7 +6,12 @@
 \usage{
 Stack2DTifs(file.names, out.name)
 }
+\arguments{
+\item{file.names}{The names of the files to stack (in order).}
+
+\item{out.name}{The name of the output .tif file.}
+}
 \description{
-Put individual tif files into one tif stack.
+Say you have saved what you would like to be one 3D tif stack as a series of 2D tif files. This helps you stack them into one file.
 }
 
