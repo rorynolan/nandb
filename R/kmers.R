@@ -89,10 +89,12 @@ KmersFromImage <- function(img, monomer.med, tau = NA,
 #'   are files that you don't want to process, take them out of the folder.
 #' @param out.name The name of the results csv file.
 #' @export
-KmersFromImagesFolder <- function(folder.path, tau, monomer.med,
+KmersFromImagesFolder <- function(folder.path = ".", tau = NA, monomer.med,
+                                  mst = NULL, filt = NULL,
                                   out.name = "results", ext = "\\.tif$",
                                   mcc = parallel::detectCores(), verbose = TRUE) {
   init.dir <- getwd()
+  on.exit(setwd(init.dir))
   setwd(folder.path)
   tif.names <- list.files(pattern = ext)
   kmerss <- tif.names %>% MCLapply(KmersFromImage, tau, monomer.med,
@@ -109,6 +111,69 @@ KmersFromImagesFolder <- function(folder.path, tau, monomer.med,
   results <- data.frame(ImageName = tif.names, MeanIntensity = means) %>% cbind(kmers.table)
   out.name <- filesstrings::MakeExtName(out.name, "csv")
   write_csv(results, out.name)
-  setwd(init.dir)
   invisible(results)
+}
+
+#' Get an image where each pixel represents a kmer.
+#'
+#' Based on a brightness image (array, can be more than two-dimensional), create
+#' a kmer image (array) where each pixel represents a kmer (0 for immobile, 1
+#' for monomer, 2 for dimer and so on).
+#'
+#' @param brightness.arr The brightness array.
+#' @param monomer.brightness The (median) brightness of a monomer.
+#'
+#' @return A matrix.
+#' @export
+KmerArray <- function(brightness.arr, monomer.brightness) {
+  stopifnot(monomer.brightness > 1)
+  max.b <- max(brightness.arr, na.rm = TRUE)
+  if (max.b > monomer.brightness) {
+    ranges <- c(seq(1 + 0.5 * (monomer.brightness - 1),
+                       max.b, monomer.brightness - 1),
+                max.b) %>% unique  # the unique avoids the unlikely possibility of repeating the max at the end
+    ranges.mat <- ranges %>% {cbind(dplyr::lag(.), .)[-1, ]}
+    kmer.arr <- WhichInterval(brightness.arr, ranges.mat)
+  } else {
+    kmer.arr <- brightness.arr %T>% {.[!is.na(.)] <- 0}
+  }
+  kmer.arr
+}
+
+
+#' Create kmer tiff files from brightness csvs
+#'
+#' For each brightness csv image in a folder, given a monomeric brightness,
+#' create a tiff file of the kmer positions using \code{\link{KmerMat}}.
+#'
+#' @param csv.paths The paths to the brightness csv files, defaults to
+#'   \code{list.files(pattern = "[Bb]rightness.*\\.csv")}.
+#' @param monomer.brightness The (median) brightness of a monomer.
+#' @param out.names The names you want the output files to have (will be forced
+#'   to .tif).
+#' @param na See \code{\link{WriteIntImage}}.
+#' @param mcc The number of parallel cores to use for the processing.
+#' @param verbose Do you want to print a message when the function is done?
+#'
+#' @export
+KmerTIFFsFromBrightnessCSVs <- function(monomer.brightness,
+                                        csv.paths = NULL, out.names = NULL,
+                                        na = "saturate",
+                                        mcc = parallel::detectCores(),
+                                        verbose = TRUE) {
+  if (is.null(csv.paths)) csv.paths <- list.files(pattern = "[Bb]rightness.*\\.csv")
+  if (is.null(out.names)) {
+    out.names <- stringr::str_replace(csv.paths, "[Bb]rightness", "kmers")
+  } else {
+    if (length(out.names) != length(csv.paths)) {
+      stop("The number of input files and output names is not equal.")
+    }
+  }
+  out.names <- sapply(out.names, filesstrings::MakeExtName,
+                      "tif", replace = TRUE)
+  brightnesses <- MCLapply(csv.paths, ReadImageTxt, mcc = mcc)
+  kmer.mats <- MCLapply(brightnesses, KmerMat, monomer.brightness, mcc = mcc)
+  MCMapply(WriteIntImage, kmer.mats, out.names, na = na, mcc = mcc) %>%
+    invisible
+  if (verbose) print("Done. Please check folder.")
 }

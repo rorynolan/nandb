@@ -96,9 +96,16 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
   df <- reshape2::melt(mat) %>%
     dplyr::transmute(x = Var1, y = 1 + max(Var2) - Var2, value = value)
   if (!is.null(ranges)) {
+    nr <- length(ranges - 1)
     if (is.null(colours)) {
-      colours <- viridis::viridis(length(ranges) - 1)
-    } else if (length(colours) != length(ranges) - 1) {
+      if (log.trans) {
+        min.log.sep <- log(nr) - log(nr - 1)
+        nums <- round((1 + log(seq_along(ranges))) / min.log.sep)
+        colours <- viridis::viridis(max(nums))[nums]
+      } else {
+        colours <- viridis::viridis(nr)
+      }
+    } else if (length(colours) != nr) {
       stop("The number of colours must match the number of ranges")
     }
     ranges <- ranges %>% {cbind(.[-length(.)], .[-1])}  # adjacent pairs
@@ -172,6 +179,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
 #'
 #' @param brightness.mat The brightness matrix.
 #' @param monomer.brightness The (median) brightness of a monomer.
+#' @param log.trans Do you want to log-transform the colour scaling?
 #'
 #' @examples
 #' library(EBImage)
@@ -183,7 +191,8 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
 #' KmerPlot(brightness, 1.16)
 #'
 #' @export
-KmerPlot <- function(brightness.mat, monomer.brightness) {
+KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
+  stopifnot(is.matrix(brightness.mat))
   stopifnot(monomer.brightness > 1)
   max.b <- max(brightness.mat, na.rm = TRUE)
   if (max.b > monomer.brightness) {
@@ -192,14 +201,21 @@ KmerPlot <- function(brightness.mat, monomer.brightness) {
                 max.b) %>% unique  # the unique avoids the unlikely possibility of repeating the max at the end
     lrm2 <- length(ranges) - 2  # LengthofRangesMinus2
     range.names <- c("Immobile", paste0(seq_len(lrm2), "mers"))
-    colours <- c("slategray4", viridis::viridis(lrm2))
+    if (log.trans) {
+      min.log.sep <- log(lrm2) - log(lrm2 - 1)
+      nums <- round((1 + log(seq_len(lrm2))) / min.log.sep)
+      colours <- c("slategray4", viridis::viridis(max(nums))[nums])
+    } else {
+      colours <- c("slategray4", viridis::viridis(lrm2))
+    }
   } else {
     ranges <- c(0, max.b)
     range.names <- "Immobile"
     colours = "slategray4"
   }
   MatrixRasterPlot(brightness.mat, scale.name = "Brightness", ranges = ranges,
-                   range.names = range.names, colours = colours)
+                   range.names = range.names, colours = colours,
+                   log.trans = log.trans)
 }
 
 #' Make brightness plots (images) for an entire folder.

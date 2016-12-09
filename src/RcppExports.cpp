@@ -90,3 +90,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// WhichIntervalC
+IntegerVector WhichIntervalC(NumericVector numbers, NumericMatrix ranges);
+RcppExport SEXP nandb_WhichIntervalC(SEXP numbersSEXP, SEXP rangesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type numbers(numbersSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type ranges(rangesSEXP);
+    rcpp_result_gen = Rcpp::wrap(WhichIntervalC(numbers, ranges));
+    return rcpp_result_gen;
+END_RCPP
+}

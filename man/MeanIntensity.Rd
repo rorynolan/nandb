@@ -2,9 +2,13 @@
 % Please edit documentation in R/Intensity.R
 \name{MeanIntensity}
 \alias{MeanIntensity}
+\alias{MeanIntensityTxtFolder}
 \title{Calculate mean intensity from image series.}
 \usage{
 MeanIntensity(mat3d, mst = NULL, filt = NULL, verbose = TRUE)
+
+MeanIntensityTxtFolder(folder.path = ".", tau = NA, mst = NULL,
+  ext = "\\\\.tif$", mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -24,6 +28,16 @@ resulting image using \code{\link{MedianFilterB}} or
 the user that that file is now being processed (useful for
 \code{MeanIntensityTxtFolder}, does not work with multiple cores) and to
 tell when \code{MeanIntensityTxtFolder} is done.}
+
+\item{folder.path}{The path (relative or absolute) to the folder you wish to
+process.}
+
+\item{ext}{the file extension of the images in the folder that you wish to
+process (can be rooted in regular expression for extra-safety, as in the
+default). You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder.}
+
+\item{mcc}{The number of parallel cores to use for the processing.}
 }
 \value{
 \code{Brightness} returns a matrix, the brightness image. The result

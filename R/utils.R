@@ -19,14 +19,13 @@ Slices <- function(slices, mat3d) {
   if (!all(slices %in% seq_len(d[3]))) stop("slices out of range of slices of mat3d")
   mat3d[, , slices]
 }
-WhichInterval <- function(number, interval.mat) {
+WhichInterval <- function(numbers, interval.mat) {
   # interval.mat is a two-column matrix where the rows are increasing, non-intersecting, half-open (open at the right) intervals on the real line
   tim <- t(interval.mat)  # transposed interval matrix
   if (!all(tim[-length(tim)] <= tim[-1]) && all(interval.mat[, 1] < interval.mat[, 2])) {
     stop("interval.mat must be a two-column matrix where the rows are increasing, non-intersecting, half-open intervals on the real line")
   }
-  interval <- (number >= interval.mat[, 1] & number <= interval.mat[, 2]) %>%
-    match(T, .)
+  WhichIntervalC(numbers, interval.mat)
 }
 AllEqual <- function(a, b = NA, allow = T, cn = F) {
   if (is.na(b[1])) {

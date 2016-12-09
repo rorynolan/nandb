@@ -5,7 +5,7 @@
 \title{Make brightness plots (images) for an entire folder.}
 \usage{
 BrightnessPlotFolder(folder.path = ".", patt = "[Bb]rightness.*\\\\.csv$",
-  ...)
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
@@ -15,11 +15,13 @@ process.}
 folder that are brightness images. The default matches any .csv files which
 contains "Brightness" or "brightness" in its name.}
 
+\item{verbose}{Get a real time report on progress?}
+
 \item{...}{Parameters to pass to \code{\link{MatrixrasterPlot}} (these
 \emph{must} be named arguments).}
 }
 \description{
 This requires that the folder already have the brightnesses saved as csv
-files.
+files. Output images are saved as pdf.
 }
 

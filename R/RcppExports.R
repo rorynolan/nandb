@@ -6,6 +6,8 @@
 #' This function assumes that the observations are evenly spaced and separated
 #' by 1 time unit (so choose your \code{tau} based on that).
 #'
+#' This is two-sided exponential smoothing.
+#'
 #' @param obs A numeric vector of observations (in order).
 #' @param tau The time scale for the exponential smoothing (see Stroud 1999).
 #'
@@ -105,5 +107,9 @@ MedianFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
 #' @export
 SmoothFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
     .Call('nandb_SmoothFilterB', PACKAGE = 'nandb', mat, size, na_rm, na_count)
+}
+
+WhichIntervalC <- function(numbers, ranges) {
+    .Call('nandb_WhichIntervalC', PACKAGE = 'nandb', numbers, ranges)
 }
 

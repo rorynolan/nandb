@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Molucular Number and Brightness Calculations
-Version: 0.0.0.9011
+Version: 0.0.0.9012
 Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", role = c("aut", "cre"))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
 Description: This package is gives functions for calculation of molecular number and brightness from images, as detailed in Digman et al. 2008.
@@ -20,7 +20,8 @@ Imports:
     autothresholdr,
     assertthat,
     abind,
-    viridis
+    viridis,
+    dplyr
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown

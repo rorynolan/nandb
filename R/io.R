@@ -51,20 +51,20 @@ ReadImageData <- function(image.name,
 #'
 #' If (as with brightness) you wish for the pixel values in an image to be
 #' represented by real numbers that aren't necessarily integers, the tiff format
-#' won't work. As a workaround we represent images (arrays) as comma-separated value
-#' (csv) files on disk, where for image stacks (3-dimensional arrays), we write one file
-#' for each slice, numbering it with the slice number.
+#' won't work. As a workaround we represent images (arrays) as comma-separated
+#' value (csv) files on disk, where for image stacks (3-dimensional arrays), we
+#' write one file for each slice, numbering it with the slice number.
 #'
-#' These functions do not work for 4-dimensional arrays (e.g. a z stack with
-#' several channels). The image slices are transposed prior to being written to
-#' disk to ensure that displaying an image with \code{\link[EBImage]{display}}
-#' in R will yield the same result (as opposed to a transposed image) as
-#' displaying the written text file in ImageJ (i.e. I've made a modification to
-#' ensure the files display correctly in ImageJ).
+#' The image slices are transposed prior to being written to disk to ensure that
+#' displaying an image with \code{\link[EBImage]{display}} in R will yield the
+#' same result (as opposed to a transposed image) as displaying the written text
+#' file in ImageJ (i.e. I've made a modification to ensure the files display
+#' correctly in ImageJ). These functions do not work for 4-dimensional arrays
+#' (e.g. a z stack with several channels).
 #'
 #' @param img.arr An image, represented by a 2- or 3-dimensional array.
-#' @param file.name The name of the input/output output file(s),
-#'   \emph{without} a file extension.
+#' @param file.name The name of the input/output output file(s), \emph{without}
+#'   a file extension.
 #'
 #' @export
 WriteImageTxt <- function(img.arr, file.name) {
@@ -82,7 +82,7 @@ WriteImageTxt <- function(img.arr, file.name) {
     img.arr <- aperm(img.arr, c(2, 1, 3))
     slices.dfs <- lapply(seq_len(d[3]), Slices, img.arr) %>%
       lapply(as.data.frame)
-    file.names <- paste0(file.name, seq_len(d[3])) %>%
+    file.names <- paste0(file.name, "_", seq_len(d[3])) %>%
       sapply(filesstrings::MakeExtName, "csv") %>%
       (filesstrings::NiceNums)
     mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE)
@@ -93,7 +93,52 @@ WriteImageTxt <- function(img.arr, file.name) {
 #' @export
 ReadImageTxt <- function(file.name) {
   suppressMessages(readr::read_csv(file.name, col_names = FALSE, progress = FALSE)) %>%
-    as.matrix %>% magrittr::set_colnames(value = NULL)
+    data.matrix %>% magrittr::set_colnames(value = NULL) %>% t
+}
+
+#' Write an integer array to disk as a tiff image.
+#'
+#' \link[EBImage]{EBImage}'s \code{\link[EBImage]{writeImage}} truncates all
+#' values above 1 to 1 and all below 0 to 0 when writing images. This function
+#' allows you to write integer-vlued arrays to disk as tiff files as you would
+#' want.
+#'
+#' @param img.arr An integer array.
+#' @param file.name The name of the tif file (with or without the .tif) that you
+#'   wish to write.
+#' @param na How do you want to treat \code{NA} values? R can only write integer
+#'   values (and hence not \code{NA}s) to tiff pixels. \code{na = "saturate"}
+#'   sets them to saturated value. \code{na = "zero"} sets them to zero, while
+#'   \code{na = "error"} will give an error if th image contains \code{NA}s.
+WriteIntImage <- function(img.arr, file.name, na = "error") {
+  if (!all(CanBeInteger(img.arr), na.rm = TRUE)) {
+    stop("img.arr must contain only integers")
+  }
+  if (!all(img.arr >= 0, na.rm = TRUE)) {
+    stop("img.arr must not contain negative values")
+  }
+  na <- RSAGA::match.arg.ext(na, c("saturate", "zero", "error"),
+                             ignore.case = TRUE)
+  any.nas <- anyNA(img.arr)
+  if (na == "error" && any.nas) stop("img.arr contains NA values.")
+  mx <- max(img.arr, na.rm = TRUE)
+  if (mx >= 2^32) {
+    stop("The maximum value in img.arr must be less than 2^32")
+  } else if (mx >= 2^16) {
+    bits.per.sample <- 32
+  } else if (mx >= 2^8) {
+    bits.per.sample <- 16
+  } else {
+    bits.per.sample <- 8
+  }
+  img.arr <- img.arr / (2 ^ bits.per.sample - 1)
+  if (any.nas) {
+    if (na == "saturate") img.arr[is.na(img.arr)] <- 1
+    if (na == "zero") img.arr[is.na(img.arr)] <- 0
+  }
+  file.name <- filesstrings::MakeExtName(file.name, "tif")
+  EBImage::writeImage(img.arr, file.name,
+                      bits.per.sample = bits.per.sample)
 }
 
 #' Fix an image that didn't recognise channels while reading
@@ -157,3 +202,4 @@ Stack2DTifs <- function(file.names, out.name) {
   stacked <- Reduce(function(x, y) abind::abind(x, y, along = 3), images)
   EBImage::writeImage(stacked, out.name)
 }
+

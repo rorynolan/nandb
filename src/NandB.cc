@@ -10,6 +10,8 @@ using namespace Rcpp;
 //' This function assumes that the observations are evenly spaced and separated
 //' by 1 time unit (so choose your \code{tau} based on that).
 //'
+//' This is two-sided exponential smoothing.
+//'
 //' @param obs A numeric vector of observations (in order).
 //' @param tau The time scale for the exponential smoothing (see Stroud 1999).
 //'
@@ -20,19 +22,29 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector ExpSmooth(NumericVector obs, double tau) {
   int n = obs.size();
-  NumericVector weights0(n);
-  for (int i = 0; i < n; i++) {
-    weights0[i] = exp(- i / tau);
-  }
   NumericVector weights(n);
-  NumericVector new_obs(n);
   for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      weights[j] = weights0[abs(i - j)];
-    }
-    new_obs[i] = sum(weights * obs) / sum(weights);
+    weights[i] = exp(- i / tau);
   }
-  return new_obs;
+  NumericVector smoothed(n);
+  NumericVector smoothed_left_right(2);
+  NumericVector weights_left_right(2);
+  for (int i = 0; i < n; i++) {
+    std::fill(smoothed_left_right.begin(), smoothed_left_right.end(), 0);
+    std::fill(weights_left_right.begin(), weights_left_right.end(), 0);
+    for (int j = 0; j <= i; j++) {
+      smoothed_left_right[0] += weights[j] * obs[i - j];
+      weights_left_right[0] += weights[j];
+    }
+    smoothed_left_right[0] /= weights_left_right[0];
+    for (int j = i; j < n; j++) {
+      smoothed_left_right[1] += weights[j - i] * obs[j];
+      weights_left_right[1] += weights[j - i];
+    }
+    smoothed_left_right[1] /= weights_left_right[1];
+    smoothed[i] = mean(smoothed_left_right);
+  }
+  return smoothed;
 }
 
 //' Exponentially smooth pillars of a 3-dimensional array
@@ -282,3 +294,18 @@ NumericMatrix SmoothFilterB(NumericMatrix mat, int size = 1,
   return smoothed;
 }
 
+// [[Rcpp::export]]
+IntegerVector WhichIntervalC(NumericVector numbers, NumericMatrix ranges) {
+  int nn = numbers.size();
+  IntegerVector interval(nn);
+  for (int i = 0; i < nn; i++) {
+    for (int j = 0; j < ranges.nrow(); j++) {
+      if (numbers[i] > ranges(j, 0) && numbers[i] <= ranges(j, 1)) {
+        interval[i] = j + 1;
+        break;
+      }
+    }
+  }
+  interval.attr("dim") = numbers.attr("dim");
+  return(interval);
+}

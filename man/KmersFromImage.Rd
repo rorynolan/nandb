@@ -8,8 +8,9 @@
 KmersFromImage(img, monomer.med, tau = NA, med.filter = TRUE,
   verbose = TRUE)
 
-KmersFromImagesFolder(folder.path, tau, monomer.med, out.name = "results",
-  ext = "\\\\.tif$", mcc = parallel::detectCores(), verbose = TRUE)
+KmersFromImagesFolder(folder.path = ".", tau = NA, monomer.med,
+  mst = NULL, filt = NULL, out.name = "results", ext = "\\\\.tif$",
+  mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{
 \item{img}{A 3-dimensional array that one would might input to

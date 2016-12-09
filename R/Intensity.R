@@ -60,7 +60,7 @@ MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, verbose = TRUE) {
   mean.intensity
 }
 
-#' @rdname Brightness
+#' @rdname MeanIntensity
 #'
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
@@ -68,6 +68,7 @@ MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, verbose = TRUE) {
 #'   process (can be rooted in regular expression for extra-safety, as in the
 #'   default). You must wish to process all files with this extension; if there
 #'   are files that you don't want to process, take them out of the folder.
+#' @param mcc The number of parallel cores to use for the processing.
 #'
 #' @export
 MeanIntensityTxtFolder <- function(folder.path = ".", tau = NA,

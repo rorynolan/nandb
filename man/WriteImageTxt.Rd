@@ -12,22 +12,22 @@ ReadImageTxt(file.name)
 \arguments{
 \item{img.arr}{An image, represented by a 2- or 3-dimensional array.}
 
-\item{file.name}{The name of the input/output output file(s),
-\emph{without} a file extension.}
+\item{file.name}{The name of the input/output output file(s), \emph{without}
+a file extension.}
 }
 \description{
 If (as with brightness) you wish for the pixel values in an image to be
 represented by real numbers that aren't necessarily integers, the tiff format
-won't work. As a workaround we represent images (arrays) as comma-separated value
-(csv) files on disk, where for image stacks (3-dimensional arrays), we write one file
-for each slice, numbering it with the slice number.
+won't work. As a workaround we represent images (arrays) as comma-separated
+value (csv) files on disk, where for image stacks (3-dimensional arrays), we
+write one file for each slice, numbering it with the slice number.
 }
 \details{
-These functions do not work for 4-dimensional arrays (e.g. a z stack with
-several channels). The image slices are transposed prior to being written to
-disk to ensure that displaying an image with \code{\link[EBImage]{display}}
-in R will yield the same result (as opposed to a transposed image) as
-displaying the written text file in ImageJ (i.e. I've made a modification to
-ensure the files display correctly in ImageJ).
+The image slices are transposed prior to being written to disk to ensure that
+displaying an image with \code{\link[EBImage]{display}} in R will yield the
+same result (as opposed to a transposed image) as displaying the written text
+file in ImageJ (i.e. I've made a modification to ensure the files display
+correctly in ImageJ). These functions do not work for 4-dimensional arrays
+(e.g. a z stack with several channels).
 }
 

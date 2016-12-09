@@ -4,12 +4,14 @@
 \alias{KmerPlot}
 \title{A brightness image with a different colour for each kmer.}
 \usage{
-KmerPlot(brightness.mat, monomer.brightness)
+KmerPlot(brightness.mat, monomer.brightness, log.trans = FALSE)
 }
 \arguments{
 \item{brightness.mat}{The brightness matrix.}
 
 \item{monomer.brightness}{The (median) brightness of a monomer.}
+
+\item{log.trans}{Do you want to log-transform the colour scaling?}
 }
 \description{
 Make a colour image based on a brightness image where each kmer has its own

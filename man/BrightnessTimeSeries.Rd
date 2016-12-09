@@ -4,7 +4,8 @@
 \alias{BrightnessTimeSeries}
 \title{Create a Brightness time-series.}
 \usage{
-BrightnessTimeSeries(mat3d, frames.per.set, pbt = NULL, tau = NA)
+BrightnessTimeSeries(mat3d, frames.per.set, tau = NA, mst = NULL,
+  filt = NULL, verbose = FALSE)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -15,13 +16,31 @@ that has not yet been read in, set this argument to the path to that file
 \item{frames.per.set}{The number of frames with which to calculate the
 successive brightnesses.}
 
-\item{tau}{The time constant for the exponential filtering.}
+\item{tau}{If this is specified, bleaching correction is performed with
+]code{\link{CorrectForBleaching}} which uses exponential filtering with
+time constant \code{tau} (where the unit of time is the time between
+frames).}
+
+\item{mst}{Do you want to apply an intensity threshold prior to calculating
+brightness (via \code{\link{MedStackThresh}})? If so, set your thresholding
+\emph{method} here.}
+
+\item{filt}{Do you want to median/smooth filter (with a radius of 1) the
+brightness image using \code{\link{MedianFilterB}} or
+\code{\link{SmoothFilterB}}? If \code{filt = "median"},
+\code{\link{MedianFilterB}} is invoked with the option \code{na_count =
+TRUE}.}
+
+\item{verbose}{If mat3d is specified as a file name, print a message to tell
+the user that that file is now being processed (useful for
+\code{BrightnessFolder}, does not work with multiple cores) and to tell
+when \code{MeanIntensityTxtFolder} is done.}
 }
 \value{
 An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
 }
 \description{
-Given a stack of images, use the first \code{frames.per.set} of them to
+Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of them to
 create one brightness image, the next \code{frames.per.set} of them to create
 the next brightness image and so on to get a time-series of brightness
 images. If \code{tau} is specified, bleaching correction is performed via

@@ -12,7 +12,10 @@ slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
 
-\item{tau}{The time constant for the exponential filtering.}
+\item{tau}{If this is specified, bleaching correction is performed with
+]code{\link{CorrectForBleaching}} which uses exponential filtering with
+time constant \code{tau} (where the unit of time is the time between
+frames).}
 }
 \value{
 The detrended image series.

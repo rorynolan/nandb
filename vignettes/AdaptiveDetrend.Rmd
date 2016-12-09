@@ -1,0 +1,57 @@
+---
+title: "Adaptive Detrending"
+author: "Rory Nolan"
+date: "8 December 2016"
+output: pdf_document
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+```
+
+Load the packages:
+```{r, message=FALSE}
+required.pkgs <- c("nandb", "EBImage", "tidyverse")
+invisible(lapply(required.pkgs, library, character.only = TRUE))
+```
+
+## Time-Series of Images with Bleaching
+
+Let's start with an example.
+
+```{r Read and display image}
+eg.img <- system.file("extdata", "500.tif", package = "nandb") %>% 
+  ReadImageData
+display(normalize(eg.img[, , 1]), method = "raster")
+```
+
+Due to bleaching, the means of the images in the series decrease over time:
+```{r}
+means <- apply(eg.img, 3, mean)
+plot(means, ylim = c(12, 15), xlab = "frame", ylab = "mean")
+```
+
+Indeed we see some gentle bleaching here. This bleaching (if we don't correct for it) will increase the variance $\sigma^2$ in the intensity of a given pixel, and decrease the mean $\mu$ thereof; therefore it will (artificially) increase the calculated brightness $B = \frac{\sigma^2}{\mu}$. Digman et al. (2008) make the reasonable assumption that only immobile particles bleach (i.e. mobile particles move out of the illumination plane so quickly as to bleach negligibly compared to those that remain therein); we'll keep that assumption here. 
+
+## Choosing the $\tau$ for the Bleaching Correction
+
+Now I'll present three facts that might take a bit of time to get your head around:
+
+1. Given that the bleaching is totally down to immobile particles, if we remove the contribution of mobile particles to the image, the amount of *bleaching* will not change.
+
+2. If the contribution of mobile particles is removed, only immobile particles remain, so wherever there are particles, they are immobile and should (without the effect of bleaching) give brightness values of (on average) 1. 
+
+3. Adding more immobile contribution to a pixel where the only contribution is immobile will increase the intensity, but the brightness will remain at (on average) 1.
+
+Hence, if we simulate images with the same means as the experimental images, but having immobile particles replace the mobile ones (i.e. the simulated images are made using only immobile simulated particles), then we have the same amount of bleaching (measured by the change in the image means as in the plot above) but we have the added information that---after correcting for bleaching---the brightnesses of the pixels of this image series should have an average of 1. This is crucial information that we get from replacing mobile particles with immobile ones; before doing this, there was a mix of mobile and immobile and all we knew was that the average brightness should be some value greater than 1. 
+
+For the simulated series, given that we know that aside from bleaching, it should have mean brightness 1, the choice of $\tau$ for the exponential filtering detrend should be the one which corrects this image series such that it has mean brightness 1.
+
+## How to Simulate the Images
+
+You wish to simulate $n$ frames of $p$ pixels. What is $p$? Say the the original images have $P$ pixels (e.g. $256 \times 256 = 65536$). If you threshold them, you exculde some pixels and are left with $p$ pixels where $p < P$ (the other pixels are set to \texttt{NA} by the thresholding). If you are not thresholding, then $p=P$. 
+
+The various pixels of the image may have different amounts of immobile and mobile particles in them, and hence, when we replace the mobile particles with immobile, the pixels still won't necessarily have the *same* amount of immobile particles contributing to their intensity (and hence not the same expected intensity at each pixel). However, since we only intend to correct for bleaching on a whole-image scale ^[By *whole-image scale* I mean applying the same exponential filtering routine (same $\tau$) to each pixel in the series of frames, rather than having a different $\tau$ for each pixel (this may not be a terrible idea but would risk artificial introduction of spatial variation, since it would allow the use of vastly different detrending regimes in neighbouring pixels)], we are only really interested in the *average* (averaged across the whole image) bleaching of the image series over time. 
+
+
