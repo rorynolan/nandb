@@ -6,8 +6,6 @@
 #' This function assumes that the observations are evenly spaced and separated
 #' by 1 time unit (so choose your \code{tau} based on that).
 #'
-#' This is two-sided exponential smoothing.
-#'
 #' @param obs A numeric vector of observations (in order).
 #' @param tau The time scale for the exponential smoothing (see Stroud 1999).
 #'
@@ -22,12 +20,17 @@ ExpSmooth <- function(obs, tau) {
 #' Exponentially smooth pillars of a 3-dimensional array
 #'
 #' For a 3-dimensional array \code{mat3d}, pillar \code{i,j} is defined as
-#' \code{mat3d[i, j, ]}. This function performs \link{ExpSmooth} on each pillar.
+#' \code{mat3d[i, j, ]}. \code{ExpSmoothPillars} function performs
+#' \link{ExpSmooth} on each pillar. \code{ExpSmoothRows} performs
+#' \link{ExpSmooth} on each row of a matrix.
 #'
-#'
+#' @param mat3d A 3-dimensional array.
+#' @param mat A matrix.
 #' @param tau The time scale for the exponential smoothing (see Stroud 1999).
 #'
-#' @return A 3-dimensional array where each pillar has been smoothed.
+#' @return For \code{ExpSmoothPillars}, a 3-dimensional array where each
+#' pillar has been smoothed. For \code{ExpSmoothRows}, a matrix where each
+#' row has been smoothed.
 #'
 #' @examples
 #' m3 <- array(1:12, dim = c(2, 2, 3))
@@ -35,6 +38,12 @@ ExpSmooth <- function(obs, tau) {
 #' @export
 ExpSmoothPillars <- function(mat3d, tau) {
     .Call('nandb_ExpSmoothPillars', PACKAGE = 'nandb', mat3d, tau)
+}
+
+#' @rdname ExpSmoothPillars
+#' @export
+ExpSmoothRows <- function(mat, tau) {
+    .Call('nandb_ExpSmoothRows', PACKAGE = 'nandb', mat, tau)
 }
 
 #' Get the means/medians/variances of pillars of a 3d array

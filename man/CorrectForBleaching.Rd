@@ -13,7 +13,7 @@ that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{tau}{If this is specified, bleaching correction is performed with
-]code{\link{CorrectForBleaching}} which uses exponential filtering with
+\code{\link{CorrectForBleaching}} which uses exponential filtering with
 time constant \code{tau} (where the unit of time is the time between
 frames).}
 }

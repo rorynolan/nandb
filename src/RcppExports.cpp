@@ -29,6 +29,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ExpSmoothRows
+NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau);
+RcppExport SEXP nandb_ExpSmoothRows(SEXP matSEXP, SEXP tauSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmoothRows(mat, tau));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MeanPillars
 NumericMatrix MeanPillars(NumericVector mat3d);
 RcppExport SEXP nandb_MeanPillars(SEXP mat3dSEXP) {

@@ -5,7 +5,7 @@
 \title{Create a Brightness time-series.}
 \usage{
 BrightnessTimeSeries(mat3d, frames.per.set, tau = NA, mst = NULL,
-  filt = NULL, verbose = FALSE)
+  skip.consts = FALSE, filt = NULL, verbose = FALSE)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -17,7 +17,7 @@ that has not yet been read in, set this argument to the path to that file
 successive brightnesses.}
 
 \item{tau}{If this is specified, bleaching correction is performed with
-]code{\link{CorrectForBleaching}} which uses exponential filtering with
+\code{\link{CorrectForBleaching}} which uses exponential filtering with
 time constant \code{tau} (where the unit of time is the time between
 frames).}
 
@@ -25,11 +25,19 @@ frames).}
 brightness (via \code{\link{MedStackThresh}})? If so, set your thresholding
 \emph{method} here.}
 
-\item{filt}{Do you want to median/smooth filter (with a radius of 1) the
-brightness image using \code{\link{MedianFilterB}} or
-\code{\link{SmoothFilterB}}? If \code{filt = "median"},
-\code{\link{MedianFilterB}} is invoked with the option \code{na_count =
-TRUE}.}
+\item{skip.consts}{An image array with only one value (a "constant array")
+won't threshold properly. By default the function would give an error, but
+by setting this parameter to \code{TRUE}, the array would instead be
+skipped (the function will return the original array) and give a warning.}
+
+\item{filt}{Do you want to smooth (\code{filt = "smooth"}) or median
+(\code{filt = "median"}) filter the brightness image using
+\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+selected, these are invoked here with a filter radius of 1 and with the
+option \code{na_count = TRUE}. If you want to smooth/median filter
+the brightness image in a different way, first calculate the brightnesses
+without filtering (\code{filt = NULL}) using this function and then perform
+your desired filtering routine on the result.}
 
 \item{verbose}{If mat3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for

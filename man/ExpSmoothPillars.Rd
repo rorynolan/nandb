@@ -2,19 +2,30 @@
 % Please edit documentation in R/RcppExports.R
 \name{ExpSmoothPillars}
 \alias{ExpSmoothPillars}
+\alias{ExpSmoothRows}
 \title{Exponentially smooth pillars of a 3-dimensional array}
 \usage{
 ExpSmoothPillars(mat3d, tau)
+
+ExpSmoothRows(mat, tau)
 }
 \arguments{
+\item{mat3d}{A 3-dimensional array.}
+
 \item{tau}{The time scale for the exponential smoothing (see Stroud 1999).}
+
+\item{mat}{A matrix.}
 }
 \value{
-A 3-dimensional array where each pillar has been smoothed.
+For \code{ExpSmoothPillars}, a 3-dimensional array where each
+pillar has been smoothed. For \code{ExpSmoothRows}, a matrix where each
+row has been smoothed.
 }
 \description{
 For a 3-dimensional array \code{mat3d}, pillar \code{i,j} is defined as
-\code{mat3d[i, j, ]}. This function performs \link{ExpSmooth} on each pillar.
+\code{mat3d[i, j, ]}. \code{ExpSmoothPillars} function performs
+\link{ExpSmooth} on each pillar. \code{ExpSmoothRows} performs
+\link{ExpSmooth} on each row of a matrix.
 }
 \examples{
 m3 <- array(1:12, dim = c(2, 2, 3))

@@ -96,11 +96,12 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
   df <- reshape2::melt(mat) %>%
     dplyr::transmute(x = Var1, y = 1 + max(Var2) - Var2, value = value)
   if (!is.null(ranges)) {
-    nr <- length(ranges - 1)
+    nr <- length(ranges) - 1
     if (is.null(colours)) {
       if (log.trans) {
         min.log.sep <- log(nr) - log(nr - 1)
-        nums <- round((1 + log(seq_along(ranges))) / min.log.sep)
+        nums <- round((1 + log(seq_along(ranges))) / min.log.sep) %>%
+          {.[-length(.)]}
         colours <- viridis::viridis(max(nums))[nums]
       } else {
         colours <- viridis::viridis(nr)
@@ -124,16 +125,16 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
     ggplot2::ggplot(df, ggplot2::aes(x, y, fill = colour)) +
       ggplot2::scale_fill_manual(scale.name,
                                  values = colours %T>% {
-                                   names(.) = as.character(seq_along(colours))
+                                   names(.) <- as.character(seq_along(colours))
                                  },
                                  na.value = na.colour,
                                  labels = range.names %T>% {
-                                   names(.) = as.character(seq_along(colours))
+                                   names(.) <- as.character(seq_along(colours))
                                  }) +
       ggplot2::geom_raster() +
       plain.theme + coord_fixed()
   } else {
-    if (is.null(limits)) limits <- range(df$value)
+    if (is.null(limits)) limits <- range(df$value, na.rm = TRUE)
     if (is.null(colours)) colours <- viridis::viridis(9)
     if (clip) {
       clip.low <- TRUE

@@ -18,9 +18,6 @@ The smoothed series, a numeric vector of the same length.
 This function assumes that the observations are evenly spaced and separated
 by 1 time unit (so choose your \code{tau} based on that).
 }
-\details{
-This is two-sided exponential smoothing.
-}
 \examples{
 ExpSmooth(1:10, 1)
 }
