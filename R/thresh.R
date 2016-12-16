@@ -21,7 +21,7 @@
 #'   (the function will return the original array) and give a warning.
 #'
 #' @return The thresholded stack, pillars not exceeding the threshold are set to
-#'   zero.
+#'   zero. The attribute "threshold" gives the value used for thresholding.
 #'
 #' @examples
 #' library(EBImage)
@@ -46,6 +46,7 @@ MedStackThresh <- function(mat3d, method, fail = NA, skip.consts = FALSE) {
   med.stack.mask <- med.stack > thresh
   set.indices <- rep(!as.vector(med.stack.mask), dim(mat3d)[3])
   mat3d[set.indices] <- fail
+  attr(mat3d, "threshold") <- thresh
   mat3d
 }
 

@@ -46,40 +46,6 @@ ExpSmoothRows <- function(mat, tau) {
     .Call('nandb_ExpSmoothRows', PACKAGE = 'nandb', mat, tau)
 }
 
-#' Get the means/medians/variances of pillars of a 3d array
-#'
-#' For a 3-dimensional array \code{mat3d}, pillar \code{ij} is defined as
-#' \code{mat3d[i, j, ]}. These functions compute the mean, median and variance of each
-#' pillar.
-#'
-#' @param mat3d A 3-dimensional array.
-#'
-#' @return A matrix where element \code{i,j} is equal to \code{mean(mat3d[i, j, ])},
-#' \code{median(mat3d[i, j, ])}, or \code{var(mat3d[i, j, ])}.
-#'
-#' @examples
-#' m3 <- array(1:16, dim = c(2, 2, 4))
-#' MeanPillars(m3)
-#' MedianPillars(m3)
-#' VarPillars(m3)
-#'
-#' @export
-MeanPillars <- function(mat3d) {
-    .Call('nandb_MeanPillars', PACKAGE = 'nandb', mat3d)
-}
-
-#' @rdname MeanPillars
-#' @export
-VarPillars <- function(mat3d) {
-    .Call('nandb_VarPillars', PACKAGE = 'nandb', mat3d)
-}
-
-#' @rdname MeanPillars
-#' @export
-MedianPillars <- function(mat3d) {
-    .Call('nandb_MedianPillars', PACKAGE = 'nandb', mat3d)
-}
-
 #' Smooth and median filters with options for handling NAs.
 #'
 #' These is an alternative to \link[EBImage]{EBImage}'s
@@ -116,6 +82,44 @@ MedianFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
 #' @export
 SmoothFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
     .Call('nandb_SmoothFilterB', PACKAGE = 'nandb', mat, size, na_rm, na_count)
+}
+
+MostConsecutiveLEs <- function(x, thresh) {
+    .Call('nandb_MostConsecutiveLEs', PACKAGE = 'nandb', x, thresh)
+}
+
+#' Get the means/medians/variances of pillars of a 3d array
+#'
+#' For a 3-dimensional array \code{mat3d}, pillar \code{ij} is defined as
+#' \code{mat3d[i, j, ]}. These functions compute the mean, median and variance of each
+#' pillar.
+#'
+#' @param mat3d A 3-dimensional array.
+#'
+#' @return A matrix where element \code{i,j} is equal to \code{mean(mat3d[i, j, ])},
+#' \code{median(mat3d[i, j, ])}, or \code{var(mat3d[i, j, ])}.
+#'
+#' @examples
+#' m3 <- array(1:16, dim = c(2, 2, 4))
+#' MeanPillars(m3)
+#' MedianPillars(m3)
+#' VarPillars(m3)
+#'
+#' @export
+MeanPillars <- function(mat3d) {
+    .Call('nandb_MeanPillars', PACKAGE = 'nandb', mat3d)
+}
+
+#' @rdname MeanPillars
+#' @export
+VarPillars <- function(mat3d) {
+    .Call('nandb_VarPillars', PACKAGE = 'nandb', mat3d)
+}
+
+#' @rdname MeanPillars
+#' @export
+MedianPillars <- function(mat3d) {
+    .Call('nandb_MedianPillars', PACKAGE = 'nandb', mat3d)
 }
 
 WhichIntervalC <- function(numbers, ranges) {

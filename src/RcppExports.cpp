@@ -41,6 +41,46 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// MedianFilterB
+NumericMatrix MedianFilterB(NumericMatrix mat, int size, bool na_rm, bool na_count);
+RcppExport SEXP nandb_MedianFilterB(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_rm(na_rmSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_count(na_countSEXP);
+    rcpp_result_gen = Rcpp::wrap(MedianFilterB(mat, size, na_rm, na_count));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SmoothFilterB
+NumericMatrix SmoothFilterB(NumericMatrix mat, int size, bool na_rm, bool na_count);
+RcppExport SEXP nandb_SmoothFilterB(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_rm(na_rmSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_count(na_countSEXP);
+    rcpp_result_gen = Rcpp::wrap(SmoothFilterB(mat, size, na_rm, na_count));
+    return rcpp_result_gen;
+END_RCPP
+}
+// MostConsecutiveLEs
+int MostConsecutiveLEs(NumericVector x, double thresh);
+RcppExport SEXP nandb_MostConsecutiveLEs(SEXP xSEXP, SEXP threshSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type thresh(threshSEXP);
+    rcpp_result_gen = Rcpp::wrap(MostConsecutiveLEs(x, thresh));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MeanPillars
 NumericMatrix MeanPillars(NumericVector mat3d);
 RcppExport SEXP nandb_MeanPillars(SEXP mat3dSEXP) {
@@ -71,34 +111,6 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type mat3d(mat3dSEXP);
     rcpp_result_gen = Rcpp::wrap(MedianPillars(mat3d));
-    return rcpp_result_gen;
-END_RCPP
-}
-// MedianFilterB
-NumericMatrix MedianFilterB(NumericMatrix mat, int size, bool na_rm, bool na_count);
-RcppExport SEXP nandb_MedianFilterB(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
-    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< bool >::type na_rm(na_rmSEXP);
-    Rcpp::traits::input_parameter< bool >::type na_count(na_countSEXP);
-    rcpp_result_gen = Rcpp::wrap(MedianFilterB(mat, size, na_rm, na_count));
-    return rcpp_result_gen;
-END_RCPP
-}
-// SmoothFilterB
-NumericMatrix SmoothFilterB(NumericMatrix mat, int size, bool na_rm, bool na_count);
-RcppExport SEXP nandb_SmoothFilterB(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
-    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< bool >::type na_rm(na_rmSEXP);
-    Rcpp::traits::input_parameter< bool >::type na_count(na_countSEXP);
-    rcpp_result_gen = Rcpp::wrap(SmoothFilterB(mat, size, na_rm, na_count));
     return rcpp_result_gen;
 END_RCPP
 }

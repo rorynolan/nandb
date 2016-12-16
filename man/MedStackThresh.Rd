@@ -22,7 +22,7 @@ setting this parameter to \code{TRUE}, the array would instead be skipped
 }
 \value{
 The thresholded stack, pillars not exceeding the threshold are set to
-  zero.
+  zero. The attribute "threshold" gives the value used for thresholding.
 }
 \description{
 Via the \code{\link[autothresholdr]{auto_thresh}} function from the
