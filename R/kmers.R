@@ -47,7 +47,7 @@ KmersFromBrightnesses <- function(brightnesses, monomer.med) {
 #' \code{KmersFromImagesFolder} does this for an entire folder (directory) of
 #' images and outputs a csv file of the results.
 #'
-#' @param img A 3-dimensional array that one would might input to
+#' @param mat3d A 3-dimensional array that one would might input to
 #'   \code{\link{Brightness}} \emph{or} the path to an image file on disk.
 #' @param monomer.med The median brightness of a monomer. You must know what
 #'   this is to use this function correctly. This must be greater than 1 (this
@@ -55,9 +55,25 @@ KmersFromBrightnesses <- function(brightnesses, monomer.med) {
 #'   al. (2008) paper, this is \eqn{1 + \epsilon}.
 #' @param tau The time constant for the exponential filtering (see
 #'   \code{\link{Brightness}}).
-#' @param med.filter Do you want to apply median filtering to the brightness
-#'   image before calculating kmers (to "remove outliers")?
-#' @param verbose Do you want to print the image name as you process it?
+#' @param mst Do you want to apply an intensity threshold prior to calculating
+#'   brightness (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+#'   \emph{method} here.
+#' @param skip.consts An image array with only one value (a "constant array")
+#'   won't threshold properly. By default the function would give an error, but
+#'   by setting this parameter to \code{TRUE}, the array would instead be
+#'   skipped (the function will return the original array) and give a warning.
+#' @param filt Do you want to smooth (\code{filt = "smooth"}) or median
+#'   (\code{filt = "median"}) filter the brightness image using
+#'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+#'   selected, these are invoked here with a filter radius of 1 and with the
+#'   option \code{na_count = TRUE}. If you want to smooth/median filter
+#'   the brightness image in a different way, first calculate the brightnesses
+#'   without filtering (\code{filt = NULL}) using this function and then perform
+#'   your desired filtering routine on the result.
+#' @param verbose If mat3d is specified as a file name, print a message to tell
+#'   the user that that file is now being processed (useful for
+#'   \code{BrightnessFolder}, does not work with multiple cores) and to tell
+#'   when \code{KmersFromImagesFolder} is done.
 #'
 #' @return A named vector (named "1mers" "2mers" "3mers" and so on) with each
 #'   element detailing the number of that kmer found, or for
@@ -65,17 +81,16 @@ KmersFromBrightnesses <- function(brightnesses, monomer.med) {
 #'   of these vectors for each image. This vector also has an attribute
 #'   "mean.intensity" giving the mean intensity of the input image.
 #' @export
-KmersFromImage <- function(img, monomer.med, tau = NA,
-                           med.filter = TRUE, verbose = TRUE) {
-  if (is.character(img)) {
-    if (verbose) print(paste0("Now processing: ", img, "."))
-    img <- ReadImageData(img)
+KmersFromImage <- function(mat3d, monomer.med, tau = NA, mst = NULL,
+                           skip.consts = FALSE, filt = NULL, verbose = TRUE) {
+  if (is.character(mat3d)) {
+    if (verbose) print(paste0("Now processing: ", mat3d, "."))
+    mat3d <- ReadImageData(mat3d)
   }
-  bright <- Brightness(img, tau = tau)
-  if (med.filter) bright <- MedianFilterB(bright, size = 1,
-                                  na_rm = TRUE, na_count = TRUE)
+  bright <- Brightness(mat3d, tau = tau, mst = mst, skip.consts = skip.consts,
+                       fail = NA, filt = filt)
   kmers <- KmersFromBrightnesses(bright, monomer.med)
-  attr(kmers, "mean.intensity") <- mean(img)
+  attr(kmers, "mean.intensity") <- mean(mat3d)
   kmers
 }
 
@@ -88,8 +103,9 @@ KmersFromImage <- function(img, monomer.med, tau = NA,
 #'   default). You must wish to process all files with this extension; if there
 #'   are files that you don't want to process, take them out of the folder.
 #' @param out.name The name of the results csv file.
+#' @param mcc The number of parallel cores to use for the processing.
 #' @export
-KmersFromImagesFolder <- function(folder.path = ".", tau = NA, monomer.med,
+KmersFromImagesFolder <- function(folder.path = ".", monomer.med, tau = NA,
                                   mst = NULL, filt = NULL,
                                   out.name = "results", ext = "\\.tif$",
                                   mcc = parallel::detectCores(), verbose = TRUE) {
@@ -97,8 +113,9 @@ KmersFromImagesFolder <- function(folder.path = ".", tau = NA, monomer.med,
   on.exit(setwd(init.dir))
   setwd(folder.path)
   tif.names <- list.files(pattern = ext)
-  kmerss <- tif.names %>% MCLapply(KmersFromImage, tau, monomer.med,
-                                   mcc = mcc, verbose = verbose)
+  kmerss <- tif.names %>%
+    BiocParallel::bplapply(KmersFromImage, tau, monomer.med, verbose = verbose,
+                           BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
   means <- sapply(kmerss, function(x) attr(x, "mean"))
   max.ks <- kmerss %>% sapply(length)  # for each image, the maximum k for which that image contains at least one kmer
   kmers.table <- matrix(0, nrow = length(tif.names), ncol = max(max.ks))
@@ -110,7 +127,7 @@ KmersFromImagesFolder <- function(folder.path = ".", tau = NA, monomer.med,
   }
   results <- data.frame(ImageName = tif.names, MeanIntensity = means) %>% cbind(kmers.table)
   out.name <- filesstrings::MakeExtName(out.name, "csv")
-  write_csv(results, out.name)
+  readr::write_csv(results, out.name)
   invisible(results)
 }
 
@@ -144,7 +161,7 @@ KmerArray <- function(brightness.arr, monomer.brightness) {
 #' Create kmer tiff files from brightness csvs
 #'
 #' For each brightness csv image in a folder, given a monomeric brightness,
-#' create a tiff file of the kmer positions using \code{\link{KmerMat}}.
+#' create a tiff file of the kmer positions using \code{\link{KmerArray}}.
 #'
 #' @param csv.paths The paths to the brightness csv files, defaults to
 #'   \code{list.files(pattern = "[Bb]rightness.*\\.csv")}.
@@ -161,7 +178,9 @@ KmerTIFFsFromBrightnessCSVs <- function(monomer.brightness,
                                         na = "saturate",
                                         mcc = parallel::detectCores(),
                                         verbose = TRUE) {
-  if (is.null(csv.paths)) csv.paths <- list.files(pattern = "[Bb]rightness.*\\.csv")
+  if (is.null(csv.paths)) {
+    csv.paths <- list.files(pattern = "[Bb]rightness.*\\.csv")
+  }
   if (is.null(out.names)) {
     out.names <- stringr::str_replace(csv.paths, "[Bb]rightness", "kmers")
   } else {
@@ -171,9 +190,11 @@ KmerTIFFsFromBrightnessCSVs <- function(monomer.brightness,
   }
   out.names <- sapply(out.names, filesstrings::MakeExtName,
                       "tif", replace = TRUE)
-  brightnesses <- MCLapply(csv.paths, ReadImageTxt, mcc = mcc)
-  kmer.mats <- MCLapply(brightnesses, KmerMat, monomer.brightness, mcc = mcc)
-  MCMapply(WriteIntImage, kmer.mats, out.names, na = na, mcc = mcc) %>%
+  brightnesses <- BiocParallel::bplapply(csv.paths, ReadImageTxt,
+                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+  kmer.mats <- BiocParallel::bplapply(brightnesses, KmerArray, monomer.brightness,                           BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+  BiocParallel::bpmapply(WriteIntImage, kmer.mats, out.names, na = na,
+                     BPPARAM = BiocParallel::MulticoreParam(workers = mcc)) %>%
     invisible
   if (verbose) print("Done. Please check folder.")
 }

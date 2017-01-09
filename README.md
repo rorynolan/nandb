@@ -13,9 +13,9 @@ This is slightly painful but you'll only have to do it once. First of all, if yo
     sudo apt-get update
     sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev 
     sudo apt-get install libcurl4-openssl-dev libxml2-dev 
-    sudo apt-get install default-jre default-jdk
+    sudo apt-get install default-jre default-jdk libboost-all-dev
 
-On **mac**, you need to go to <https://support.apple.com/kb/dl1572?locale=en_US> and download and install Java 6 (don't ask me why this is necessary).
+On **mac**, you need to go to <https://support.apple.com/kb/dl1572?locale=en_US> and download and install Java 6 (don't ask me why this is necessary). Then you need to install `Xcode` from the app store. Finally, you need to open a terminal and type `brew install boost`.
 
 On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools/> and install the latest version of Rtools.
 
@@ -78,9 +78,7 @@ library("magrittr")
 Then load the .tif file included with the package:
 
 ``` r
-tif_file_location <- system.file("extdata", 
-                                 "FKBP-mClover_before_0.5nM_AP1510.tif", 
-                                 package = "nandb")
+tif_file_location <- system.file("extdata", "50.tif", package = "nandb")
 img <- ReadImageData(tif_file_location)
 ```
 
@@ -88,7 +86,7 @@ This `img` is a 3-dimensional array of image slices, where each element correspo
 
 ``` r
 dim(img)
-#> [1] 256 256  50
+#> [1] 100 100  50
 ```
 
 we can see that it is 50 slices each of which is a 256x256 image. We can view the first slice:
@@ -102,14 +100,13 @@ EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
 Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via
 
 ``` r
-img_brightness <- Brightness(img, tau = 10, mst = "Huang")
+img.brightness <- Brightness(img, tau = "auto", mst = "Huang", filt = "median")
 ```
 
 Now we can see the (median filtered) version of the output.
 
 ``` r
-img_brightness %>% MedianFilterB %>% 
-  MatrixRasterPlot(scale.name = "brightness", limits = c(0.9, 1.5))
+MatrixRasterPlot(img.brightness, scale.name = "brightness", log.trans = TRUE)
 ```
 
 ![](README_files/figure-markdown_github/Brightness%20plot-1.png)

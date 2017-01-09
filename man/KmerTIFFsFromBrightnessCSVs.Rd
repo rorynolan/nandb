@@ -25,6 +25,6 @@ to .tif).}
 }
 \description{
 For each brightness csv image in a folder, given a monomeric brightness,
-create a tiff file of the kmer positions using \code{\link{KmerMat}}.
+create a tiff file of the kmer positions using \code{\link{KmerArray}}.
 }
 

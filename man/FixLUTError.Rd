@@ -9,7 +9,7 @@ FixLUTError(arr, ndim.out)
 \arguments{
 \item{arr}{An array, representing the read image.}
 
-\item{dim.out}{How many dimensions do you want the output array to have?}
+\item{ndim.out}{How many dimensions do you want the output array to have?}
 }
 \value{
 An array. If the function implemented a "fix", then the output array

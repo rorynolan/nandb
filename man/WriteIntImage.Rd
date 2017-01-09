@@ -23,4 +23,10 @@ values above 1 to 1 and all below 0 to 0 when writing images. This function
 allows you to write integer-vlued arrays to disk as tiff files as you would
 want.
 }
+\examples{
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+dir.create("tempdir")
+WriteIntImage(img, "tempdir/50.tif")
+
+}
 

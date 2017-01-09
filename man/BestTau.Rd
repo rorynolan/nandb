@@ -4,15 +4,17 @@
 \alias{BestTau}
 \title{Find the best tau for exponential filtering detrend.}
 \usage{
-BestTau(img.arr, mst = NULL, tol = 1)
+BestTau(mat3d, mst = NULL, tol = 1)
 }
 \arguments{
-\item{img.arr}{A 3-dimensional array of images (where the ith frame is
-\code{img.arr[, , i]}).}
+\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+slice is the \eqn{n}th image in the time series. To perform this on a file
+that has not yet been read in, set this argument to the path to that file
+(a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link{MedStackThresh}})? If so, set your thresholding
-\emph{method} here.}
+brightness (via \code{\link{MeanStackThresh}})? If so, set your
+thresholding \emph{method} here.}
 
 \item{tol}{What size of error in the estimate of the \emph{ideal} \code{tau}
 (aside from the error introduced by the random image simulation, see
@@ -30,5 +32,10 @@ Say you have an image series that you wish to detrend before performing a
 brightness calculation. This function finds the best \code{tau} for an
 exponential filtering detrend. See \code{vignette("Adaptive Detrending",
 package = "nandb")} for more details.
+}
+\examples{
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+BestTau(img, mst = "tri", tol = 3)
+
 }
 

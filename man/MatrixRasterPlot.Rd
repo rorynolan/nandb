@@ -11,6 +11,9 @@ MatrixRasterPlot(mat, scale.name = "scale", limits = NULL, ranges = NULL,
 \arguments{
 \item{mat}{The matrix you wish to plot.}
 
+\item{scale.name}{A string. The title of the color scale on the right of the
+plot.}
+
 \item{limits}{This gives the user the option to set all values outside a
 certain range to their nearest value within that range (if \code{clip =
 TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
@@ -28,6 +31,9 @@ equivalent to setting \code{ranges = seq(min(mat), max(mat), length.out = n
 + 1)}. At most one of \code{ranges} and \code{limits} should be set. If
 ranges is set, the behaviour for values which are not in any of the ranges
 are set by the \code{clip} arguments as in the \code{limits} argument.}
+
+\item{range.names}{A character vector. If your colour scale is discrete, here
+you can set the names which will label each range in the legend.}
 
 \item{colours}{If you have set \code{ranges}, here you may specify which
 colors you wish to colour each range. It must have the same length as the
@@ -63,9 +69,8 @@ falling below those limits/ranges will be set to \code{NA}.}
 
 \item{log.trans}{Do you want to log-transform the colour scaling?}
 
-\item{breaks}{Where do you want tick marks to appear on the legend colour scale?}
-
-\item{scale}{A string. The title of the color scale on the right of the plot.}
+\item{breaks}{Where do you want tick marks to appear on the legend colour
+scale?}
 }
 \value{
 In the graphics console, a raster plot (via

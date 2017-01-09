@@ -20,8 +20,7 @@ should be greater than 1).
 }
 \examples{
 library(EBImage)
-img <- ReadImageData(system.file("extdata",
-"FKBP-mClover_before_0.5nM_AP1510.tif",
+img <- ReadImageData(system.file("extdata", "low_oligomers.tif",
 package = "nandb"))
 display(normalize(img[, , 1]), method = "raster")
 brightness <- Brightness(img, tau = 10, mst = "Huang")

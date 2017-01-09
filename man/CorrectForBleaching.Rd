@@ -12,10 +12,9 @@ slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
 
-\item{tau}{If this is specified, bleaching correction is performed with
-\code{\link{CorrectForBleaching}} which uses exponential filtering with
-time constant \code{tau} (where the unit of time is the time between
-frames).}
+\item{tau}{The time constant for the exponential filtering. If this is set to
+\code{"auto"}, then the value of \code{tau} is calculated automatically via
+\code{\link{BestTau}}.}
 }
 \value{
 The detrended image series.
@@ -23,5 +22,14 @@ The detrended image series.
 \description{
 Apply detrending to an image time series using the bleaching correction
 method described in Digman et al. 2008.
+}
+\references{
+Stroud, P. D.: A recursive exponential filter for time-sensitive
+  data, Los Alamos national Laboratory, LAUR-99-5573,
+  \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
+
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+tau10 <- CorrectForBleaching(img, 10)
+autotau <- CorrectForBleaching(img, "auto")
 }
 

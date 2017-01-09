@@ -1,9 +1,12 @@
 ---
 title: "Adaptive Detrending"
 author: "Rory Nolan"
-date: "8 December 2016"
-output: pdf_document
-fontsize: 11pt
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Number and Brightness analysis in R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -22,16 +25,16 @@ invisible(sapply(required.pkgs, library, character.only = TRUE))
 
 Let's start with an example.
 
-```{r Read and display image}
-eg.img <- system.file("extdata", "500.tif", package = "nandb") %>% 
+```{r Read and display image, fig.width=5, fig.height=5}
+eg.img <- system.file("extdata", "50.tif", package = "nandb") %>% 
   ReadImageData
 display(normalize(eg.img[, , 1]), method = "raster")
 ```
 
-Due to bleaching, the means of the images in the series decrease over time:
-```{r real data frame means}
+Due to bleaching, the means of the images in the series decrease gradually over time:
+```{r real data frame means, fig.width=7, fig.height=5}
 means <- apply(eg.img, 3, mean)
-plot(means, ylim = c(13, 14.5), xlab = "frame", ylab = "mean")
+plot(means, ylim = range(means), xlab = "frame", ylab = "mean")
 ```
 
 Indeed we see some gentle bleaching here. This bleaching (if we don't correct for it) will increase the variance $\sigma^2$ in the intensity of a given pixel, and decrease the mean $\mu$ thereof; therefore it will (artificially) increase the calculated brightness $B = \frac{\sigma^2}{\mu}$. Digman et al. (2008) make the reasonable assumption that only immobile particles bleach (i.e. mobile particles move out of the illumination plane so quickly as to bleach negligibly compared to those that remain therein); we'll keep that assumption here. 
@@ -52,7 +55,7 @@ For the simulated series, given that we know that aside from bleaching, it shoul
 
 # Simulating the Images
 
-You wish to simulate $n$ frames of $p$ pixels. What is $p$? Say the the original images have $P$ pixels (e.g. $256 \times 256 = 65536$). If you threshold them, you exculde some pixels and are left with $p$ pixels where $p < P$ (the other pixels are set to \texttt{NA} by the thresholding). If you are not thresholding, then $p=P$. 
+You wish to simulate $n$ frames of $p$ pixels. What is $p$? Say the the original images have $P$ pixels (e.g. $256 \times 256 = 65536$). If you threshold them, you exculde some pixels and are left with $p$ pixels where $p < P$ (the other pixels are set to `NA` by the thresholding). If you are not thresholding, then $p=P$. 
 
 The various pixels of the image may have different amounts of immobile and mobile particles in them, and hence, when we replace the mobile particles with immobile, the pixels still won't necessarily have the *same* amount of immobile particles contributing to their intensity (and hence not the same expected intensity at each pixel). However, since we only intend to correct for bleaching on a whole-image scale,^[By *whole-image scale* I mean applying the same exponential filtering routine (same $\tau$) to each pixel in the series of frames, rather than having a different $\tau$ for each pixel. This is a good idea since at a global scale it is relatively easy to get a sense of bleaching whereas at the pixel microscale, it is hard to distinguish whether changes in intensity are due to particle movement or due to bleaching.] we are only really interested in the *average* (averaged across the whole image) bleaching of the image series.^[Inherent here is an assumption that the amount of bleaching per fluorophore is region-independent.]
 
@@ -66,7 +69,7 @@ Hence, the only criteria we want our simulated image series to have are:
 
 Here's how we satisfy them:
 
-1. To find the number of pixels $p$, just count the number of non-\texttt{NA} pixels in the image post-thresholding, or if you don't threshold, it's just the number of pixels in the image.
+1. To find the number of pixels $p$, just count the number of non-`NA` pixels in the image post-thresholding, or if you don't threshold, it's just the number of pixels in the image.
 
 1. Counts from stationary particles follow a Poission distribution, so each pixel intensity value should be drawn from a Poisson distribution with some mean $\lambda$.
 
@@ -91,10 +94,10 @@ p <- MedianPillars(eg.img) %>% round %>% auto_thresh_mask("tri") %>% sum
 # Simulate the images
 sims <- sapply(means, rpois, n = p)
 ```
-So \texttt{sims} is a matrix where \texttt{sims[i, j]} is the \texttt{i}^th^ pixel in the \texttt{j}^th^ simulated frame. Before going on, let's just check that our simulations are as we would like:
-```{r simulated frame means}
+So `sims` is a matrix where `sims[i, j]` is the `i`^th^ pixel in the `j`^th^ simulated frame. Before going on, let's just check that our simulations are as we would like:
+```{r simulated frame means, fig.width=7, fig.height=5}
 sim.frame.means <- colMeans(sims)
-plot(sim.frame.means, xlab = "frame", ylab = "mean", ylim = c(13, 14.5))
+plot(sim.frame.means, xlab = "frame", ylab = "mean", ylim = range(sim.frame.means))
 ```
 
 Yes, this looks like the plot above, which is what we want. Now we can calculate the simulated brightnesses: 
@@ -109,13 +112,13 @@ sims.tau10 <- sims - ExpSmoothRows(sims, 10) +
 sim.brightnesses.tau10 <- rowVars(sims.tau10) / rowMeans(sims.tau10)
 mean(sim.brightnesses.tau10)
 ```
-So we see that $\tau = 10$ is far too severe. Let's go to the other extreme: $\tau = 500$:
-```{r "check out tau = 500"}
-sims.tau500 <- sims - ExpSmoothRows(sims, 500) + rowMeans(sims)
-sim.brightnesses.tau500 <- rowVars(sims.tau500) / rowMeans(sims.tau500)
-mean(sim.brightnesses.tau500)
+So we see that $\tau = 10$ is far too severe. Let's go to the other extreme: $\tau = 10^6$:
+```{r "check out tau = 10^6"}
+sims.tau106 <- sims - ExpSmoothRows(sims, 10^6) + rowMeans(sims)
+sim.brightnesses.tau106 <- rowVars(sims.tau106) / rowMeans(sims.tau106)
+mean(sim.brightnesses.tau106)
 ```
-And so we see that $\tau = 500$ is not severe enough. Hence we have lower and upper bounds on what $\tau$ should be. 
+And so we see that $\tau = 10^6$ is not severe enough. Hence we have lower and upper bounds on what $\tau$ should be. 
 
 To find the $\tau$ which gives us a detrend that results in the simulated frames having mean brightness 1, we set up a function of tau which returns the distance of the mean brightness from 1 after detrending (with exponential filtering) with that parameter $\tau$. Then by minimizing this function with respect to $\tau$, we find the ideal $\tau$ that we seek.
 First let's create that function:
@@ -128,7 +131,7 @@ TauFarFromOne <- function(tau, sims) {
 ```
 Now minimize:
 ```{r find the ideal tau}
-system.time(tau <- uniroot(TauFarFromOne, c(10, 500), sims, 
+system.time(tau <- uniroot(TauFarFromOne, c(10, 10^6), sims, 
                            tol = 1, extendInt = "upX")$root)
 tau
 ```
@@ -140,29 +143,25 @@ tau.again <- BestTau(eg.img, mst = "tri")
 tau.again
 ```
 
-Now you may be concerned that \texttt{tau} (`r round(tau, 2)`) and \texttt{tau.again} (`r round(tau.again, 2)`) are different. This is to be expected since there is a random element to the way they are computed: the images coming from all immobile particles are \emph{simulated}. Whilst the difference in \texttt{tau}s might seem alarming, they are actually relatively similar values in that detrends of \texttt{tau = }`r round(tau, 2)` and \texttt{tau.again = }`r round(tau.again, 2)` are actually relatively similar, indeed the difference between them is akin to the difference between \texttt{tau}s of `r 10` and `r round(10 * tau.again / tau, 2)`. Let's plot the brightnesses of no detrend, $\tau = 10$, `r round(tau, 2)` and `r round(tau.again, 2)` to see how similar they are.
-```{r plot the brightnesses from the various detrends, fig.width=9}
+Now you may be concerned that `tau` (`r round(tau)`) and `tau.again` (`r round(tau.again)`) are different. This is to be expected since there is a random element to the way they are computed: the images coming from all immobile particles are \emph{simulated}. Whilst the difference in `tau`s might seem alarming, they are actually relatively similar values in that detrends of `tau = ``r round(tau)` and `tau.again = ``r round(tau.again)` are actually relatively similar, indeed the difference between them is akin to the difference between `tau`s of `r 10` and `r round(10 * tau.again / tau)`. Let's plot the brightnesses of no detrend, $\tau = 10$, `r round(tau)` and `r round(tau.again)` to see how similar they are.
+```{r plot the brightnesses from the various detrends, fig.width=7}
 GetDensityDF <- function(mat, detrend) {
   d <- bkde(mat[!is.na(mat)], range.x = c(0, 5), gridsize = 2^16)
-  tibble(brightness = d$x, frequency = d$y, detrend = detrend)
+  tibble(detrend = detrend, brightness = d$x, frequency = d$y)
 }
 brightnesses <- lapply(c(NA, 10, tau, tau.again), Brightness, mat3d = eg.img,
                        mst = "tri")
 plot.df <- mapply(GetDensityDF, brightnesses, 
-                  c("no detrend", "tau = 10", paste0("tau = ", round(tau, 2)),
-                    paste0("tau = ", round(tau.again, 2))),
+                  c("no detrend", "tau = 10", paste0("tau = ", round(tau)),
+                    paste0("tau = ", round(tau.again))),
                   SIMPLIFY = FALSE) %>% 
   Reduce(rbind, .)
-ggplot(plot.df, aes(brightness, frequency, colour = detrend)) + geom_line() + xlim(0, 5)
-```
-It seems that the brightnesses without detrend and those with detrends of $tau = `r tau`$ and tau = `r tau.again` roughly overlap, but the detrend of \texttt{tau = 10} has a significant shift.^[Recall that our calculations above show that a detrend with $\tau = 10$ is incorrect.] To check out the differences between no detrend, tau = `r tau` and tau = `r tau.again`, we'll have to zoom in:
-```{r zoom in, fig.width=9}
 ggplot(plot.df, aes(brightness, frequency, colour = detrend)) + 
-  geom_line() + xlim(0.99, 1.01)
+  geom_line() + xlim(0, 2)
 ```
-So this time we see that tau =  abc `r tau` and tau =  abc `r tau.again` are separated from no detrend, but to see the difference between them, we'll have to zoom in even further:
-```{r zoom in further, fig.width=9}
-ggplot(plot.df, aes(brightness, frequency, colour = detrend)) + 
-  geom_line() + xlim(0.999, 1.001) + ylim(2.55, 2.65)
+It seems that the brightnesses without detrend and those with detrends of $\tau = `r round(tau)`$ and $\tau = `r round(tau.again)`$ roughly overlap, but the detrend of `tau = 10` has a significant shift.^[Recall that our calculations above show that a detrend with $\tau = 10$ is incorrect.] ^[The closeness of the \emph{correct} detrends to having no detrend at all is due to the fact that there's almost no bleaching in these 50 frames. Try this on more (e.g. 500) with a high laser power and you'll see that then the detrended series is significantly different.] The point is now well-made that by choosing $\tau = 10$ we would have been way off, but using our procedure one can get a sensibly obtained value for tau and, although there is some uncertainty in its value to the randomness involved in simulating the images, this uncertainty is negligible.^[If one wanted to be extra-careful, one could run the procedure for estimating tau several times to get an idea of its distribution and then carry on taking into account the thus quantifiable uncertainty in $\tau$.]
+
+Finally, just in case you don't believe me that "the brightnesses without detrend and those with detrends of $\tau = `r round(tau)`$ and tau = `r round(tau.again)` roughly overlap, but the detrend of `tau = 10` has a significant shift," I'll \emph{prove} it to you by checking their values at 1.5. 
+```{r PS}
+nandb:::Closest(1.5, plot.df$brightness) %>% {filter(plot.df, brightness == .)}
 ```
-So one can begin to see that they are indeed different. The point is now well-made that by choosing tau = 10 we would have been way off, but using our procedure one can get a sensibly obtained value for tau and, although there is some uncertainty in its value to the randomness involved in simulating the images, this uncertainty and its effects are negligible.^[If one wanted to be extra-careful, one could run the procedure for estimating tau several times to get an idea of its distribution and then carry on taking into account the thus quantifiable uncertainty in tau.]

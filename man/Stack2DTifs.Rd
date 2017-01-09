@@ -4,14 +4,24 @@
 \alias{Stack2DTifs}
 \title{Put individual tif files into one tif stack.}
 \usage{
-Stack2DTifs(file.names, out.name)
+Stack2DTifs(file.names, out.name, mcc = parallel::detectCores())
 }
 \arguments{
 \item{file.names}{The names of the files to stack (in order).}
 
 \item{out.name}{The name of the output .tif file.}
+
+\item{mcc}{The number of parallel cores to use for the processing.}
 }
 \description{
-Say you have saved what you would like to be one 3D tif stack as a series of 2D tif files. This helps you stack them into one file.
+Say you have saved what you would like to be one 3D tif stack as a series of
+2D tif files. This helps you stack them into one file.
+}
+\examples{
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+WriteIntImage(img[, , 1], "50_1.tif")
+WriteIntImage(img[, , 2], "50_2.tif")
+Stack2DTifs(c("50_1.tif", "50_2.tif"), "50_1_2")
+file.remove(c("50_1.tif", "50_2.tif", "50_1_2.tif"))
 }
 

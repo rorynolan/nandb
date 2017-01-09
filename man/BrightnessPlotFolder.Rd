@@ -17,7 +17,7 @@ contains "Brightness" or "brightness" in its name.}
 
 \item{verbose}{Get a real time report on progress?}
 
-\item{...}{Parameters to pass to \code{\link{MatrixrasterPlot}} (these
+\item{...}{Parameters to pass to \code{\link{MatrixRasterPlot}} (these
 \emph{must} be named arguments).}
 }
 \description{

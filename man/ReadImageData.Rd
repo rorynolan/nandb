@@ -42,4 +42,8 @@ the value in position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from
 \code{mat[j, i]}, so if you're confused about a phantom transposition, this
 is why.
 }
+\examples{
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+
+}
 

@@ -10,11 +10,17 @@
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   mean intensities (via \code{\link{MedStackThresh}})? If so, set your
-#'   thresholding \emph{method} here.
-#' @param filt Do you want to median/smooth filter (with a radius of 1) the
-#'   resulting image using \code{\link{MedianFilterB}} or
-#'   \code{\link{SmoothFilterB}}?
+#'   mean intensities (via \code{\link{MeanStackThresh}})? If so, set your
+#'   thresholding \emph{method} here. Pixels failing to exceed the threshold are
+#'   set to \code{NA}.
+#' @param filt Do you want to smooth (\code{filt = "smooth"}) or median
+#'   (\code{filt = "median"}) filter the brightness image using
+#'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+#'   selected, these are invoked here with a filter radius of 1 and with the
+#'   option \code{na_count = TRUE}. If you want to smooth/median filter the
+#'   brightness image in a different way, first calculate the brightnesses
+#'   without filtering (\code{filt = NULL}) using this function and then perform
+#'   your desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
 #'   \code{MeanIntensityTxtFolder}, does not work with multiple cores) and to
@@ -40,7 +46,7 @@ MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, verbose = TRUE) {
   }
   d <- dim(mat3d)
   if (length(d) != 3) stop("mat3d must be a three-dimensional array")
-  if (!is.null(mst)) mat3d <- MedStackThresh(mat3d, method = mst)
+  if (!is.null(mst)) mat3d <- MeanStackThresh(mat3d, method = mst)
   mean.intensity <- MeanPillars(mat3d)
   if (!is.null(filt)) {
     allowed <- c("median", "smooth")
@@ -70,17 +76,26 @@ MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, verbose = TRUE) {
 #'   are files that you don't want to process, take them out of the folder.
 #' @param mcc The number of parallel cores to use for the processing.
 #'
+#' @examples
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' dir.create("tempdir")
+#' WriteIntImage(img, "tempdir/50.tif")
+#' WriteIntImage(img, "tempdir/50again.tif")
+#' MeanIntensityTxtFolder("tempdir")
+#' filesstrings::RemoveDirs("tempdir")
+#'
 #' @export
-MeanIntensityTxtFolder <- function(folder.path = ".", tau = NA,
-                                mst = NULL, ext = "\\.tif$",
-                                mcc = parallel::detectCores(),
-                                verbose = TRUE) {
+MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
+                                   ext = "\\.tif$",
+                                   mcc = parallel::detectCores(),
+                                   verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
   file.names <- list.files(pattern = ext)
-  mean.intensities <- MCLapply(file.names, MeanIntensity, mst = mst,
-                           mcc = mcc, verbose = verbose)
+  mean.intensities <- MCLapply(file.names, MeanIntensity,
+                               mst = mst, verbose = verbose,
+                               mcc = mcc)
   frames <- sapply(mean.intensities, function(x) attr(x, "frames"))
   msts <- sapply(mean.intensities, function(x) attr(x, "thresh"))
   filters <- sapply(mean.intensities, function(x) attr(x, "filter"))

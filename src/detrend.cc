@@ -58,13 +58,24 @@ NumericVector ExpSmoothPillars(NumericVector mat3d, double tau) {
   int n_pillars = dim[0] * dim[1];
   int pillar_len = dim[2];
   NumericVector pillar_i(pillar_len);
+  NumericVector weights0(pillar_len);
+  NumericVector weights(pillar_len);
+  for (int i = 0; i < pillar_len; i++) {
+    weights0[i] = exp(- i / tau);
+  }
+  NumericVector smoothed_pillar_i(pillar_len);
   for (int i = 0; i < n_pillars; i++) {
     for (int j = 0; j < pillar_len; j++) {
       pillar_i[j] = mat3d[i + j * n_pillars];
     }
-    pillar_i = ExpSmooth(pillar_i, tau);
+    for (int k = 0; k < pillar_len; k++) {
+      for (int l = 0; l < pillar_len; l++) {
+        weights[l] = weights0[abs(k - l)];
+      }
+      smoothed_pillar_i[k] = sum(weights * pillar_i) / sum(weights);
+    }
     for (int j = 0; j < pillar_len; j++) {
-      smoothed_pillars[i + j * n_pillars] = pillar_i[j];
+      smoothed_pillars[i + j * n_pillars] = smoothed_pillar_i[j];
     }
   }
   return smoothed_pillars;

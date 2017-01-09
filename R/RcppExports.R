@@ -88,6 +88,10 @@ MostConsecutiveLEs <- function(x, thresh) {
     .Call('nandb_MostConsecutiveLEs', PACKAGE = 'nandb', x, thresh)
 }
 
+MostConsecutiveLEsPillars <- function(mat3d, thresh) {
+    .Call('nandb_MostConsecutiveLEsPillars', PACKAGE = 'nandb', mat3d, thresh)
+}
+
 #' Get the means/medians/variances of pillars of a 3d array
 #'
 #' For a 3-dimensional array \code{mat3d}, pillar \code{ij} is defined as

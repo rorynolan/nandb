@@ -30,6 +30,10 @@
 #'   Read \code{\link{FixLUTError}} to find out more.
 #'
 #' @return An array of integers representing the image.
+#'
+#' @examples
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#'
 #' @export
 ReadImageData <- function(image.name,
                           fix.lut = NULL) {
@@ -66,6 +70,10 @@ ReadImageData <- function(image.name,
 #' @param file.name The name of the input/output output file(s), \emph{without}
 #'   a file extension.
 #'
+#' @examples
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' WriteImageTxt(img, "temp")
+#'
 #' @export
 WriteImageTxt <- function(img.arr, file.name) {
   d <- dim(img.arr)
@@ -85,11 +93,16 @@ WriteImageTxt <- function(img.arr, file.name) {
     file.names <- paste0(file.name, "_", seq_len(d[3])) %>%
       sapply(filesstrings::MakeExtName, "csv") %>%
       (filesstrings::NiceNums)
-    mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE)
+    mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE) %>%
+      invisible
   }
 }
 
 #' @rdname WriteImageTxt
+#'
+#' @examples
+#' img <- ReadImageTxt("temp_01.csv")
+#' file.remove(list.files(pattern = "^temp.*\\.csv$"))
 #' @export
 ReadImageTxt <- function(file.name) {
   suppressMessages(readr::read_csv(file.name, col_names = FALSE, progress = FALSE)) %>%
@@ -110,6 +123,13 @@ ReadImageTxt <- function(file.name) {
 #'   values (and hence not \code{NA}s) to tiff pixels. \code{na = "saturate"}
 #'   sets them to saturated value. \code{na = "zero"} sets them to zero, while
 #'   \code{na = "error"} will give an error if th image contains \code{NA}s.
+#'
+#' @examples
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' dir.create("tempdir")
+#' WriteIntImage(img, "tempdir/50.tif")
+#'
+#' @export
 WriteIntImage <- function(img.arr, file.name, na = "error") {
   if (!all(CanBeInteger(img.arr), na.rm = TRUE)) {
     stop("img.arr must contain only integers")
@@ -162,7 +182,7 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
 #' @examples
 #' library(magrittr)
 #' x <- lapply(1:300, function(x) matrix(runif(4), nrow = 2)) %>%
-#' Reduce(function(x, y) abind::abind(x, y, along = 3), .)
+#'   Reduce(function(x, y) abind::abind(x, y, along = 3), .)
 #' str(x)
 #' ForceChannels(x, 6) %>% str
 #'
@@ -182,15 +202,24 @@ ForceChannels <- function(img.arr, n.ch) {
 
 #' Put individual tif files into one tif stack.
 #'
-#' Say you have saved what you would like to be one 3D tif stack as a series of 2D tif files. This helps you stack them into one file.
+#' Say you have saved what you would like to be one 3D tif stack as a series of
+#' 2D tif files. This helps you stack them into one file.
 #'
 #' @param file.names The names of the files to stack (in order).
 #' @param out.name The name of the output .tif file.
+#' @param mcc The number of parallel cores to use for the processing.
 #'
+#' @examples
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' WriteIntImage(img[, , 1], "50_1.tif")
+#' WriteIntImage(img[, , 2], "50_2.tif")
+#' Stack2DTifs(c("50_1.tif", "50_2.tif"), "50_1_2")
+#' file.remove(c("50_1.tif", "50_2.tif", "50_1_2.tif"))
 #' @export
-Stack2DTifs <- function(file.names, out.name) {
+Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
   out.name <- filesstrings::MakeExtName(out.name, "tif")
-  images <- MCLapply(file.names, EBImage::readImage)
+  images <- BiocParallel::bplapply(file.names, EBImage::readImage,
+                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
   dims <- lapply(images, dim)
   u <- unique(dims)
   if (length(u) != 1) {

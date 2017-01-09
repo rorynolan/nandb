@@ -1,11 +1,11 @@
 Package: nandb
 Type: Package
 Title: Molucular Number and Brightness Calculations
-Version: 0.0.0.9013
+Version: 0.0.0.9016
 Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", role = c("aut", "cre"))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
 Description: This package is gives functions for calculation of molecular number and brightness from images, as detailed in Digman et al. 2008.
-License: BSD 3-Clause + file LICENSE
+License: BSD_3_clause + file LICENSE
 LazyData: TRUE
 LinkingTo: Rcpp,
     BH
@@ -15,14 +15,19 @@ Imports:
     magrittr,
     readr,
     reshape2,
-    tidyverse,
     R.utils,
     autothresholdr,
-    assertthat,
     abind,
     viridis,
     dplyr,
-    matrixStats
+    matrixStats,
+    BiocParallel,
+    parallel,
+    stringr,
+    EBImage,
+    RSAGA,
+    ggplot2,
+    grDevices
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown

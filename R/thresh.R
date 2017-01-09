@@ -1,4 +1,4 @@
-#' Threshold every image in a stack based on their median.
+#' Threshold every image in a stack based on their mean.
 #'
 #' Via the \code{\link[autothresholdr]{auto_thresh}} function from the
 #' \code{autothresholdr} package, apply a threshold to the image stack before
@@ -6,7 +6,7 @@
 #' where the cell is.
 #'
 #' This function finds a threshold based on all of the frames and then uses
-#' takes the median of all the frames in the stack image to create a mask and
+#' takes the mean of all the frames in the stack image to create a mask and
 #' then applies this mask to every frame in the stack (so for a given pillar in
 #' the image stack, either it is wiped away to zero, or it is untouched).
 #'
@@ -28,21 +28,21 @@
 #' img <- ReadImageData(system.file("extdata",
 #' "low_oligomers.tif", package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
-#' img_thresh_mask <- MedStackThresh(img, "Otsu")
+#' img_thresh_mask <- MeanStackThresh(img, "Otsu")
 #' display(img_thresh_mask[, , 1] > 0, method = "r")
 #' display(normalize(img[, , 1]), method = "raster")
-#' img_thresh_mask <- MedStackThresh(img, "Triangle")
+#' img_thresh_mask <- MeanStackThresh(img, "Triangle")
 #' display(img_thresh_mask[, , 1] > 0, method = "r")
 #'
 #' @export
-MedStackThresh <- function(mat3d, method, fail = NA, skip.consts = FALSE) {
+MeanStackThresh <- function(mat3d, method, fail = NA, skip.consts = FALSE) {
   stopifnot(length(dim(mat3d)) == 3)
   if (length(unique(as.vector(mat3d))) == 1 && skip.consts) {
     warning("Constant array, skipping thresholding.")
     return(mat3d)
   }
   thresh <- autothresholdr::auto_thresh(mat3d, method)
-  med.stack <- MedianPillars(mat3d)
+  med.stack <- MeanPillars(mat3d)
   med.stack.mask <- med.stack > thresh
   set.indices <- rep(!as.vector(med.stack.mask), dim(mat3d)[3])
   mat3d[set.indices] <- fail

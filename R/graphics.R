@@ -15,7 +15,8 @@
 #' if you're confused about a transposed plot, this is why.
 #'
 #' @param mat The matrix you wish to plot.
-#' @param scale A string. The title of the color scale on the right of the plot.
+#' @param scale.name A string. The title of the color scale on the right of the
+#'   plot.
 #' @param limits This gives the user the option to set all values outside a
 #'   certain range to their nearest value within that range (if \code{clip =
 #'   TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
@@ -32,6 +33,8 @@
 #'   + 1)}. At most one of \code{ranges} and \code{limits} should be set. If
 #'   ranges is set, the behaviour for values which are not in any of the ranges
 #'   are set by the \code{clip} arguments as in the \code{limits} argument.
+#' @param range.names A character vector. If your colour scale is discrete, here
+#'   you can set the names which will label each range in the legend.
 #' @param colours If you have set \code{ranges}, here you may specify which
 #'   colors you wish to colour each range. It must have the same length as the
 #'   number of intervals you have specified in \code{ranges}.  If you have not
@@ -60,7 +63,8 @@
 #'   specified limits/ranges to their nearest value within them, but all values
 #'   falling below those limits/ranges will be set to \code{NA}.
 #' @param log.trans Do you want to log-transform the colour scaling?
-#' @param breaks Where do you want tick marks to appear on the legend colour scale?
+#' @param breaks Where do you want tick marks to appear on the legend colour
+#'   scale?
 #'
 #' @return In the graphics console, a raster plot (via
 #'   \code{\link[ggplot2]{geom_raster}}) will appear with the matrix values
@@ -87,10 +91,10 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
                              clip.low = FALSE, clip.high = FALSE,
                              log.trans = FALSE, breaks = NULL) {
   plain.theme <- ggplot2::theme(axis.ticks = ggplot2::element_blank(),
-                                axis.text = ggplot2::element_blank(),
-                                axis.title = ggplot2::element_blank(),
-                                panel.background = ggplot2::element_rect(fill = "white"),
-                                legend.key.height = unit(1, "cm"))
+                      axis.text = ggplot2::element_blank(),
+                      axis.title = ggplot2::element_blank(),
+                      panel.background = ggplot2::element_rect(fill = "white"),
+                      legend.key.height = ggplot2::unit(1, "cm"))
   rownames(mat) <- NULL
   colnames(mat) <- NULL
   df <- reshape2::melt(mat) %>%
@@ -132,7 +136,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
                                    names(.) <- as.character(seq_along(colours))
                                  }) +
       ggplot2::geom_raster() +
-      plain.theme + coord_fixed()
+      plain.theme + ggplot2::coord_fixed()
   } else {
     if (is.null(limits)) limits <- range(df$value, na.rm = TRUE)
     if (is.null(colours)) colours <- viridis::viridis(9)
@@ -158,7 +162,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
           round(untruncated, roundn)
         }
       } else {
-        breaks <- waiver()
+        breaks <- ggplot2::waiver()
       }
     }
     ggplot2::ggplot(df, ggplot2::aes(x, y, fill = value)) +
@@ -168,7 +172,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
                                    trans = ifelse(log.trans,
                                                   "log", "identity"),
                                    breaks = breaks) +
-      ggplot2::geom_raster() + plain.theme + coord_fixed()
+      ggplot2::geom_raster() + plain.theme + ggplot2::coord_fixed()
   }
 }
 
@@ -184,8 +188,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
 #'
 #' @examples
 #' library(EBImage)
-#' img <- ReadImageData(system.file("extdata",
-#' "FKBP-mClover_before_0.5nM_AP1510.tif",
+#' img <- ReadImageData(system.file("extdata", "low_oligomers.tif",
 #' package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
 #' brightness <- Brightness(img, tau = 10, mst = "Huang")
@@ -230,7 +233,7 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
 #'   folder that are brightness images. The default matches any .csv files which
 #'   contains "Brightness" or "brightness" in its name.
 #' @param verbose Get a real time report on progress?
-#' @param ... Parameters to pass to \code{\link{MatrixrasterPlot}} (these
+#' @param ... Parameters to pass to \code{\link{MatrixRasterPlot}} (these
 #'   \emph{must} be named arguments).
 #'
 BrightnessPlotFolder <- function(folder.path = ".",
@@ -253,9 +256,9 @@ BrightnessPlotFolder <- function(folder.path = ".",
       paste0("Now processing ", bld, ".") %>% message
     }
     pdf.file.name <- bld %>% filesstrings::MakeExtName("pdf")
-    pdf(pdf.file.name)
+    grDevices::pdf(pdf.file.name)
     c(list(mat = brightness.matrices[[i]]), dots) %>%
     do.call(MatrixRasterPlot, .) %>% print
-    dev.off()
+    grDevices::dev.off()
   }
 }

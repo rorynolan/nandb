@@ -5,15 +5,15 @@
 \alias{KmersFromImagesFolder}
 \title{Calculate numbers of kmers based on an image time-series}
 \usage{
-KmersFromImage(img, monomer.med, tau = NA, med.filter = TRUE,
-  verbose = TRUE)
+KmersFromImage(mat3d, monomer.med, tau = NA, mst = NULL,
+  skip.consts = FALSE, filt = NULL, verbose = TRUE)
 
-KmersFromImagesFolder(folder.path = ".", tau = NA, monomer.med,
+KmersFromImagesFolder(folder.path = ".", monomer.med, tau = NA,
   mst = NULL, filt = NULL, out.name = "results", ext = "\\\\.tif$",
   mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{
-\item{img}{A 3-dimensional array that one would might input to
+\item{mat3d}{A 3-dimensional array that one would might input to
 \code{\link{Brightness}} \emph{or} the path to an image file on disk.}
 
 \item{monomer.med}{The median brightness of a monomer. You must know what
@@ -24,10 +24,28 @@ al. (2008) paper, this is \eqn{1 + \epsilon}.}
 \item{tau}{The time constant for the exponential filtering (see
 \code{\link{Brightness}}).}
 
-\item{med.filter}{Do you want to apply median filtering to the brightness
-image before calculating kmers (to "remove outliers")?}
+\item{mst}{Do you want to apply an intensity threshold prior to calculating
+brightness (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+\emph{method} here.}
 
-\item{verbose}{Do you want to print the image name as you process it?}
+\item{skip.consts}{An image array with only one value (a "constant array")
+won't threshold properly. By default the function would give an error, but
+by setting this parameter to \code{TRUE}, the array would instead be
+skipped (the function will return the original array) and give a warning.}
+
+\item{filt}{Do you want to smooth (\code{filt = "smooth"}) or median
+(\code{filt = "median"}) filter the brightness image using
+\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+selected, these are invoked here with a filter radius of 1 and with the
+option \code{na_count = TRUE}. If you want to smooth/median filter
+the brightness image in a different way, first calculate the brightnesses
+without filtering (\code{filt = NULL}) using this function and then perform
+your desired filtering routine on the result.}
+
+\item{verbose}{If mat3d is specified as a file name, print a message to tell
+the user that that file is now being processed (useful for
+\code{BrightnessFolder}, does not work with multiple cores) and to tell
+when \code{KmersFromImagesFolder} is done.}
 
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
@@ -38,6 +56,8 @@ process.}
 process (can be rooted in regular expression for extra-safety, as in the
 default). You must wish to process all files with this extension; if there
 are files that you don't want to process, take them out of the folder.}
+
+\item{mcc}{The number of parallel cores to use for the processing.}
 }
 \value{
 A named vector (named "1mers" "2mers" "3mers" and so on) with each
