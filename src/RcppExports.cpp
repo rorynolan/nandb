@@ -138,3 +138,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SplitEverykGives
+int SplitEverykGives(IntegerVector vec, int k);
+RcppExport SEXP nandb_SplitEverykGives(SEXP vecSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type vec(vecSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(SplitEverykGives(vec, k));
+    return rcpp_result_gen;
+END_RCPP
+}

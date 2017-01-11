@@ -72,9 +72,7 @@
 #'
 #' @examples
 #' library(EBImage)
-#' img <- ReadImageData(system.file("extdata",
-#' "low_oligomers.tif",
-#' package = "nandb"))
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
 #' brightness <- Brightness(img, tau = 10, mst = "Huang")
 #' MatrixRasterPlot(brightness, scale.name = "brightness")
@@ -188,8 +186,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
 #'
 #' @examples
 #' library(EBImage)
-#' img <- ReadImageData(system.file("extdata", "low_oligomers.tif",
-#' package = "nandb"))
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
 #' brightness <- Brightness(img, tau = 10, mst = "Huang")
 #' KmerPlot(brightness, 1.16)
@@ -237,7 +234,7 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
 #'   \emph{must} be named arguments).
 #'
 BrightnessPlotFolder <- function(folder.path = ".",
-                                 patt = "[Bb]rightness.*\\.csv$",
+                                 patt = ".*[Bb]rightness.*\\.csv$",
                                  verbose = TRUE,
                                  ...) {
   init.dir <- getwd()
@@ -255,7 +252,7 @@ BrightnessPlotFolder <- function(folder.path = ".",
     if (verbose) {
       paste0("Now processing ", bld, ".") %>% message
     }
-    pdf.file.name <- bld %>% filesstrings::MakeExtName("pdf")
+    pdf.file.name <- filesstrings::MakeExtName(bld, "pdf")
     grDevices::pdf(pdf.file.name)
     c(list(mat = brightness.matrices[[i]]), dots) %>%
     do.call(MatrixRasterPlot, .) %>% print

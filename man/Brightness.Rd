@@ -14,7 +14,8 @@ BrightnessTxtFolder(folder.path = ".", tau = NA, mst = NULL,
   mcc = parallel::detectCores(), verbose = FALSE)
 
 Brightnesses(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, mcc = parallel::detectCores())
+  fail = NA, filt = NULL, verbose = FALSE,
+  mcc = parallel::detectCores())
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -97,7 +98,10 @@ MatrixRasterPlot(brightness, log.trans = TRUE)
 dir.create("tempdir")
 WriteIntImage(img, "tempdir/50.tif")
 WriteIntImage(img, "tempdir/50again.tif")
-BrightnessTxtFolder("tempdir", tau = "auto", mst = "tri")
+BrightnessTxtFolder("tempdir", tau = "auto", mst = "tri", mcc = 2)
 filesstrings::RemoveDirs("tempdir")
+img.paths <- rep(system.file("extdata", "50.tif", package = "nandb"), 2)
+brightnesses <- Brightnesses(img.paths, mst = "Huang", tau = "auto", mcc = 2)
+
 }
 

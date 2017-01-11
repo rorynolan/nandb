@@ -42,7 +42,7 @@ MatrixRasterPlot(img_brightness, log.trans = TRUE)
 ```
 
 and we can see what happens when we median filter. 
-```{r Brightness Plot, fig.width=5}
+```{r Brightness Plot, fig.width=5, fig.height=5}
 Brightness(img, tau = "auto", mst = "Huang", filt = "median") %>% 
   MatrixRasterPlot(scale.name = "brightness", log.trans = TRUE)
 ```

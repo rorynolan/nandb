@@ -95,9 +95,7 @@ if you're confused about a transposed plot, this is why.
 }
 \examples{
 library(EBImage)
-img <- ReadImageData(system.file("extdata",
-"low_oligomers.tif",
-package = "nandb"))
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 display(normalize(img[, , 1]), method = "raster")
 brightness <- Brightness(img, tau = 10, mst = "Huang")
 MatrixRasterPlot(brightness, scale.name = "brightness")

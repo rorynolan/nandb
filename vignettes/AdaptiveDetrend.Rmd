@@ -4,7 +4,7 @@ author: "Rory Nolan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Number and Brightness analysis in R}
+  %\VignetteIndexEntry{Adaptive Detrending}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

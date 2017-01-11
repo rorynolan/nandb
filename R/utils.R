@@ -108,20 +108,116 @@ Closest <- function(x, vec) {
   which.min(abs(x - vec)) %>% {vec[.]}
 }
 
-MCLapply <- function(x, fun, ..., mcc = parallel::detectCores()) {
-  dots <- list(...)
-  if (tolower(.Platform$OS.type) == "windows") mcc <- 1
-  if (length(dots)) {
-    args <- list(X = x, FUN = fun, ... = ..., mc.cores = mcc)
-  } else {
-    args <- list(X = x, FUN = fun, mc.cores = mcc)
-  }
-  do.call(parallel::mclapply, args)
-}
 MCMapply <- function(fun, ..., mcc = parallel::detectCores()) {
   dots <- list(...)
   x <- dots[[1]]
   if (tolower(.Platform$OS.type) == "windows") mcc <- 1
   args <- list(FUN = fun, ... = ..., mc.cores = mcc)
   do.call(parallel::mcmapply, args)
+}
+
+#' Collapse a big set of ranges into a smaller set.
+#'
+#' Say you have many ranges (or bins) in which you're assigning continuous
+#' values and you'd like to collapse these ranges such that there are fewer of
+#' them (but they still cover the same part of that continuous scale). This
+#' function is here to help.
+#'
+#' One property of this procedure is that each new range is the union of old
+#' ranges.
+#'
+#' @param ranges A strictly increasing (numeric) vector. Each set of adjacent
+#'   elements are interpreted as the bounds of a range (or bin).
+#' @param n.out A natural number. How many ranges should the output have?
+#' @param preserve A vector. Are there any original ranges that you'd like to
+#'   preserve? If so set them here. The first range is the interval
+#'   [\code{ranges[1]}, \code{ranges[2]}) and so on.
+#' @param prefer.low Are you more interested in the lower ranges? If so, set
+#'   this to true and all the high ranges will be collapsed into one.
+#' @param prefer.high Are you more interested in the higher ranges? If so, set
+#'   this to true and all the high ranges will be collapsed into one.
+#'
+#' @return A vector of the new ranges.
+CollapseRanges <- function(ranges, n.out, preserve = NULL,
+                           prefer.low = FALSE, prefer.high = FALSE) {
+  stopifnot(is.vector(ranges), is.numeric(ranges))
+  if (prefer.high && prefer.low) {
+    stop("One cannot select both prefer.high and prefer.low.")
+  }
+  if (!all(diff(ranges) > 0)) stop("ranges must be strictly increasing.")
+  lp <- length(preserve)
+  if (lp > n.out) {
+    stop("One cannot try to preserve more ranges than one wants overall. ",
+         "i.e. one cannot have length(preserve) > n.out.")
+  }
+  between.isolates <- GroupClose(setdiff(seq_along(ranges), isolate))
+  lbi <- length(between.isolates)
+  ranges.lower.bound <- li + lbi
+  if (ranges.lower.bound > n.out) {
+    message <- paste0("The way in which you've chosen n.out and isolate makes ",
+                      "it impossible to collapse the entirety of ranges into ",
+                      "n.out = ", n.out, " ranges. your selection for preserve ",
+                      "leaves ", lp, " ranges to preserve and ", lbi,
+                      " sets of ranges in between, so the result must have at ",
+                      "least ", ranges.lower.bound, " ranges, which is more ",
+                      "than you want.")
+    stop(message)
+  }
+  required.lbi <- n.out - lbi
+  lsbi <- lengths(between.isolates)
+  if (prefer.low) {
+
+  } else if (prefer.high) {
+
+  } else {
+    newbi <- as.list(lsbi)
+
+  }
+}
+
+#' Group together close adjacent elements of a vector.
+#'
+#' Given a strictly increasing vector (each element is bigger than the last),
+#' group together stretches of the vector where \emph{adjacent} elements are
+#' separeted by at most some specified distance. Hence, each element in each
+#' group has at least one other element in that group that is \emph{close} to
+#' it. See the examples.
+#' @param vec.ascending A strictly increasing numeric vector.
+#' @param max.gap The biggest allowable gap between adjacent elements for them
+#'   to be considered part of the same \emph{group}.
+#' @return A where each element is one group, as a numeric vector.
+#' @examples
+#' GroupClose(1:10, 1)
+#' GroupClose(1:10, 0.5)
+#' GroupClose(c(1, 2, 4, 10, 11, 14, 20, 25, 27), 3)
+#' @export
+GroupClose <- function(vec.ascending, max.gap = 1) {
+  lv <- length(vec.ascending)
+  if (lv == 0) stop("vec.ascending must have length greater than zero.")
+  test <- all(vec.ascending > dplyr::lag(vec.ascending), na.rm = TRUE)
+  if (!test) stop("vec.ascending must be strictly increasing.")
+  if (lv == 1) {
+    return(list(vec.ascending))
+  } else {
+    gaps <- vec.ascending[2:lv] - vec.ascending[1:(lv-1)]
+    big.gaps <- gaps > max.gap
+    nbgaps <- sum(big.gaps)  # number of big (>10) gaps
+    if (!nbgaps) {
+      return(list(vec.ascending))
+    } else {
+      ends <- which(big.gaps)  # vertical end of lines
+      group1 <- vec.ascending[1:ends[1]]
+      lg <- list(group1)
+      if (nbgaps == 1){
+        lg[[2]] <- vec.ascending[(ends[1] + 1):lv]
+      } else {
+        for (i in 2:nbgaps){
+          lg[[i]] <- vec.ascending[(ends[i - 1] + 1):ends[i]]
+          ikeep <- i
+        }
+        lg[[ikeep + 1]] <- vec.ascending[(ends[nbgaps] + 1):lv]
+      }
+      return(lg)
+    }
+  }
 }

@@ -13,12 +13,18 @@
 #'   mean intensities (via \code{\link{MeanStackThresh}})? If so, set your
 #'   thresholding \emph{method} here. Pixels failing to exceed the threshold are
 #'   set to \code{NA}.
+#' @param skip.consts An image array with only one value (a "constant array")
+#'   won't threshold properly. By default the function would give an error, but
+#'   by setting this parameter to \code{TRUE}, the array would instead be
+#'   skipped (the function will return the original array) and give a warning.
+#' @param fail If thresholding is done, to which value should pixels not
+#'   exceeeding the threshold be set?
 #' @param filt Do you want to smooth (\code{filt = "smooth"}) or median
-#'   (\code{filt = "median"}) filter the brightness image using
+#'   (\code{filt = "median"}) filter the mean intensity image using
 #'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option \code{na_count = TRUE}. If you want to smooth/median filter the
-#'   brightness image in a different way, first calculate the brightnesses
+#'   option \code{na_count = TRUE}. If you want to smooth/median filter the mean
+#'   intensity image in a different way, first calculate the mean intensities
 #'   without filtering (\code{filt = NULL}) using this function and then perform
 #'   your desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
@@ -32,21 +38,23 @@
 #'
 #' @examples
 #' library(EBImage)
-#' img <- ReadImageData(system.file("extdata",
-#' "low_oligomers.tif",
-#' package = "nandb"))
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
 #' mean.intensity <- MeanIntensity(img, mst = "Huang", filt = "median")
 #' display(normalize(mean.intensity), method = "r")
 #' @export
-MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, verbose = TRUE) {
+MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, skip.consts = FALSE,
+                          fail = NA, verbose = FALSE) {
   if (is.character(mat3d)) {
     if (verbose) print(paste0("Now processing: ", mat3d, "."))
     mat3d <- ReadImageData(mat3d)
   }
   d <- dim(mat3d)
   if (length(d) != 3) stop("mat3d must be a three-dimensional array")
-  if (!is.null(mst)) mat3d <- MeanStackThresh(mat3d, method = mst)
+  if (!is.null(mst)) {
+    mat3d <- MeanStackThresh(mat3d, method = mst, fail = fail,
+                             skip.consts = skip.consts)
+  }
   mean.intensity <- MeanPillars(mat3d)
   if (!is.null(filt)) {
     allowed <- c("median", "smooth")
@@ -81,7 +89,7 @@ MeanIntensity <- function(mat3d, mst = NULL, filt = NULL, verbose = TRUE) {
 #' dir.create("tempdir")
 #' WriteIntImage(img, "tempdir/50.tif")
 #' WriteIntImage(img, "tempdir/50again.tif")
-#' MeanIntensityTxtFolder("tempdir")
+#' MeanIntensityTxtFolder("tempdir", mcc = 2)
 #' filesstrings::RemoveDirs("tempdir")
 #'
 #' @export
@@ -93,15 +101,64 @@ MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
   on.exit(setwd(init.dir))
   setwd(folder.path)
   file.names <- list.files(pattern = ext)
-  mean.intensities <- MCLapply(file.names, MeanIntensity,
-                               mst = mst, verbose = verbose,
-                               mcc = mcc)
+  mean.intensities <- MeanIntensities(file.names, MeanIntensity, mst = mst,
+                                      verbose = verbose, mcc = mcc)
   frames <- sapply(mean.intensities, function(x) attr(x, "frames"))
   msts <- sapply(mean.intensities, function(x) attr(x, "thresh"))
   filters <- sapply(mean.intensities, function(x) attr(x, "filter"))
-  names.noext.brightness <- sapply(file.names, filesstrings::StrBeforeNth,
+  names.noext.mean.intensity <- sapply(file.names, filesstrings::StrBeforeNth,
                                    stringr::coll("."), -1) %>%
     paste0("_MeanIntensity_frames=", frames, "_mst=", msts, "_filter=", filters)
-  mapply(WriteImageTxt, mean.intensities, names.noext.brightness) %>% invisible
+  invisible(mapply(WriteImageTxt, mean.intensities, names.noext.mean.intensity))
   if (verbose) print("Done. Please check folder.")
+}
+
+#' @rdname MeanIntensity
+#'
+#' @param mat3d.list A list of 3-dimensional arrays. To perform this on files
+#'   that have not yet been read in, set this argument to the path to these
+#'   files (a character vector).
+#'
+#' @examples
+#' img.paths <- rep(system.file("extdata", "50.tif", package = "nandb"), 2)
+#' mean.intensities <- MeanIntensities(img.paths, mst = "Huang", mcc = 2)
+#'
+#' @export
+MeanIntensities <- function(mat3d.list, mst = NULL, skip.consts = FALSE,
+                            fail = NA, filt = NULL, verbose = FALSE,
+                            mcc = parallel::detectCores()) {
+  if (is.null(mst)) {
+    mean.intensities <- BiocParallel::bplapply(mat3d.list, MeanIntensity,
+                                               filt = filt, verbose = verbose,
+                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+  } else if (is.list(mat3d.list)) {
+    mat3d.list <- lapply(mat3d.list, MeanStackThresh, method = mst,
+                         fail = fail, skip.consts = skip.consts)
+    mean.intensities <- BiocParallel::bplapply(mat3d.list, MeanIntensity,
+                                               filt = filt, verbose = verbose,
+                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+  } else {
+    if (!is.character(mat3d.list)) {
+      stop("mat3d.list must either be a list of 3d arrays, ",
+           "or a character vector of paths to the locations ",
+           "of 3d arrays on disk.")
+    }
+    mean.intensities <- list()
+    sets <- seq_along(mat3d.list) %>% {split(., ((. - 1) %/% mcc) + 1)}
+    for (i in sets) {
+      arrays <- BiocParallel::bplapply(mat3d.list[i], ReadImageData,
+                  BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+      threshed <- lapply(arrays, MeanStackThresh, method = mst, fail = fail,
+                         skip.consts = skip.consts)
+      mean.intensities.i <- BiocParallel::bplapply(threshed, MeanIntensity,
+                          filt = filt, verbose = verbose,
+                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+      mean.intensities[i] <- mean.intensities.i
+    }
+  }
+  mean.intensities <- lapply(mean.intensities, function(x) {
+    attr(x, "mst") <- mst
+    x
+  })
+  mean.intensities
 }

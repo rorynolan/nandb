@@ -68,7 +68,7 @@ sectioning is done for calculation of brightnesses.
 library(EBImage)
 img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 display(normalize(img[, , 1]), method = "raster")
-bts <- BrightnessTimeSeries(img, 10, tau = "auto", mst = "tri", filt = "median")
+bts <- BrightnessTimeSeries(img, 10, tau = "auto", mst = "tri", filt = "median", mcc = 2)
 
 }
 \seealso{

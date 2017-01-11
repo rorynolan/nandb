@@ -1,10 +1,17 @@
 Package: nandb
 Type: Package
 Title: Molucular Number and Brightness Calculations
-Version: 0.0.0.9016
-Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", role = c("aut", "cre"))
+Version: 0.0.0.9017
+Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
+                  role = c("aut", "cre"))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
-Description: This package is gives functions for calculation of molecular number and brightness from images, as detailed in Digman et al. 2008.
+URL: https://github.com/rorynolan/filesstrings
+BugReports: https://github.com/rorynolan/filesstrings/issues
+Description: This package is gives functions for calculation of molecular 
+    number and brightness from images, as detailed in Digman et al. 2008. This
+    is (to the best of my knowledge) the first free, open-source software 
+    available for this purpose and comes with an implementation of the novel
+    "automatic detrending" technique.
 License: BSD_3_clause + file LICENSE
 LazyData: TRUE
 LinkingTo: Rcpp,

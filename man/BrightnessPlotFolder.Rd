@@ -4,7 +4,7 @@
 \alias{BrightnessPlotFolder}
 \title{Make brightness plots (images) for an entire folder.}
 \usage{
-BrightnessPlotFolder(folder.path = ".", patt = "[Bb]rightness.*\\\\.csv$",
+BrightnessPlotFolder(folder.path = ".", patt = ".*[Bb]rightness.*\\\\.csv$",
   verbose = TRUE, ...)
 }
 \arguments{

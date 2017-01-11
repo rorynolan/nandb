@@ -130,3 +130,7 @@ WhichIntervalC <- function(numbers, ranges) {
     .Call('nandb_WhichIntervalC', PACKAGE = 'nandb', numbers, ranges)
 }
 
+SplitEverykGives <- function(vec, k) {
+    .Call('nandb_SplitEverykGives', PACKAGE = 'nandb', vec, k)
+}
+

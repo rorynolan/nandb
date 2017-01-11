@@ -20,8 +20,7 @@ should be greater than 1).
 }
 \examples{
 library(EBImage)
-img <- ReadImageData(system.file("extdata", "low_oligomers.tif",
-package = "nandb"))
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 display(normalize(img[, , 1]), method = "raster")
 brightness <- Brightness(img, tau = 10, mst = "Huang")
 KmerPlot(brightness, 1.16)

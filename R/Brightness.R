@@ -67,16 +67,17 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
     mat3d <- MeanStackThresh(mat3d, method = mst, fail = fail,
                              skip.consts = skip.consts)
   }
+  tau.auto <- FALSE
   if (!is.na(tau)) {
     if (is.character(tau)) {
       tau <- tolower(tau)
       if (startsWith("auto", tau)) {
         tau <- BestTau(mat3d)
+        tau.auto <- TRUE
       } else {
         stop("If tau is a string, it must be 'auto'.")
       }
     } else if ((!is.numeric(tau)) && (!is.na(tau))) {
-      print(tau)
       stop("If tau is not numeric, then is must be NA or 'auto'.")
     }
     mat3d <- CorrectForBleaching(mat3d, tau)
@@ -95,10 +96,14 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
     }
   }
   attributes(brightness) <- c(attributes(brightness),
-                              list(frames = d[3], tau = tau,
-                                 filter = ifelse(is.null(filt), NA, filt),
-                                 mst = ifelse(is.null(mst), NA, mst)
-                                 )
+    list(frames = d[3],
+         tau = ifelse(tau.auto,
+                      ifelse(is.na(tau), "auto=NA",
+                             stringr::str_c("auto=", round(tau, 2))),
+                      tau),
+         filter = ifelse(is.null(filt), NA, filt),
+         mst = ifelse(is.null(mst), NA, mst)
+    )
   )
   brightness
 }
@@ -127,7 +132,7 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #' library(EBImage)
 #' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
-#' bts <- BrightnessTimeSeries(img, 10, tau = "auto", mst = "tri", filt = "median")
+#' bts <- BrightnessTimeSeries(img, 10, tau = "auto", mst = "tri", filt = "median", mcc = 2)
 #'
 #' @export
 BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
@@ -175,7 +180,7 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
 #' dir.create("tempdir")
 #' WriteIntImage(img, "tempdir/50.tif")
 #' WriteIntImage(img, "tempdir/50again.tif")
-#' BrightnessTxtFolder("tempdir", tau = "auto", mst = "tri")
+#' BrightnessTxtFolder("tempdir", tau = "auto", mst = "tri", mcc = 2)
 #' filesstrings::RemoveDirs("tempdir")
 #' @export
 BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
@@ -199,6 +204,7 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
     const <- sapply(file.names, CheckConst)
     mst <- ifelse(const, mst, "fail")
   }
+  tau <- sapply(brightnesses, function(x) attr(x, "tau"))
   names.noext.brightness <- sapply(file.names, filesstrings::BeforeLastDot) %>%
     paste0("_brightness_frames=", frames, "_tau=", tau,
            "_mst=", mst, "_filter=", ifelse(is.null(filt), NA, filt))
@@ -212,18 +218,23 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
 #'   that have not yet been read in, set this argument to the path to these
 #'   files (a character vector).
 #'
+#' @examples
+#' img.paths <- rep(system.file("extdata", "50.tif", package = "nandb"), 2)
+#' brightnesses <- Brightnesses(img.paths, mst = "Huang", tau = "auto", mcc = 2)
+#'
 #' @export
 Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
-                         fail = NA, filt = NULL,
+                         fail = NA, filt = NULL, verbose = FALSE,
                          mcc = parallel::detectCores()) {
   if (is.null(mst)) {
     brightnesses <- BiocParallel::bplapply(mat3d.list, Brightness, tau = tau,
-      filt = filt, BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+                      filt = filt, verbose = verbose,
+                      BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
   } else if (is.list(mat3d.list)) {
     mat3d.list <- lapply(mat3d.list, MeanStackThresh, method = mst,
                          fail = fail, skip.consts = skip.consts)
     brightnesses <- BiocParallel::bplapply(mat3d.list, Brightness,
-                                           tau = tau, filt = filt,
+                      tau = tau, filt = filt, verbose = verbose,
                       BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
   } else {
     if (!is.character(mat3d.list)) {
@@ -239,7 +250,7 @@ Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
       threshed <- lapply(arrays, MeanStackThresh, method = mst, fail = fail,
                          skip.consts = skip.consts)
       brightnesses.i <- BiocParallel::bplapply(threshed, Brightness,
-                                               tau = tau, filt = filt,
+                          tau = tau, filt = filt, verbose = verbose,
                           BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
       brightnesses[i] <- brightnesses.i
     }

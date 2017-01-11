@@ -16,3 +16,8 @@ IntegerVector WhichIntervalC(NumericVector numbers, NumericMatrix ranges) {
   interval.attr("dim") = numbers.attr("dim");
   return(interval);
 }
+
+// [[Rcpp::export]]
+int SplitEverykGives(IntegerVector vec, int k) {
+  return(sum(ceiling(as<NumericVector>(vec) / k)));
+}

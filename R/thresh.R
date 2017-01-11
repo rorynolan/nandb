@@ -25,8 +25,7 @@
 #'
 #' @examples
 #' library(EBImage)
-#' img <- ReadImageData(system.file("extdata",
-#' "low_oligomers.tif", package = "nandb"))
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' display(normalize(img[, , 1]), method = "raster")
 #' img_thresh_mask <- MeanStackThresh(img, "Otsu")
 #' display(img_thresh_mask[, , 1] > 0, method = "r")
