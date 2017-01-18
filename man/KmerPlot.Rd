@@ -11,7 +11,9 @@ KmerPlot(brightness.mat, monomer.brightness, log.trans = FALSE)
 
 \item{monomer.brightness}{The (median) brightness of a monomer.}
 
-\item{log.trans}{Do you want to log-transform the colour scaling?}
+\item{log.trans}{Do you want to log-transform the colour scaling?
+
+This is a \code{ggplot2} object and can be manipulated thus.}
 }
 \description{
 Make a colour image based on a brightness image where each kmer has its own

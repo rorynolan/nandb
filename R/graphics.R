@@ -65,6 +65,9 @@
 #' @param log.trans Do you want to log-transform the colour scaling?
 #' @param breaks Where do you want tick marks to appear on the legend colour
 #'   scale?
+#' @param include.breaks If you don't want to specify all the breaks, but you
+#'   want some specific ones to be included on the legend colour scale, specify
+#'   those specific ones here
 #'
 #' @return In the graphics console, a raster plot (via
 #'   \code{\link[ggplot2]{geom_raster}}) will appear with the matrix values
@@ -87,12 +90,13 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
                              range.names = NULL, colours = NULL,
                              na.colour = "black", clip = FALSE,
                              clip.low = FALSE, clip.high = FALSE,
-                             log.trans = FALSE, breaks = NULL) {
-  plain.theme <- ggplot2::theme(axis.ticks = ggplot2::element_blank(),
-                      axis.text = ggplot2::element_blank(),
-                      axis.title = ggplot2::element_blank(),
-                      panel.background = ggplot2::element_rect(fill = "white"),
-                      legend.key.height = ggplot2::unit(1, "cm"))
+                             log.trans = FALSE, breaks = NULL,
+                             include.breaks = NULL) {
+  plain.theme <- theme(axis.ticks = element_blank(),
+                      axis.text = element_blank(),
+                      axis.title = element_blank(),
+                      panel.background = element_rect(fill = "white"),
+                      legend.key.height = unit(1, "cm"))
   rownames(mat) <- NULL
   colnames(mat) <- NULL
   df <- reshape2::melt(mat) %>%
@@ -124,8 +128,8 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
     } else {
       range.names <- levels(colours.ranges)
     }
-    ggplot2::ggplot(df, ggplot2::aes(x, y, fill = colour)) +
-      ggplot2::scale_fill_manual(scale.name,
+    ggplot(df, aes(x, y, fill = colour)) +
+      scale_fill_manual(scale.name,
                                  values = colours %T>% {
                                    names(.) <- as.character(seq_along(colours))
                                  },
@@ -133,8 +137,8 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
                                  labels = range.names %T>% {
                                    names(.) <- as.character(seq_along(colours))
                                  }) +
-      ggplot2::geom_raster() +
-      plain.theme + ggplot2::coord_fixed()
+      geom_raster() +
+      plain.theme + coord_fixed()
   } else {
     if (is.null(limits)) limits <- range(df$value, na.rm = TRUE)
     if (is.null(colours)) colours <- viridis::viridis(9)
@@ -147,30 +151,34 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
     if (is.null(breaks)) {
       if (log.trans) {
         if (min(limits) <= 0) {
-          stop("The data or limits range are not all positive-valued therefore a log-transformation is not possible.")
-        } else {
-          # limits <- log(limits)
+          stop("The data or limits range are not all positive-valued, ",
+               "therefore a log-transformation is not possible.")
         }
         breaks <- function(x) {
           untruncated <- exp(seq(log(min(x)), log(max(x)), length.out = 5))
           min.sep <- min(diff(untruncated))
-          roundn <- log10(min.sep) %>% {  # get a sensible amount of digits for breaks
+          roundn <- log10(min.sep) %>% {
+            # get a sensible amount of digits for breaks
             ifelse(. >= 1, 0, -floor(.))
           }
           round(untruncated, roundn)
         }
       } else {
-        breaks <- ggplot2::waiver()
+        if (is.null(include.breaks)) {
+          breaks <- waiver()
+        } else {
+          breaks
+        }
       }
     }
-    ggplot2::ggplot(df, ggplot2::aes(x, y, fill = value)) +
-      ggplot2::scale_fill_gradientn(scale.name, limits = limits,
+    ggplot(df, aes(x, y, fill = value)) +
+      scale_fill_gradientn(scale.name, limits = limits,
                                    colours = colours,
                                    na.value = na.colour,
                                    trans = ifelse(log.trans,
                                                   "log", "identity"),
                                    breaks = breaks) +
-      ggplot2::geom_raster() + plain.theme + ggplot2::coord_fixed()
+      geom_raster() + plain.theme + coord_fixed()
   }
 }
 
@@ -183,6 +191,8 @@ MatrixRasterPlot <- function(mat, scale.name = "scale",
 #' @param brightness.mat The brightness matrix.
 #' @param monomer.brightness The (median) brightness of a monomer.
 #' @param log.trans Do you want to log-transform the colour scaling?
+#'
+#' This is a \code{ggplot2} object and can be manipulated thus.
 #'
 #' @examples
 #' library(EBImage)
@@ -233,6 +243,8 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
 #' @param ... Parameters to pass to \code{\link{MatrixRasterPlot}} (these
 #'   \emph{must} be named arguments).
 #'
+#' This is a \code{ggplot2} object and can be manipulated thus.
+#'
 BrightnessPlotFolder <- function(folder.path = ".",
                                  patt = ".*[Bb]rightness.*\\.csv$",
                                  verbose = TRUE,
@@ -258,4 +270,22 @@ BrightnessPlotFolder <- function(folder.path = ".",
     do.call(MatrixRasterPlot, .) %>% print
     grDevices::dev.off()
   }
+}
+
+#' Plot the values in two arrays against each other.
+#'
+#' Plot the values of two arrays of identical dimension against each other using
+#' a hexagonal heatmap.
+#'
+#' @param arr.x,arr.y The two arrays. The \code{arrx} values will be along the \eqn{x} axis and the \code{arry} values along the \eqn{y} axis.
+#'
+#' This is a \code{ggplot2} object and can be manipulated thus.
+#'
+ArrArrHexPlot <- function(arr.x, arr.y, bins = 100, log.trans = FALSE) {
+  stopifnot(all.equal(dim(arr.x), dim(arr.y)))
+  df <- tibble(x = as.vector(arr.x), y = as.vector(arr.y))
+  ggplot(df, aes(x, y)) + geom_hex(bins = bins) +
+    scale_fill_gradientn(colours = viridis::viridis(99),
+                         trans = ifelse(log.trans,
+                                        "log", "identity"))
 }

@@ -6,7 +6,8 @@
 \usage{
 MatrixRasterPlot(mat, scale.name = "scale", limits = NULL, ranges = NULL,
   range.names = NULL, colours = NULL, na.colour = "black", clip = FALSE,
-  clip.low = FALSE, clip.high = FALSE, log.trans = FALSE, breaks = NULL)
+  clip.low = FALSE, clip.high = FALSE, log.trans = FALSE, breaks = NULL,
+  include.breaks = NULL)
 }
 \arguments{
 \item{mat}{The matrix you wish to plot.}
@@ -71,6 +72,10 @@ falling below those limits/ranges will be set to \code{NA}.}
 
 \item{breaks}{Where do you want tick marks to appear on the legend colour
 scale?}
+
+\item{include.breaks}{If you don't want to specify all the breaks, but you
+want some specific ones to be included on the legend colour scale, specify
+those specific ones here}
 }
 \value{
 In the graphics console, a raster plot (via

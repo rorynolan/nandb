@@ -21,3 +21,18 @@ IntegerVector WhichIntervalC(NumericVector numbers, NumericMatrix ranges) {
 int SplitEverykGives(IntegerVector vec, int k) {
   return(sum(ceiling(as<NumericVector>(vec) / k)));
 }
+
+// [[Rcpp::export]]
+IntegerVector SpreadSpecificHelper(NumericVector interval_lengths,
+                                   IntegerVector interval_pops,  //populations
+                                   int m) {
+  NumericVector next_betw_lengths;
+  NumericVector interval_pops_num = as<NumericVector>(interval_pops);
+  int min_pos;
+  for (int i = 0; i < m; i++) {
+    next_betw_lengths = interval_lengths / interval_pops_num;
+    min_pos = which_max(next_betw_lengths);
+    interval_pops_num[min_pos]++;
+  }
+  return(as<IntegerVector>(interval_pops_num));
+}

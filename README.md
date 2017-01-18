@@ -24,7 +24,8 @@ On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools
 Then, everyone, open R and run:
 
 ``` r
-install.packages(c("devtools", "knitr", "rmarkdown", "XML", "xml2"))
+install.packages(c("devtools", "knitr", "rmarkdown", 
+                   "XML", "xml2", "gstat", "gridExtra"))
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("EBImage", "BiocParallel"))
 ```
@@ -68,7 +69,6 @@ For the lowdown on how to use this package, you should read the package vignette
 
 ``` r
 library("nandb")
-library("magrittr")
 ```
 
 Then load the .tif file included with the package:

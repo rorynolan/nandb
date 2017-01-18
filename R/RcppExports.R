@@ -134,3 +134,7 @@ SplitEverykGives <- function(vec, k) {
     .Call('nandb_SplitEverykGives', PACKAGE = 'nandb', vec, k)
 }
 
+SpreadSpecificHelper <- function(interval_lengths, interval_pops, m) {
+    .Call('nandb_SpreadSpecificHelper', PACKAGE = 'nandb', interval_lengths, interval_pops, m)
+}
+

@@ -1,6 +1,7 @@
 #' @useDynLib nandb
 #' @importFrom Rcpp sourceCpp
 #' @importFrom magrittr "%>%" "%T>%"
+#' @import ggplot2
 NULL
 
 ## quiet concerns of R CMD check re: the .'s that appear in pipelines

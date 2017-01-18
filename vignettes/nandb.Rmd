@@ -15,9 +15,8 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 
 ### Loading the libraries
 
-First, let's load the `nandb` and `EBImage` libraries and the `tidyverse` (we'll need them).
 ```{r load library, results='hide', message=FALSE}
-required <- c("nandb", "EBImage", "tidyverse")
+required <- c("nandb", "EBImage", "magrittr", "dplyr", "ggplot2")
 sapply(required, library, character.only = TRUE)
 ```
 

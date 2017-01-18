@@ -221,3 +221,72 @@ GroupClose <- function(vec.ascending, max.gap = 1) {
     }
   }
 }
+
+#' Get the best \emph{spread} of numbers in an interval.
+#'
+#' Say we have an interval \eqn{[a, b]}  and we want to evenly spread \eqn{n}
+#' numbers in this interval, however \eqn{m} of these \eqn{n} numbers have been
+#' chosen beforehand, so we have to fithe the other \eqn{n - m} in around them
+#' the best we can. Our goal is to maximize the minimum distance between
+#' adjacent elements.
+#'
+#' The idea is to, for an interval of size \eqn{s}, put in \eqn{floor(s / (n -
+#' m))} numbers into each of these intervals. Then, if there any numbers left
+#' over, put exactly one into each of the intervals with the biggest \eqn{(s /
+#' (n - m)) - \code{floor}(s / (n - m))} (starting with the biggest and working
+#' one's way down) until there are no numbers left to assign. The end intervals
+#' need special treatment since (assuming the ends are not in the specific
+#' numbers), the end intervals are open on one side (one boundary has no point
+#' on it), whereas all the middle intervals are not.
+#'
+#' @param interval A length 2 numeric vector. The real interval over which one
+#'   wants to spread the numbers.
+#' @param specific A numeric vector. The specific numbers that one wants to be
+#'   part of our spread.
+#' @param n A number. The total number of numbers that you want to be in the
+#'   spread (including the number(s) in \code{specific}).
+#'
+#' @return A numeric vector. The chosen \eqn{n} numbers.
+#'
+#' @examples
+#' SpreadSpecific(c(0, 10), 1, 3)
+#'
+#' @export
+SpreadSpecific <- function(interval, specific, n) {
+  stopifnot(length(interval) == 2, length(specific) > 0, length(n) == 1)
+  interval <- sort(interval)
+  specific <- sort(unique(specific))
+  lspec <- length(specific)
+  interval.pops.init <- c(1, rep(2, lspec - 1), 1)
+  left.open <- interval[1] == specific[1]
+  right.open <- interval[2] == specific[length(specific)]
+  if (left.open) interval.pops.init <- interval.pops.init[-1]
+  if (right.open) {
+    interval.pops <- interval.pops.init[-length(interval.pops.init)]
+  }
+  intervals <- unique(c(interval[1], specific, interval[2]))
+  interval.lengths <- diff(intervals)
+  stopifnot(length(interval.lengths) == length(interval.pops.init))
+  interval.pops.final <- SpreadSpecificHelper(interval.lengths,
+                                              interval.pops.init,
+                                              n - lspec)
+  interval.pops.add <- interval.pops.final - interval.pops.init
+  intervals.list <- cbind(dplyr::lag(intervals), intervals)[-1, ] %>%
+    Mat2RowList
+  to.be.added.to <- interval.pops.add > 0
+  intervals.list.to.add <- intervals.list[to.be.added.to]
+  interval.pops.final.to.add <- interval.pops.final[to.be.added.to]
+  for (i in seq_along(intervals.list.to.add)) {
+    intervals.list.to.add[[i]] <- seq(intervals.list.to.add[[i]][1],
+                                    intervals.list.to.add[[i]][2],
+                                    length.out = interval.pops.final.to.add[i])
+  }
+  sort(unique(c(specific, unlist(intervals.list.to.add))))
+}
+
+Mat2ColList <- function(mat) {
+  lapply(seq_len(ncol(mat)), function(i) mat[, i])
+}
+Mat2RowList <- function(mat) {
+  lapply(seq_len(ncol(mat)), function(i) mat[i, ])
+}

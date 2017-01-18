@@ -18,7 +18,9 @@ contains "Brightness" or "brightness" in its name.}
 \item{verbose}{Get a real time report on progress?}
 
 \item{...}{Parameters to pass to \code{\link{MatrixRasterPlot}} (these
-\emph{must} be named arguments).}
+  \emph{must} be named arguments).
+
+This is a \code{ggplot2} object and can be manipulated thus.}
 }
 \description{
 This requires that the folder already have the brightnesses saved as csv

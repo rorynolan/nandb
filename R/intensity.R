@@ -130,13 +130,13 @@ MeanIntensities <- function(mat3d.list, mst = NULL, skip.consts = FALSE,
   if (is.null(mst)) {
     mean.intensities <- BiocParallel::bplapply(mat3d.list, MeanIntensity,
                                                filt = filt, verbose = verbose,
-                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+      BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
   } else if (is.list(mat3d.list)) {
     mat3d.list <- lapply(mat3d.list, MeanStackThresh, method = mst,
                          fail = fail, skip.consts = skip.consts)
     mean.intensities <- BiocParallel::bplapply(mat3d.list, MeanIntensity,
                                                filt = filt, verbose = verbose,
-                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+      BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
   } else {
     if (!is.character(mat3d.list)) {
       stop("mat3d.list must either be a list of 3d arrays, ",
@@ -146,13 +146,12 @@ MeanIntensities <- function(mat3d.list, mst = NULL, skip.consts = FALSE,
     mean.intensities <- list()
     sets <- seq_along(mat3d.list) %>% {split(., ((. - 1) %/% mcc) + 1)}
     for (i in sets) {
-      arrays <- BiocParallel::bplapply(mat3d.list[i], ReadImageData,
-                  BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+      arrays <- lapply(mat3d.list[i], ReadImageData)
       threshed <- lapply(arrays, MeanStackThresh, method = mst, fail = fail,
                          skip.consts = skip.consts)
       mean.intensities.i <- BiocParallel::bplapply(threshed, MeanIntensity,
                           filt = filt, verbose = verbose,
-                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+        BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
       mean.intensities[i] <- mean.intensities.i
     }
   }

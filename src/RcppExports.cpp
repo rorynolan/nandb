@@ -150,3 +150,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SpreadSpecificHelper
+IntegerVector SpreadSpecificHelper(NumericVector interval_lengths, IntegerVector interval_pops, int m);
+RcppExport SEXP nandb_SpreadSpecificHelper(SEXP interval_lengthsSEXP, SEXP interval_popsSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type interval_lengths(interval_lengthsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type interval_pops(interval_popsSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(SpreadSpecificHelper(interval_lengths, interval_pops, m));
+    return rcpp_result_gen;
+END_RCPP
+}
