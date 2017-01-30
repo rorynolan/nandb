@@ -11,7 +11,7 @@ KmersFromBrightnesses(brightnesses, monomer.med)
 
 \item{monomer.med}{The median brightness of a monomer. You must know what
   this is to use this function correctly. This must be greater than 1 (this
-  is the "apparent brightness" of a monomer). If you're reading the Digman et
+  is the 'apparent brightness' of a monomer). If you're reading the Digman et
   al. (2008) paper, this is \eqn{1 + \epsilon}.
 
   This function takes the brightnesses in the range (1, 1 + 2 *
@@ -20,7 +20,7 @@ KmersFromBrightnesses(brightnesses, monomer.med)
   \code{monomer.med}, 1 + 6 * \code{monomer.med} to be trimers and so on.}
 }
 \value{
-A named vector (named "1mers" "2mers" "3mers" and so on) with each
+A named vector (named '1mers' '2mers' '3mers' and so on) with each
   element detailing the number of that kmer found.
 }
 \description{

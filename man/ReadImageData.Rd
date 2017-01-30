@@ -8,7 +8,7 @@ ReadImageData(image.name, fix.lut = NULL)
 }
 \arguments{
 \item{image.name}{The path to the image file on disk. The file extension must
-be one of ".jpeg", ".png", ".tiff" or ".tif".}
+be one of '.jpeg', '.png', '.tiff' or '.tif'.}
 
 \item{fix.lut}{When reading in images (via \code{\link[EBImage]{readImage}}),
 R can give an array of different dimensionality than you expect. If you
@@ -30,7 +30,7 @@ package. By default, \code{readImage} reads in pixel intensities in the range
 [0, 1]. \code{ReadImageData} reads in pixel intensities as integers as they
 would be represented in a tiff file and displayed therefrom in ImageJ. This
 is necessary when calculating number and brightness, where we need pixel
-values to be in units of "counts".
+values to be in units of 'counts'.
 
 Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
 }\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
@@ -43,7 +43,7 @@ the value in position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from
 is why.
 }
 \examples{
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 
 }
 

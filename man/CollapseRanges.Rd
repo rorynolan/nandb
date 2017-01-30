@@ -36,4 +36,12 @@ function is here to help.
 One property of this procedure is that each new range is the union of old
 ranges.
 }
+\examples{
+set.seed(0)
+ranges <- sort(sample(1:100, 11))
+print(ranges)
+CollapseRanges(ranges, 6, c(3, 7))
+CollapseRanges(ranges, 6, c(3, 7), prefer.low = TRUE)
+CollapseRanges(ranges, 6, c(3, 7), prefer.high = TRUE)
+}
 

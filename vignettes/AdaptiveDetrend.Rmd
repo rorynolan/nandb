@@ -16,8 +16,8 @@ set.seed(2016)
 
 Load the packages:
 ```{r load packages, message=FALSE}
-required.pkgs <- c("nandb", "EBImage", "autothresholdr", 
-                   "tidyverse", "matrixStats", "KernSmooth")
+required.pkgs <- c("nandb", "EBImage", "autothresholdr", "dplyr", 
+                   "ggplot2", "matrixStats")
 invisible(sapply(required.pkgs, library, character.only = TRUE))
 ```
 
@@ -57,7 +57,7 @@ For the simulated series, given that we know that aside from bleaching, it shoul
 
 You wish to simulate $n$ frames of $p$ pixels. What is $p$? Say the the original images have $P$ pixels (e.g. $256 \times 256 = 65536$). If you threshold them, you exculde some pixels and are left with $p$ pixels where $p < P$ (the other pixels are set to `NA` by the thresholding). If you are not thresholding, then $p=P$. 
 
-The various pixels of the image may have different amounts of immobile and mobile particles in them, and hence, when we replace the mobile particles with immobile, the pixels still won't necessarily have the *same* amount of immobile particles contributing to their intensity (and hence not the same expected intensity at each pixel). However, since we only intend to correct for bleaching on a whole-image scale,^[By *whole-image scale* I mean applying the same exponential filtering routine (same $\tau$) to each pixel in the series of frames, rather than having a different $\tau$ for each pixel. This is a good idea since at a global scale it is relatively easy to get a sense of bleaching whereas at the pixel microscale, it is hard to distinguish whether changes in intensity are due to particle movement or due to bleaching.] we are only really interested in the *average* (averaged across the whole image) bleaching of the image series.^[Inherent here is an assumption that the amount of bleaching per fluorophore is region-independent.]
+The various pixels of the image may have different amounts of immobile and mobile particles in them, and hence, when we replace the mobile particles with immobile, the pixels still won't necessarily have the *same* amount of immobile particles contributing to their intensity (and hence not the same expected intensity at each pixel). However, since we only intend to correct for bleaching on a whole-image scale,^[By *whole-image scale* I mean applying the same exponential filtering routine (same $\tau$) to each pixel in the series of frames, rather than having a different $\tau$ for each pixel. This is a good idea since at a global scale it is relatively easy to get a sense of bleaching whereas at the pixel microscale, it is hard to distinguish whether changes in intensity are due to particle movement or due to bleaching.] we are only really interested in the *average* (averaged across the whole image) bleaching of the image series.
 
 Hence, the only criteria we want our simulated image series to have are:
 
@@ -71,7 +71,7 @@ Here's how we satisfy them:
 
 1. To find the number of pixels $p$, just count the number of non-`NA` pixels in the image post-thresholding, or if you don't threshold, it's just the number of pixels in the image.
 
-1. Counts from stationary particles follow a Poission distribution, so each pixel intensity value should be drawn from a Poisson distribution with some mean $\lambda$.
+1. Counts from stationary particles follow a Poission distribution, so each pixel intensity value should be drawn from a Poisson distribution with some mean parameter $\lambda$.
 
 1. Setting $\lambda$ equal to the desired mean for the whole frame (so a different $\lambda$ for each frame but the same $\lambda$ for each pixel within a given frame) will ensure that the whole frame will have mean $\lambda$ (or as near as makes no difference).^[This is common sense, but mathematically it comes from the central limit theorem.]
 
@@ -146,7 +146,7 @@ tau.again
 Now you may be concerned that `tau` (`r round(tau)`) and `tau.again` (`r round(tau.again)`) are different. This is to be expected since there is a random element to the way they are computed: the images coming from all immobile particles are \emph{simulated}. Whilst the difference in `tau`s might seem alarming, they are actually relatively similar values in that detrends of `tau = ``r round(tau)` and `tau.again = ``r round(tau.again)` are actually relatively similar, indeed the difference between them is akin to the difference between `tau`s of `r 10` and `r round(10 * tau.again / tau)`. Let's plot the brightnesses of no detrend, $\tau = 10$, `r round(tau)` and `r round(tau.again)` to see how similar they are.
 ```{r plot the brightnesses from the various detrends, fig.width=7}
 GetDensityDF <- function(mat, detrend) {
-  d <- bkde(mat[!is.na(mat)], range.x = c(0, 5), gridsize = 2^16)
+  d <- density(mat[!is.na(mat)], range.x = c(0, 5), gridsize = 2^16)
   tibble(detrend = detrend, brightness = d$x, frequency = d$y)
 }
 brightnesses <- lapply(c(NA, 10, tau, tau.again), Brightness, mat3d = eg.img,

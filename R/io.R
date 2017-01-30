@@ -8,7 +8,7 @@
 #' [0, 1]. \code{ReadImageData} reads in pixel intensities as integers as they
 #' would be represented in a tiff file and displayed therefrom in ImageJ. This
 #' is necessary when calculating number and brightness, where we need pixel
-#' values to be in units of "counts".
+#' values to be in units of 'counts'.
 #'
 #' Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
 #' }\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
@@ -21,7 +21,7 @@
 #' is why.
 #'
 #' @param image.name The path to the image file on disk. The file extension must
-#'   be one of ".jpeg", ".png", ".tiff" or ".tif".
+#'   be one of '.jpeg', '.png', '.tiff' or '.tif'.
 #' @param fix.lut When reading in images (via \code{\link[EBImage]{readImage}}),
 #'   R can give an array of different dimensionality than you expect. If you
 #'   suspect this happening, set the value of this parameter to the \emph{number
@@ -32,16 +32,16 @@
 #' @return An array of integers representing the image.
 #'
 #' @examples
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #'
 #' @export
-ReadImageData <- function(image.name,
-                          fix.lut = NULL) {
+ReadImageData <- function(image.name, fix.lut = NULL) {
   image.data <- suppressWarnings(EBImage::imageData(
     EBImage::readImage(image.name, as.is = TRUE)))
   if (!is.null(fix.lut)) {
     if (isTRUE(fix.lut)) {
-      stop("If fix.lut is not set to false, it must be specified as an integer (not as TRUE). Read the documentation for ReadImageData.")
+      stop("If fix.lut is not set to false, it must be specified as an integer",
+           " (not as TRUE). Read the documentation for ReadImageData.")
     }
     image.data <- FixLUTError(image.data, fix.lut)
   }
@@ -71,8 +71,8 @@ ReadImageData <- function(image.name,
 #'   a file extension.
 #'
 #' @examples
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-#' WriteImageTxt(img, "temp")
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' WriteImageTxt(img, 'temp')
 #'
 #' @export
 WriteImageTxt <- function(img.arr, file.name) {
@@ -91,7 +91,7 @@ WriteImageTxt <- function(img.arr, file.name) {
     slices.dfs <- lapply(seq_len(d[3]), Slices, img.arr) %>%
       lapply(as.data.frame)
     file.names <- paste0(file.name, "_", seq_len(d[3])) %>%
-      sapply(filesstrings::MakeExtName, "csv") %>%
+      vapply(filesstrings::MakeExtName, character(1), "csv") %>%
       (filesstrings::NiceNums)
     mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE) %>%
       invisible
@@ -101,12 +101,15 @@ WriteImageTxt <- function(img.arr, file.name) {
 #' @rdname WriteImageTxt
 #'
 #' @examples
-#' img <- ReadImageTxt("temp_01.csv")
-#' file.remove(list.files(pattern = "^temp.*\\.csv$"))
+#' img <- ReadImageTxt('temp_01.csv')
+#' file.remove(list.files(pattern = '^temp.*\\.csv$'))
 #' @export
 ReadImageTxt <- function(file.name) {
-  suppressMessages(readr::read_csv(file.name, col_names = FALSE, progress = FALSE)) %>%
-    data.matrix %>% magrittr::set_colnames(value = NULL) %>% t
+  suppressMessages(readr::read_csv(file.name, col_names = FALSE,
+    progress = FALSE)) %>%
+    data.matrix %>%
+    magrittr::set_colnames(value = NULL) %>%
+    t
 }
 
 #' Write an integer array to disk as a tiff image.
@@ -120,14 +123,14 @@ ReadImageTxt <- function(file.name) {
 #' @param file.name The name of the tif file (with or without the .tif) that you
 #'   wish to write.
 #' @param na How do you want to treat \code{NA} values? R can only write integer
-#'   values (and hence not \code{NA}s) to tiff pixels. \code{na = "saturate"}
-#'   sets them to saturated value. \code{na = "zero"} sets them to zero, while
-#'   \code{na = "error"} will give an error if th image contains \code{NA}s.
+#'   values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'}
+#'   sets them to saturated value. \code{na = 'zero'} sets them to zero, while
+#'   \code{na = 'error'} will give an error if th image contains \code{NA}s.
 #'
 #' @examples
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-#' dir.create("tempdir")
-#' WriteIntImage(img, "tempdir/50.tif")
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' dir.create('tempdir')
+#' WriteIntImage(img, 'tempdir/50.tif')
 #'
 #' @export
 WriteIntImage <- function(img.arr, file.name, na = "error") {
@@ -138,9 +141,10 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
     stop("img.arr must not contain negative values")
   }
   na <- RSAGA::match.arg.ext(na, c("saturate", "zero", "error"),
-                             ignore.case = TRUE)
+    ignore.case = TRUE)
   any.nas <- anyNA(img.arr)
-  if (na == "error" && any.nas) stop("img.arr contains NA values.")
+  if (na == "error" && any.nas)
+    stop("img.arr contains NA values.")
   mx <- max(img.arr, na.rm = TRUE)
   if (mx >= 2^32) {
     stop("The maximum value in img.arr must be less than 2^32")
@@ -151,14 +155,15 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
   } else {
     bits.per.sample <- 8
   }
-  img.arr <- img.arr / (2 ^ bits.per.sample - 1)
+  img.arr <- img.arr/(2^bits.per.sample - 1)
   if (any.nas) {
-    if (na == "saturate") img.arr[is.na(img.arr)] <- 1
-    if (na == "zero") img.arr[is.na(img.arr)] <- 0
+    if (na == "saturate")
+      img.arr[is.na(img.arr)] <- 1
+    if (na == "zero")
+      img.arr[is.na(img.arr)] <- 0
   }
   file.name <- filesstrings::MakeExtName(file.name, "tif")
-  EBImage::writeImage(img.arr, file.name,
-                      bits.per.sample = bits.per.sample)
+  EBImage::writeImage(img.arr, file.name, bits.per.sample = bits.per.sample)
 }
 
 #' Fix an image that didn't recognise channels while reading
@@ -189,14 +194,20 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
 #' @export
 ForceChannels <- function(img.arr, n.ch) {
   d <- dim(img.arr)
-  if (length(d) != 3) stop("img.arr must be a 3-dimensional array")
-  if (d[3] %% n.ch != 0) {
-    message <- paste0("The number of slices in the input array must be a multiple of n.ch, however you have ", d[3], " slices in your input array and n.ch = ", n.ch, ".")
+  if (length(d) != 3)
+    stop("img.arr must be a 3-dimensional array")
+  if (d[3]%%n.ch != 0) {
+    message <- paste0("The number of slices in the input array must be a ",
+      "multiple of n.ch, however you have ",
+      d[3], " slices in your input array and n.ch = ", n.ch, ".")
     stop(message)
   }
-  index.groups <- lapply(seq_len(n.ch), function(x) seq(x, d[3], n.ch))
-  ch.groups <- lapply(index.groups, function(x) img.arr[, , x])
-  to.be.apermed <- Reduce(function(x, y) abind::abind(x, y, along = 4), ch.groups)
+  index.groups <- lapply(seq_len(n.ch), function(x) seq(x,
+    d[3], n.ch))
+  ch.groups <- lapply(index.groups, function(x) img.arr[, ,
+    x])
+  to.be.apermed <- Reduce(function(x, y) abind::abind(x, y,
+    along = 4), ch.groups)
   aperm(to.be.apermed, c(1, 2, 4, 3))
 }
 
@@ -210,16 +221,16 @@ ForceChannels <- function(img.arr, n.ch) {
 #' @param mcc The number of parallel cores to use for the processing.
 #'
 #' @examples
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-#' WriteIntImage(img[, , 1], "50_1.tif")
-#' WriteIntImage(img[, , 2], "50_2.tif")
-#' Stack2DTifs(c("50_1.tif", "50_2.tif"), "50_1_2")
-#' file.remove(c("50_1.tif", "50_2.tif", "50_1_2.tif"))
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' WriteIntImage(img[, , 1], '50_1.tif')
+#' WriteIntImage(img[, , 2], '50_2.tif')
+#' Stack2DTifs(c('50_1.tif', '50_2.tif'), '50_1_2')
+#' file.remove(c('50_1.tif', '50_2.tif', '50_1_2.tif'))
 #' @export
 Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
   out.name <- filesstrings::MakeExtName(out.name, "tif")
   images <- BiocParallel::bplapply(file.names, EBImage::readImage,
-                          BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+    BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
   dims <- lapply(images, dim)
   u <- unique(dims)
   if (length(u) != 1) {
@@ -228,7 +239,8 @@ Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
   if (length(u[[1]]) != 2) {
     stop("The images must all be 2-dimensional")
   }
-  stacked <- Reduce(function(x, y) abind::abind(x, y, along = 3), images)
+  stacked <- Reduce(function(x, y) abind::abind(x, y, along = 3),
+    images)
   EBImage::writeImage(stacked, out.name)
 }
 

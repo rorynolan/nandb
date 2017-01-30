@@ -18,24 +18,24 @@ thresholding \emph{method} here.}
 
 \item{tol}{What size of error in the estimate of the \emph{ideal} \code{tau}
 (aside from the error introduced by the random image simulation, see
-\code{vignette("Adaptive Detrending", package = "nandb")}) are you willing
-to tolerate?}
+\code{vignette('AdaptiveDetrend', package = 'nandb')}) are you willing
+to tolerate? The default is 1.}
 }
 \value{
 A number. The estimate of the ideal \code{tau} to use, with an
-  attribute "\code{brightness.immobile}" giving the brightness of the
+  attribute '\code{brightness.immobile}' giving the brightness of the
   simulated (from all immobile particles) image series after detrending with
   this \code{tau} (this should be very close to 1).
 }
 \description{
 Say you have an image series that you wish to detrend before performing a
 brightness calculation. This function finds the best \code{tau} for an
-exponential filtering detrend. See \code{vignette("Adaptive Detrending",
-package = "nandb")} for more details.
+exponential filtering detrend. See \code{vignette('Adaptive Detrending',
+package = 'nandb')} for more details.
 }
 \examples{
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-BestTau(img, mst = "tri", tol = 3)
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+BestTau(img, mst = 'tri', tol = 3)
 
 }
 

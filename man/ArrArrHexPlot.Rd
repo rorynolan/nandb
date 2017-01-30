@@ -4,15 +4,41 @@
 \alias{ArrArrHexPlot}
 \title{Plot the values in two arrays against each other.}
 \usage{
-ArrArrHexPlot(arr.x, arr.y, bins = 100, log.trans = FALSE)
+ArrArrHexPlot(arr.x, arr.y, bins = 60, log.trans = FALSE, colours = NULL,
+  limits = NULL)
 }
 \arguments{
-\item{arr.x, arr.y}{The two arrays. The \code{arrx} values will be along the \eqn{x} axis and the \code{arry} values along the \eqn{y} axis.
+\item{arr.x, arr.y}{The two arrays. The \code{arrx} values will be along the \eqn{x} axis and the \code{arry} values along the \eqn{y} axis.}
 
-This is a \code{ggplot2} object and can be manipulated thus.}
+\item{bins}{Passed to \code{\link[ggplot2]{geom_hex}}.}
+
+\item{log.trans}{Do you want to log-transform the colour scaling?}
+
+\item{colours}{Here you may specify the colours (to be passed to
+\code{\link[ggplot2]{scale_fill_gradientn}}) to create the continuous
+colour band. It is specified as a character vector, with the colors
+specified either as the values in \code{\link{colors}} or as in the value
+of the \code{\link{rgb}} function. Note that this allows the use of
+\code{\link[grDevices]{rainbow}} and friends. The default uses
+\code{\link[viridis]{viridis}}.}
+
+\item{limits}{A numeric vector of length two providing limits of the scale.}
+}
+\value{
+This is a \code{ggplot2} object and can be manipulated thus.
 }
 \description{
 Plot the values of two arrays of identical dimension against each other using
 a hexagonal heatmap.
+}
+\examples{
+library(EBImage)
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+display(normalize(img[, , 1]), method = 'raster')
+brightness <- Brightness(img, tau = 10, mst = 'Huang')
+mean.intensity <- MeanPillars(img)
+ArrArrHexPlot(mean.intensity, brightness) +
+ggplot2::labs(x = 'intensity', y = 'brightness')
+
 }
 

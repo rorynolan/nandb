@@ -9,12 +9,18 @@ ApplyOnPillars(mat3d, FUN)
 \arguments{
 \item{mat3d}{A 3-dimensional array.}
 
-\item{FUN}{A function which takes a vector as imput and, for a given input length, outputs a vector of constant length (can be 1).}
+\item{FUN}{A function which takes a vector as imput and, for a given input
+length, outputs a vector of constant length (can be 1).}
 }
 \value{
-If \code{FUN} is returning length 1 vectors, a matrix whereby \code{mat[i, j] = FUN(mat3d[i, j, ])}. If FUN is returning vectors of length \code{l > 1}, a 3-dimensional array whereby \code{arr[i, j, ] = FUN(mat3d[i, j, ])}.
+If \code{FUN} is returning length 1 vectors, a matrix whereby
+  \code{mat[i, j] = FUN(mat3d[i, j, ])}. If FUN is returning vectors of
+  length \code{l > 1}, a 3-dimensional array whereby \code{arr[i, j, ] =
+  FUN(mat3d[i, j, ])}.
 }
 \description{
-Define a "pillar" of a 3-dimensional array as pillar \code{i,j} off array \code{arr} being \code{arr[i, j, ]}. This function applies a specified function to each pillar.
+Define a 'pillar' of a 3-dimensional array as pillar \code{i,j} off array
+\code{arr} being \code{arr[i, j, ]}. This function applies a specified
+function to each pillar.
 }
 

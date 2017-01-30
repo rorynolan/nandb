@@ -1,16 +1,19 @@
 #' @useDynLib nandb
 #' @importFrom Rcpp sourceCpp
-#' @importFrom magrittr "%>%" "%T>%"
+#' @importFrom magrittr '%>%' '%T>%'
 #' @import ggplot2
 NULL
 
-## quiet concerns of R CMD check re: the .'s that appear in pipelines
+## quiet concerns of R CMD check re: the .'s that appear in
+## pipelines
 if (getRversion() >= "2.15.1") {
-  utils::globalVariables(c(".", "Var1", "Var2", "value", "x", "y", "colour"))
+  utils::globalVariables(c(".", "Var1", "Var2", "value", "x", 
+    "y", "colour"))
 }
 
 .onLoad <- function(libname, pkgname) {
-  ## Workaround needed for BiocParallel MulticoreParam to work on mac
+  ## Workaround needed for BiocParallel MulticoreParam to work
+  ## on mac
   options(bphost = "localhost")
 }
 
@@ -19,8 +22,8 @@ if (getRversion() >= "2.15.1") {
 #' The \code{nandb} package is gives functions for calculation of molecular
 #' number and brightness from images, as detailed in Digman et al. 2008. This is
 #' (to the best of my knowledge) the first free, open-source software available
-#' for this purpose and comes with an implementation of the novel "automatic
-#' detrending" technique.
+#' for this purpose and comes with an implementation of the novel 'automatic
+#' detrending' technique.
 #'
 #' @docType package
 #' @name nandb

@@ -12,7 +12,7 @@ KmerTIFFsFromBrightnessCSVs(monomer.brightness, csv.paths = NULL,
 \item{monomer.brightness}{The (median) brightness of a monomer.}
 
 \item{csv.paths}{The paths to the brightness csv files, defaults to
-\code{list.files(pattern = "[Bb]rightness.*\\.csv")}.}
+\code{list.files(pattern = '[Bb]rightness.*\\.csv')}.}
 
 \item{out.names}{The names you want the output files to have (will be forced
 to .tif).}

@@ -8,23 +8,25 @@
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param tau The time constant for the exponential filtering. If this is set to
-#'   \code{"auto"}, then the value of \code{tau} is calculated automatically via
+#'   \code{'auto'}, then the value of \code{tau} is calculated automatically via
 #'   \code{\link{BestTau}}.
 #'
 #' @references Stroud, P. D.: A recursive exponential filter for time-sensitive
 #'   data, Los Alamos national Laboratory, LAUR-99-5573,
 #'   \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
 #'
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' tau10 <- CorrectForBleaching(img, 10)
-#' autotau <- CorrectForBleaching(img, "auto")
+#' autotau <- CorrectForBleaching(img, 'auto')
 #'
 #' @return The detrended image series.
 #' @export
 CorrectForBleaching <- function(mat3d, tau) {
   d <- dim(mat3d)
-  if (length(d) != 3) stop("mat3d must be a three-dimensional array")
-  if (is.na(tau)) return(mat3d)  # option to do nothing
+  if (length(d) != 3)
+    stop("mat3d must be a three-dimensional array")
+  if (is.na(tau))
+    return(mat3d)  # option to do nothing
   if (is.character(tau)) {
     tau <- tolower(tau)
     if (startsWith("auto", tau)) {
@@ -38,17 +40,18 @@ CorrectForBleaching <- function(mat3d, tau) {
   smoothed <- ExpSmoothPillars(mat3d, tau)
   filtered <- mat3d - smoothed
   means <- MeanPillars(mat3d)
-  corrected <- filtered + as.vector(means)  # as it so happens, this will add the means to the pillars as we desire
+  corrected <- filtered + as.vector(means)
+  # as it so happens, this will add the means to the pillars as we desire
   corrected[corrected < 0] <- 0
-  corrected <- round(corrected)  # return the array back to integer counts
+  round(corrected)  # return the array back to integer counts
 }
 
 #' Find the best tau for exponential filtering detrend.
 #'
 #' Say you have an image series that you wish to detrend before performing a
 #' brightness calculation. This function finds the best \code{tau} for an
-#' exponential filtering detrend. See \code{vignette("Adaptive Detrending",
-#' package = "nandb")} for more details.
+#' exponential filtering detrend. See \code{vignette('Adaptive Detrending',
+#' package = 'nandb')} for more details.
 #'
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
@@ -59,24 +62,25 @@ CorrectForBleaching <- function(mat3d, tau) {
 #'   thresholding \emph{method} here.
 #' @param tol What size of error in the estimate of the \emph{ideal} \code{tau}
 #'   (aside from the error introduced by the random image simulation, see
-#'   \code{vignette("Adaptive Detrending", package = "nandb")}) are you willing
-#'   to tolerate?
+#'   \code{vignette('AdaptiveDetrend', package = 'nandb')}) are you willing
+#'   to tolerate? The default is 1.
 #'
 #' @return A number. The estimate of the ideal \code{tau} to use, with an
-#'   attribute "\code{brightness.immobile}" giving the brightness of the
+#'   attribute '\code{brightness.immobile}' giving the brightness of the
 #'   simulated (from all immobile particles) image series after detrending with
 #'   this \code{tau} (this should be very close to 1).
 #'
 #' @examples
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-#' BestTau(img, mst = "tri", tol = 3)
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' BestTau(img, mst = 'tri', tol = 3)
 #'
 #' @export
 BestTau <- function(mat3d, mst = NULL, tol = 1) {
   if (is.character(mat3d)) {
     mat3d <- ReadImageData(mat3d[1])
   }
-  if (!is.null(mst)) mat3d <- MeanStackThresh(mat3d, mst, fail = NA)
+  if (!is.null(mst))
+    mat3d <- MeanStackThresh(mat3d, mst, fail = NA)
   raw.brightness.mean <- Brightness(mat3d) %>% mean(na.rm = TRUE)
   if (raw.brightness.mean < 1) {
     stop("Your raw brightness mean is below 1,",
@@ -84,30 +88,33 @@ BestTau <- function(mat3d, mst = NULL, tol = 1) {
   }
   means <- apply(mat3d, 3, mean, na.rm = TRUE)
   p <- sum(!is.na(mat3d[, , 1]))
-  sim.img.arr <- sapply(means, stats::rpois, n = p)
+  sim.img.arr <- vapply(means, stats::rpois, numeric(p), n = p)
   BrightnessMeanSimMatTau <- function(sim.img.arr, tau) {
     if (is.na(tau)) {
       detrended <- sim.img.arr
     } else {
-      detrended <- sim.img.arr - ExpSmoothRows(sim.img.arr, tau) +
-        rowMeans(sim.img.arr)
+      detrended <- sim.img.arr - ExpSmoothRows(sim.img.arr,
+        tau) + rowMeans(sim.img.arr)
     }
-    brightnesses <- matrixStats::rowVars(detrended) / rowMeans(detrended)
+    brightnesses <- matrixStats::rowVars(detrended)/rowMeans(detrended)
     mean(brightnesses)
   }
-  notau.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr, NA)
+  notau.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr,
+    NA)
   if (notau.sim.brightness.mean <= 1) {
-    # In this case, no bleaching is detected, therefore no detrend is needed
+    # In this case, no bleaching is detected, therefore no
+    # detrend is needed
     return(NA)
   }
-  tau2.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr, 2)
+  tau2.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr,
+    2)
   if (tau2.sim.brightness.mean > 1) {
     stop("Even with a savage detrend of tau = 2, ",
          "the brightnesses still have mean greater than 1. ",
-         "There's probably a problem with your data. ",
-         "You should check this out, ",
-         "and if you want to work with the data as is, ",
-         "then you'll have to choose your own detrend.")
+        "There's probably a problem with your data. ",
+        "You should check this out, ",
+        "and if you want to work with the data as is, ",
+        "then you'll have to choose your own detrend.")
   }
   lower <- 2
   upper <- length(means)
@@ -119,7 +126,7 @@ BestTau <- function(mat3d, mst = NULL, tol = 1) {
     BrightnessMeanSimMatTau(sim.img.arr, tau) - 1
   }
   root <- stats::uniroot(TauFarFromOne, c(lower, upper), sim.img.arr,
-                  tol = tol, extendInt = "upX")
+    tol = tol, extendInt = "upX")
   tau <- root$root
   attr(tau, "brightness.immobile") <- 1 + root$f.root
   tau

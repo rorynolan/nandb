@@ -18,10 +18,10 @@ Say you have saved what you would like to be one 3D tif stack as a series of
 2D tif files. This helps you stack them into one file.
 }
 \examples{
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-WriteIntImage(img[, , 1], "50_1.tif")
-WriteIntImage(img[, , 2], "50_2.tif")
-Stack2DTifs(c("50_1.tif", "50_2.tif"), "50_1_2")
-file.remove(c("50_1.tif", "50_2.tif", "50_1_2.tif"))
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+WriteIntImage(img[, , 1], '50_1.tif')
+WriteIntImage(img[, , 2], '50_2.tif')
+Stack2DTifs(c('50_1.tif', '50_2.tif'), '50_1_2')
+file.remove(c('50_1.tif', '50_2.tif', '50_1_2.tif'))
 }
 

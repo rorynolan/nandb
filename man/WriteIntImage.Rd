@@ -13,9 +13,9 @@ WriteIntImage(img.arr, file.name, na = "error")
 wish to write.}
 
 \item{na}{How do you want to treat \code{NA} values? R can only write integer
-values (and hence not \code{NA}s) to tiff pixels. \code{na = "saturate"}
-sets them to saturated value. \code{na = "zero"} sets them to zero, while
-\code{na = "error"} will give an error if th image contains \code{NA}s.}
+values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'}
+sets them to saturated value. \code{na = 'zero'} sets them to zero, while
+\code{na = 'error'} will give an error if th image contains \code{NA}s.}
 }
 \description{
 \link[EBImage]{EBImage}'s \code{\link[EBImage]{writeImage}} truncates all
@@ -24,9 +24,9 @@ allows you to write integer-vlued arrays to disk as tiff files as you would
 want.
 }
 \examples{
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-dir.create("tempdir")
-WriteIntImage(img, "tempdir/50.tif")
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+dir.create('tempdir')
+WriteIntImage(img, 'tempdir/50.tif')
 
 }
 

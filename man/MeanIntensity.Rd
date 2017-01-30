@@ -26,8 +26,8 @@ mean intensities (via \code{\link{MeanStackThresh}})? If so, set your
 thresholding \emph{method} here. Pixels failing to exceed the threshold are
 set to \code{NA}.}
 
-\item{filt}{Do you want to smooth (\code{filt = "smooth"}) or median
-(\code{filt = "median"}) filter the mean intensity image using
+\item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
+(\code{filt = 'median'}) filter the mean intensity image using
 \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter the mean
@@ -35,7 +35,7 @@ intensity image in a different way, first calculate the mean intensities
 without filtering (\code{filt = NULL}) using this function and then perform
 your desired filtering routine on the result.}
 
-\item{skip.consts}{An image array with only one value (a "constant array")
+\item{skip.consts}{An image array with only one value (a 'constant array')
 won't threshold properly. By default the function would give an error, but
 by setting this parameter to \code{TRUE}, the array would instead be
 skipped (the function will return the original array) and give a warning.}
@@ -75,19 +75,19 @@ does this for every image in a folder, writing the results as text files via
 }
 \examples{
 library(EBImage)
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-display(normalize(img[, , 1]), method = "raster")
-mean.intensity <- MeanIntensity(img, mst = "Huang", filt = "median")
-display(normalize(mean.intensity), method = "r")
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-dir.create("tempdir")
-WriteIntImage(img, "tempdir/50.tif")
-WriteIntImage(img, "tempdir/50again.tif")
-MeanIntensityTxtFolder("tempdir", mcc = 2)
-filesstrings::RemoveDirs("tempdir")
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+display(normalize(img[, , 1]), method = 'raster')
+mean.intensity <- MeanIntensity(img, mst = 'Huang', filt = 'median')
+display(normalize(mean.intensity), method = 'r')
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+dir.create('tempdir')
+WriteIntImage(img, 'tempdir/50.tif')
+WriteIntImage(img, 'tempdir/50again.tif')
+MeanIntensityTxtFolder('tempdir', mcc = 2)
+filesstrings::RemoveDirs('tempdir')
 
-img.paths <- rep(system.file("extdata", "50.tif", package = "nandb"), 2)
-mean.intensities <- MeanIntensities(img.paths, mst = "Huang", mcc = 2)
+img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
+mean.intensities <- MeanIntensities(img.paths, mst = 'Huang', mcc = 2)
 
 }
 

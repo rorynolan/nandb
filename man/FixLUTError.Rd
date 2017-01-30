@@ -12,7 +12,7 @@ FixLUTError(arr, ndim.out)
 \item{ndim.out}{How many dimensions do you want the output array to have?}
 }
 \value{
-An array. If the function implemented a "fix", then the output array
+An array. If the function implemented a 'fix', then the output array
   will have one less dimension than the input array.
 }
 \description{

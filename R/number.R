@@ -1,17 +1,17 @@
-#' Calculate brightness from image series.
+#' Calculate number from image series.
 #'
-#' Given a time stack of images, \code{Brightness} performs a calculation of the
-#' brightness for each pixel. \code{BrightnessTxtFolder} does this calculation
-#' for an entire folder, writing the results as text files via
-#' \code{\link{WriteImageTxt}}. \code{Brightnesses} calculates the brightnesses
-#' for several image series in parallel.
+#' Given a time stack of images, \code{Number} performs a calculation of the
+#' number for each pixel. \code{NumberTxtFolder} does this
+#' calculation for an entire folder, writing the results as text files via
+#' \code{\link{WriteImageTxt}}. \code{Numbers} calculates the numbers for
+#' several image series in parallel.
 #'
-#' Do not try to parallelize the use of \code{Brightness} and friends yourself
-#' (e.g. with \code{\link{mclapply}}) because it will throw an error (this is
-#' because the \code{autothresholdr} package does not work in parallel (indeed
-#' anything run using the \code{rJava} package won't)). Always use
-#' \code{Brightnesses} for this purpose (this has a workaround whereby it does
-#' the thresholding in series and does the rest in parallel).
+#' Do not try to parallelize the use of \code{Number} and friends yourself (e.g.
+#' with \code{\link{mclapply}}) because it will throw an error (this is because
+#' the \code{autothresholdr} package does not work in parallel (indeed anything
+#' run using the \code{rJava} package won't)). Always use \code{Numbers} for
+#' this purpose (this has a workaround whereby it does the thresholding in
+#' series and does the rest in parallel).
 #'
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
@@ -23,8 +23,8 @@
 #'   frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 #'   calculated automatically via \code{\link{BestTau}}.
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via \code{\link{MeanStackThresh}})? If so, set your
-#'   thresholding \emph{method} here.
+#'   number (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+#'   \emph{method} here.
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
 #'   by setting this parameter to \code{TRUE}, the array would instead be
@@ -32,30 +32,29 @@
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeeding the threshold be set?
 #' @param filt Do you want to smooth (\code{filt = 'smooth'}) or median
-#'   (\code{filt = 'median'}) filter the brightness image using
+#'   (\code{filt = 'median'}) filter the number image using
 #'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
 #'   option \code{na_count = TRUE}. If you want to smooth/median filter the
-#'   brightness image in a different way, first calculate the brightnesses
-#'   without filtering (\code{filt = NULL}) using this function and then perform
-#'   your desired filtering routine on the result.
+#'   number image in a different way, first calculate the numbers without
+#'   filtering (\code{filt = NULL}) using this function and then perform your
+#'   desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   \code{BrightnessTxtFolder}, does not work with multiple cores).
+#'   \code{NumberTxtFolder}, does not work with multiple cores).
 #'
-#' @return \code{Brightness} returns a matrix, the brightness image;
-#'   \code{Brightnesses} returns a list of these. The result of
-#'   \code{BrightnessTxtFolder} is the text csv files written to disk (in the
-#'   same folder as the input images).
+#' @return \code{Number} returns a matrix, the number image; \code{Numbers}
+#'   returns a list of these. The result of \code{NumberTxtFolder} is the text
+#'   csv files written to disk (in the same folder as the input images).
 #'
 #' @examples
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
-#' MatrixRasterPlot(brightness, log.trans = TRUE)
+#' number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median')
+#' MatrixRasterPlot(number, log.trans = TRUE)
 #' @export
-Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
+Number <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
   fail = NA, filt = NULL, verbose = FALSE) {
   if (is.character(mat3d)) {
     if (verbose)
@@ -84,7 +83,7 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
     }
     mat3d <- CorrectForBleaching(mat3d, tau)
   }
-  brightness <- VarPillars(mat3d)/MeanPillars(mat3d)
+  number <- MeanPillars(mat3d)^2/VarPillars(mat3d)
   if (!is.null(filt)) {
     allowed <- c("median", "smooth")
     filt <- tolower(filt)
@@ -93,50 +92,47 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
       stop("filt must be either 'median' or 'smooth'")
     filt <- allowed[sw]
     if (filt == "median") {
-      brightness <- MedianFilterB(brightness, na_count = TRUE)
+      number <- MedianFilterB(number, na_count = TRUE)
     } else {
-      brightness <- SmoothFilterB(brightness, na_count = TRUE)
+      number <- SmoothFilterB(number, na_count = TRUE)
     }
   }
-  tau <- ifelse(tau.auto, ifelse(is.na(tau), "auto=NA", stringr::str_c("auto=",
-    round(tau, 2))), tau)
-  filter <- ifelse(is.null(filt), NA, filt)
-  mst <- ifelse(is.null(mst), NA, mst)
-  new.brightness.attrs <- list(frames = d[3], tau = tau, filter = filter,
-    mst = mst)
-  attributes(brightness) <- c(attributes(brightness), new.brightness.attrs)
-  brightness
+  attributes(number) <- c(attributes(number), list(frames = d[3],
+    tau = as.character(ifelse(tau.auto, ifelse(is.na(tau), "auto=NA",
+      stringr::str_c("auto=", round(tau, 2))), tau)),
+    filter = ifelse(is.null(filt), NA, filt),
+    mst = ifelse(is.null(mst), NA, mst)))
+  number
 }
 
-#' Create a Brightness time-series.
+#' Create a number time-series.
 #'
-#' Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of
-#' them to create one brightness image, the next \code{frames.per.set} of them
-#' to create the next brightness image and so on to get a time-series of
-#' brightness images. If \code{tau} is specified, bleaching correction is
-#' performed via \code{\link{CorrectForBleaching}}.
+#' Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of them to
+#' create one number image, the next \code{frames.per.set} of them to create
+#' the next number image and so on to get a time-series of number
+#' images. If \code{tau} is specified, bleaching correction is performed via
+#' \code{\link{CorrectForBleaching}}.
 #'
 #' This may discard some images, for example if 175 frames are in the input and
 #' \code{frames.per.set = 50}, then the last 25 are discarded. If bleaching
 #' correction is selected, it is performed on the whole image stack before the
-#' sectioning is done for calculation of brightnesses.
+#' sectioning is done for calculation of numbers.
 #'
-#' @inheritParams Brightness
+#' @inheritParams Number
 #' @param frames.per.set The number of frames with which to calculate the
-#'   successive brightnesses.
+#'   successive numbers.
 #'
-#' @return An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
-#' @seealso \code{\link{Brightness}}.
+#' @return An array where the \eqn{i}th slice is the \eqn{i}th number image.
+#' @seealso \code{\link{Number}}.
 #'
 #' @examples
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
-#' filt = 'median', mcc = 2)
+#' bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median', mcc = 2)
 #'
 #' @export
-BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
+NumberTimeSeries <- function(mat3d, frames.per.set, tau = NA,
   mst = NULL, skip.consts = FALSE, filt = NULL, verbose = FALSE,
   mcc = parallel::detectCores()) {
   if (is.character(mat3d)) {
@@ -157,17 +153,16 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
     ((x - 1) * frames.per.set + 1):(x * frames.per.set)
   })
   sets <- lapply(set.indices, Slices, mat3d)
-  brightnesses <- Brightnesses(sets, tau = NA, mst = NULL,
-    skip.consts = skip.consts, filt = filt, mcc = mcc) %>%
-    Reduce(function(x, y) abind::abind(x, y, along = 3),
-      .)
-  if (length(dim(brightnesses)) == 2) {
-    brightnesses <- abind::abind(brightnesses, along = 3)
+  numbers <- Numbers(sets, tau = NA, mst = NULL, skip.consts = skip.consts,
+    filt = filt, mcc = mcc) %>% Reduce(function(x, y) abind::abind(x,
+    y, along = 3), .)
+  if (length(dim(numbers)) == 2) {
+    numbers <- abind::abind(numbers, along = 3)
   }
-  brightnesses
+  numbers
 }
 
-#' @rdname Brightness
+#' @rdname Number
 #'
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
@@ -181,22 +176,22 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
 #' dir.create('tempdir')
 #' WriteIntImage(img, 'tempdir/50.tif')
 #' WriteIntImage(img, 'tempdir/50again.tif')
-#' BrightnessTxtFolder('tempdir', tau = 'auto', mst = 'tri', mcc = 2)
+#' NumberTxtFolder('tempdir', tau = 'auto', mst = 'tri', mcc = 2)
 #' filesstrings::RemoveDirs('tempdir')
 #' @export
-BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
-  mst = NULL, skip.consts = FALSE, filt = NULL, ext = "\\.tif$",
+NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
+  skip.consts = FALSE, filt = NULL, ext = "\\.tif$",
   mcc = parallel::detectCores(), verbose = FALSE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
   file.names <- list.files(pattern = ext)
-  brightnesses <- Brightnesses(file.names, tau = tau, mst = mst,
-    skip.consts = skip.consts, filt = filt)
-  frames <- vapply(brightnesses, function(x) attr(x, "frames"), integer(1))
+  numbers <- Numbers(file.names, tau = tau, mst = mst,
+                     skip.consts = skip.consts, filt = filt)
+  frames <- vapply(numbers, function(x) attr(x, "frames"), integer(1))
   if (skip.consts) {
-    # this may seem inefficient but it's cost is negligible
-    # relative to that of the brightness calculations
+    # this may seem inefficient but it's cost is negligible in
+    # relative to that of the number calculations
     CheckConst <- function(file.path) {
       arr <- ReadImageData(file.path)
       length(unique(as.vector(arr))) == 1
@@ -204,18 +199,17 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
     const <- vapply(file.names, CheckConst, TRUE)
     mst <- ifelse(const, mst, "fail")
   }
-  tau <- simplify2array(lapply(brightnesses, function(x) attr(x, "tau")))
-  names.noext.brightness <- vapply(file.names, filesstrings::BeforeLastDot,
-                                   character(1)) %>%
-    paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
+  tau <- vapply(numbers, function(x) attr(x, "tau"), character(1))
+  names.noext.number <- vapply(file.names, filesstrings::BeforeLastDot,
+                               character(1)) %>%
+    paste0("_number_frames=", frames, "_tau=", tau, "_mst=",
       mst, "_filter=", ifelse(is.null(filt), NA, filt))
-  mapply(WriteImageTxt, brightnesses, names.noext.brightness) %>%
-    invisible
+  mapply(WriteImageTxt, numbers, names.noext.number) %>% invisible
   if (verbose)
     print("Done. Please check folder.")
 }
 
-#' @rdname Brightness
+#' @rdname Number
 #'
 #' @param mat3d.list A list of 3-dimensional arrays. To perform this on files
 #'   that have not yet been read in, set this argument to the path to these
@@ -223,19 +217,19 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
 #'
 #' @examples
 #' img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-#' brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
+#' numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
 #'
 #' @export
-Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
+Numbers <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
   fail = NA, filt = NULL, verbose = FALSE, mcc = parallel::detectCores()) {
   if (is.null(mst)) {
-    brightnesses <- BiocParallel::bplapply(mat3d.list, Brightness,
+    numbers <- BiocParallel::bplapply(mat3d.list, Number,
       tau = tau, filt = filt, verbose = verbose,
       BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
   } else if (is.list(mat3d.list)) {
     mat3d.list <- lapply(mat3d.list, MeanStackThresh, method = mst,
       fail = fail, skip.consts = skip.consts)
-    brightnesses <- BiocParallel::bplapply(mat3d.list, Brightness,
+    numbers <- BiocParallel::bplapply(mat3d.list, Number,
       tau = tau, filt = filt, verbose = verbose,
       BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
   } else {
@@ -244,7 +238,7 @@ Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
         "or a character vector of paths to the locations ",
         "of 3d arrays on disk.")
     }
-    brightnesses <- list()
+    numbers <- list()
     sets <- seq_along(mat3d.list) %>% {
       split(., ((. - 1)%/%mcc) + 1)
     }
@@ -252,15 +246,15 @@ Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
       arrays <- lapply(mat3d.list[i], ReadImageData)
       threshed <- lapply(arrays, MeanStackThresh, method = mst,
         fail = fail, skip.consts = skip.consts)
-      brightnesses.i <- BiocParallel::bplapply(threshed,
-        Brightness, tau = tau, filt = filt, verbose = verbose,
+      numbers.i <- BiocParallel::bplapply(threshed, Number,
+        tau = tau, filt = filt, verbose = verbose,
         BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
-      brightnesses[i] <- brightnesses.i
+      numbers[i] <- numbers.i
     }
   }
-  brightnesses <- lapply(brightnesses, function(x) {
+  numbers <- lapply(numbers, function(x) {
     attr(x, "mst") <- mst
     x
   })
-  brightnesses
+  numbers
 }

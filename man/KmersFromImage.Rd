@@ -18,7 +18,7 @@ KmersFromImagesFolder(folder.path = ".", monomer.med, tau = NA,
 
 \item{monomer.med}{The median brightness of a monomer. You must know what
 this is to use this function correctly. This must be greater than 1 (this
-is the "apparent brightness" of a monomer). If you're reading the Digman et
+is the 'apparent brightness' of a monomer). If you're reading the Digman et
 al. (2008) paper, this is \eqn{1 + \epsilon}.}
 
 \item{tau}{The time constant for the exponential filtering (see
@@ -28,13 +28,13 @@ al. (2008) paper, this is \eqn{1 + \epsilon}.}
 brightness (via \code{\link{MeanStackThresh}})? If so, set your thresholding
 \emph{method} here.}
 
-\item{skip.consts}{An image array with only one value (a "constant array")
+\item{skip.consts}{An image array with only one value (a 'constant array')
 won't threshold properly. By default the function would give an error, but
 by setting this parameter to \code{TRUE}, the array would instead be
 skipped (the function will return the original array) and give a warning.}
 
-\item{filt}{Do you want to smooth (\code{filt = "smooth"}) or median
-(\code{filt = "median"}) filter the brightness image using
+\item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
+(\code{filt = 'median'}) filter the brightness image using
 \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter
@@ -60,11 +60,11 @@ are files that you don't want to process, take them out of the folder.}
 \item{mcc}{The number of parallel cores to use for the processing.}
 }
 \value{
-A named vector (named "1mers" "2mers" "3mers" and so on) with each
+A named vector (named '1mers' '2mers' '3mers' and so on) with each
   element detailing the number of that kmer found, or for
   \code{KmersFromImagesFolder}, a csv file is written to disk detailing one
   of these vectors for each image. This vector also has an attribute
-  "mean.intensity" giving the mean intensity of the input image.
+  'mean.intensity' giving the mean intensity of the input image.
 }
 \description{
 Given an image (as a file path or an array), \code{KmersFromImage} does the

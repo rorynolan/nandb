@@ -15,23 +15,23 @@
 #' @param method The thresholding method to use. See
 #'   \code{\link[autothresholdr]{auto_thresh}}.
 #' @param fail To which value should pixels not exceeeding the threshold be set?
-#' @param skip.consts An array with only one value (a "constant array") won't
+#' @param skip.consts An array with only one value (a 'constant array') won't
 #'   threshold properly. By default the function would give an error, but by
 #'   setting this parameter to \code{TRUE}, the array would instead be skipped
 #'   (the function will return the original array) and give a warning.
 #'
 #' @return The thresholded stack, pillars not exceeding the threshold are set to
-#'   zero. The attribute "threshold" gives the value used for thresholding.
+#'   zero. The attribute 'threshold' gives the value used for thresholding.
 #'
 #' @examples
 #' library(EBImage)
-#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-#' display(normalize(img[, , 1]), method = "raster")
-#' img_thresh_mask <- MeanStackThresh(img, "Otsu")
-#' display(img_thresh_mask[, , 1] > 0, method = "r")
-#' display(normalize(img[, , 1]), method = "raster")
-#' img_thresh_mask <- MeanStackThresh(img, "Triangle")
-#' display(img_thresh_mask[, , 1] > 0, method = "r")
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' display(normalize(img[, , 1]), method = 'raster')
+#' img_thresh_mask <- MeanStackThresh(img, 'Otsu')
+#' display(img_thresh_mask[, , 1] > 0, method = 'r')
+#' display(normalize(img[, , 1]), method = 'raster')
+#' img_thresh_mask <- MeanStackThresh(img, 'Triangle')
+#' display(img_thresh_mask[, , 1] > 0, method = 'r')
 #'
 #' @export
 MeanStackThresh <- function(mat3d, method, fail = NA, skip.consts = FALSE) {

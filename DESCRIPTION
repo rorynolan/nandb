@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Molucular Number and Brightness Calculations
-Version: 0.0.0.9017
+Version: 0.0.0.9018
 Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
                   role = c("aut", "cre"))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
@@ -34,7 +34,8 @@ Imports:
     EBImage,
     RSAGA,
     ggplot2,
-    grDevices
+    grDevices,
+    RcppRoll
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown,

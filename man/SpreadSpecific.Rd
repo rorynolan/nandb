@@ -4,7 +4,7 @@
 \alias{SpreadSpecific}
 \title{Get the best \emph{spread} of numbers in an interval.}
 \usage{
-SpreadSpecific(interval, specific, n)
+SpreadSpecific(interval, specific, n, log = FALSE)
 }
 \arguments{
 \item{interval}{A length 2 numeric vector. The real interval over which one
@@ -15,6 +15,8 @@ part of our spread.}
 
 \item{n}{A number. The total number of numbers that you want to be in the
 spread (including the number(s) in \code{specific}).}
+
+\item{log}{Measure the difference between adjacent elements as the difference in their log instead?}
 }
 \value{
 A numeric vector. The chosen \eqn{n} numbers.

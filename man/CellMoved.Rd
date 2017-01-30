@@ -25,7 +25,7 @@ A logical matrix (or vector or array) with \code{TRUE} for pixels
 If a cell moves into a pixel during the course of a multi-frame acquisition,
 as the frames go on, the intensity at that pixel will go from low (absence of
 cell) to high (presence of cell). We detect this movement in a given pixel by
-detecting the series of consecutive low values. The "low" values are those
+detecting the series of consecutive low values. The 'low' values are those
 failing to exceed a certain threshold (set by thresholding the whole image
 via \code{\link[autothresholdr]{auto_thresh}}). Of course this also works for
 cells moving out of pixels.

@@ -86,7 +86,7 @@ In the graphics console, a raster plot (via
 Given a matrix \code{mat}, make a raster plot of the matrix whereby in the
 plot, the pixel at \eqn{x = }\code{i}, \eqn{y = }\code{j} has colour based on
 the value of \code{mat[i, j]} and the \eqn{x} axis points right and the
-\eqn{y} axis points down (see "Details").
+\eqn{y} axis points down (see 'Details').
 }
 \details{
 The pixel at \eqn{x = }\code{i}, \eqn{y = }\code{j} has colour based on the
@@ -100,14 +100,14 @@ if you're confused about a transposed plot, this is why.
 }
 \examples{
 library(EBImage)
-img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-display(normalize(img[, , 1]), method = "raster")
-brightness <- Brightness(img, tau = 10, mst = "Huang")
-MatrixRasterPlot(brightness, scale.name = "brightness")
-MatrixRasterPlot(brightness, scale.name = "brightness", log.trans = TRUE)
-MatrixRasterPlot(brightness, scale.name = "brightness", log.trans = TRUE,
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+display(normalize(img[, , 1]), method = 'raster')
+brightness <- Brightness(img, tau = 10, mst = 'Huang')
+MatrixRasterPlot(brightness, scale.name = 'brightness')
+MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE)
+MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,
 breaks = 1:3)
-MatrixRasterPlot(brightness, scale.name = "brightness",
-ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, "mer"))
+MatrixRasterPlot(brightness, scale.name = 'brightness',
+ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, 'mer'))
 }
 

@@ -13,14 +13,15 @@ process.}
 
 \item{patt}{The pattern (in regular expression) of the csv files in the
 folder that are brightness images. The default matches any .csv files which
-contains "Brightness" or "brightness" in its name.}
+contains 'Brightness' or 'brightness' in its name.}
 
 \item{verbose}{Get a real time report on progress?}
 
 \item{...}{Parameters to pass to \code{\link{MatrixRasterPlot}} (these
-  \emph{must} be named arguments).
-
-This is a \code{ggplot2} object and can be manipulated thus.}
+\emph{must} be named arguments).}
+}
+\value{
+This is a \code{ggplot2} object and can be manipulated thus.
 }
 \description{
 This requires that the folder already have the brightnesses saved as csv
