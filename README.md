@@ -36,7 +36,6 @@ If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. Then run
 options(unzip = "internal")
 devtools::install_github(paste0("rorynolan/", 
                                 c("filesstrings", "autothresholdr", "nandb")),
-               auth_token = "50627d2ca9badc802ed993cb2b9a914034ab2246",
                build_vignettes = TRUE)
 ```
 
@@ -65,7 +64,7 @@ If you don't want to bother checking and you just want to make sure you have the
 Use
 ---
 
-For the lowdown on how to use this package, you should read the package vignette (using `vignette("nandb")`); however, here's a quick example. First load the libraries:
+For the lowdown on how to use this package, you should read the package vignettes (browse them using `vignette(package = "nandb")`); however, here's a quick example. First load the library:
 
 ``` r
 library("nandb")
