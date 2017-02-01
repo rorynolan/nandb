@@ -53,7 +53,6 @@ To update the package, you just need to do the same thing:
 options(unzip = "internal")
 devtools::install_github(paste0("rorynolan/", 
                                 c("filesstrings", "autothresholdr", "nandb")),
-               auth_token = "50627d2ca9badc802ed993cb2b9a914034ab2246",
                build_vignettes = TRUE)
 ```
 

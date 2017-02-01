@@ -55,7 +55,6 @@ To update the package, you just need to do the same thing:
 options(unzip = "internal")
 devtools::install_github(paste0("rorynolan/", 
                                 c("filesstrings", "autothresholdr", "nandb")),
-               auth_token = "50627d2ca9badc802ed993cb2b9a914034ab2246",
                build_vignettes = TRUE)
 ```
 To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page https://github.com/rorynolan/filesstrings (you're probably there right now) and look for the version in the DESCRIPTION file.
