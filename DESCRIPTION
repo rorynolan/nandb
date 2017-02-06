@@ -38,5 +38,6 @@ Imports:
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown,
-    hexbin
+    hexbin,
+    covr
 VignetteBuilder: knitr
