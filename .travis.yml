@@ -11,3 +11,12 @@ r_github_packages:
   - rorynolan/autothresholdr
 after_success:
   - Rscript -e 'covr::codecov()'
+apt_packages:
+  - libssl-dev
+  - libtiff5-dev
+  - libfftw3-dev
+  - libcurl4-openssl-dev
+  - libxml2-dev
+  - default-jre
+  - default-jdk
+  - libboost-all-dev
