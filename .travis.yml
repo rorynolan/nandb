@@ -3,11 +3,11 @@
 language: R
 sudo: false
 cache: packages
-after_success:
-  - Rscript -e 'covr::codecov()'
-r_github_packages:
-  - rorynolan/filesstrings
-  - rorynolan/autothresholdr
 bioc_packages:
   - BiocParallel
   - EBImage
+r_github_packages:
+  - rorynolan/filesstrings
+  - rorynolan/autothresholdr
+after_success:
+  - Rscript -e 'covr::codecov()'
