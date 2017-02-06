@@ -3,3 +3,6 @@
 ^README.*$
 ^R_junk$
 ^Icon.*$
+^\.travis\.yml$
+^appveyor\.yml$
+^codecov\.yml$

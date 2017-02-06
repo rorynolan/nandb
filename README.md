@@ -3,6 +3,8 @@ nandb
 
 An R package for performing number and brightness analysis as in Digman et al. 2008.
 
+[![Travis-CI Build Status](https://travis-ci.org/rorynolan/nandb.svg?branch=master)](https://travis-ci.org/rorynolan/nandb) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rorynolan/nandb?branch=master&svg=true)](https://ci.appveyor.com/project/rorynolan/nandb) [![Coverage Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](https://codecov.io/github/rorynolan/nandb?branch=master) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
+
 Installation
 ------------
 
