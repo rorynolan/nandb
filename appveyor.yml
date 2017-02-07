@@ -12,6 +12,9 @@ install:
 
 # Adapt as necessary starting from here
 
+R_ARCH:
+  - x64
+
 build_script:
   - R -e "install.packages('rJava', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
   - travis-tool.sh install_deps
