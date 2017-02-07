@@ -14,14 +14,14 @@ install:
 
 environment:
   R_ARCH: x64
-  JAVA_HOME: "C:\\Program Files\\Java\\jdk1.6.0\\bin"
+  JAVA_HOME: ""
 
 build_script:
-  - travis-tool.sh install_deps
-  - travis-tool.sh install_bioc_deps
   - R -e "install.packages('rJava', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
   - R -e "install.packages('devtools', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
   - R -e "devtools::install_github('rorynolan/autothresholdr', INSTALL_opts='--no-multiarch')"
+  - travis-tool.sh install_deps
+  - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_github rorynolan/filesstrings
 
 test_script:
