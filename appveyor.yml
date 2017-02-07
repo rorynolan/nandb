@@ -13,6 +13,7 @@ install:
 # Adapt as necessary starting from here
 
 build_script:
+  - R -e "install.packages('rJava', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_github rorynolan/filesstrings
