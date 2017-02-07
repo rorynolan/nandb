@@ -13,7 +13,7 @@ after_success:
   - Rscript -e 'covr::codecov()'
 apt_packages:
   - libssl-dev
-  - libtiff5-dev
+  - libtiff4-dev
   - libfftw3-dev
   - libcurl4-openssl-dev
   - libxml2-dev
