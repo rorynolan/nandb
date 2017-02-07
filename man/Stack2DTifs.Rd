@@ -24,4 +24,3 @@ WriteIntImage(img[, , 2], '50_2.tif')
 Stack2DTifs(c('50_1.tif', '50_2.tif'), '50_1_2')
 file.remove(c('50_1.tif', '50_2.tif', '50_1_2.tif'))
 }
-

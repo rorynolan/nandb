@@ -46,4 +46,3 @@ is why.
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 
 }
-

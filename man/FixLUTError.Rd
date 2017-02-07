@@ -25,4 +25,3 @@ one of them has the values you wanted. This function deletes the zero
 channels from the array. If there were no such LUT errors and the image read
 in as you desired, then this function does nothing.
 }
-

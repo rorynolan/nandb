@@ -47,4 +47,3 @@ img_thresh_mask <- MeanStackThresh(img, 'Triangle')
 display(img_thresh_mask[, , 1] > 0, method = 'r')
 
 }
-

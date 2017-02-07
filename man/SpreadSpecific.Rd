@@ -16,7 +16,8 @@ part of our spread.}
 \item{n}{A number. The total number of numbers that you want to be in the
 spread (including the number(s) in \code{specific}).}
 
-\item{log}{Measure the difference between adjacent elements as the difference in their log instead?}
+\item{log}{Measure the difference between adjacent elements as the difference
+in their log instead?}
 }
 \value{
 A numeric vector. The chosen \eqn{n} numbers.
@@ -42,4 +43,3 @@ on it), whereas all the middle intervals are not.
 SpreadSpecific(c(0, 10), 1, 3)
 
 }
-

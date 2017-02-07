@@ -38,4 +38,3 @@ img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 BestTau(img, mst = 'tri', tol = 3)
 
 }
-

@@ -110,4 +110,3 @@ breaks = 1:3)
 MatrixRasterPlot(brightness, scale.name = 'brightness',
 ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, 'mer'))
 }
-

@@ -29,4 +29,3 @@ dir.create('tempdir')
 WriteIntImage(img, 'tempdir/50.tif')
 
 }
-

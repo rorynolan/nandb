@@ -29,4 +29,3 @@ KmerPlot(brightness, 1.02)
 KmerPlot(MedianFilterB(brightness), 1.02)
 
 }
-

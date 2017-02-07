@@ -44,4 +44,3 @@ CollapseRanges(ranges, 6, c(3, 7))
 CollapseRanges(ranges, 6, c(3, 7), prefer.low = TRUE)
 CollapseRanges(ranges, 6, c(3, 7), prefer.high = TRUE)
 }
-

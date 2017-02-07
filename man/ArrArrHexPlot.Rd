@@ -41,4 +41,3 @@ ArrArrHexPlot(mean.intensity, brightness) +
 ggplot2::labs(x = 'intensity', y = 'brightness')
 
 }
-

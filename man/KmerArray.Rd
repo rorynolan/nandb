@@ -19,4 +19,3 @@ Based on a brightness image (array, can be more than two-dimensional), create
 a kmer image (array) where each pixel represents a kmer (0 for immobile, 1
 for monomer, 2 for dimer and so on).
 }
-

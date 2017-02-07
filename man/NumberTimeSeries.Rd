@@ -73,4 +73,3 @@ bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median', mcc
 \seealso{
 \code{\link{Number}}.
 }
-

@@ -21,4 +21,3 @@ by 1 time unit (so choose your \code{tau} based on that).
 \examples{
 ExpSmooth(1:10, 1)
 }
-

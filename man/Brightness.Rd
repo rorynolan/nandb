@@ -104,4 +104,3 @@ img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
 brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
 
 }
-

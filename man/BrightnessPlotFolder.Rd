@@ -27,4 +27,3 @@ This is a \code{ggplot2} object and can be manipulated thus.
 This requires that the folder already have the brightnesses saved as csv
 files. Output images are saved as pdf.
 }
-

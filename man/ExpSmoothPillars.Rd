@@ -31,4 +31,3 @@ For a 3-dimensional array \code{mat3d}, pillar \code{i,j} is defined as
 m3 <- array(1:12, dim = c(2, 2, 3))
 ExpSmoothPillars(m3, 7)
 }
-

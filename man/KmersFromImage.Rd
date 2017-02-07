@@ -73,4 +73,3 @@ numbers of each kmer via \code{\link{KmersFromBrightnesses}}.
 \code{KmersFromImagesFolder} does this for an entire folder (directory) of
 images and outputs a csv file of the results.
 }
-

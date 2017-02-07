@@ -23,4 +23,3 @@ Define a 'pillar' of a 3-dimensional array as pillar \code{i,j} off array
 \code{arr} being \code{arr[i, j, ]}. This function applies a specified
 function to each pillar.
 }
-

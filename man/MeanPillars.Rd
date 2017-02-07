@@ -2,8 +2,8 @@
 % Please edit documentation in R/RcppExports.R
 \name{MeanPillars}
 \alias{MeanPillars}
-\alias{MedianPillars}
 \alias{VarPillars}
+\alias{MedianPillars}
 \title{Get the means/medians/variances of pillars of a 3d array}
 \usage{
 MeanPillars(mat3d)
@@ -31,4 +31,3 @@ MedianPillars(m3)
 VarPillars(m3)
 
 }
-

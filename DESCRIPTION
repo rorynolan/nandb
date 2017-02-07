@@ -35,7 +35,7 @@ Imports:
     ggplot2,
     grDevices,
     RcppRoll
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.0
 Suggests: knitr,
     rmarkdown,
     hexbin,

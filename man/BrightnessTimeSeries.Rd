@@ -74,4 +74,3 @@ filt = 'median', mcc = 2)
 \seealso{
 \code{\link{Brightness}}.
 }
-

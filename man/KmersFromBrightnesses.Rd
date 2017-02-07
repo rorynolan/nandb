@@ -33,4 +33,3 @@ brightnesses <- runif(100, 1, 3)
 monomer.med <- 1.2
 KmersFromBrightnesses(brightnesses, monomer.med)
 }
-

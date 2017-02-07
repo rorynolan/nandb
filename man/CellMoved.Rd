@@ -35,4 +35,3 @@ This assumes that you've already thresholded out pixels where the cell
 \emph{never} was (perhaps via \code{\link[autothresholdr]{auto_thresh}}),
 setting those to \code{NA}.
 }
-

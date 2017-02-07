@@ -32,4 +32,3 @@ img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 tau10 <- CorrectForBleaching(img, 10)
 autotau <- CorrectForBleaching(img, 'auto')
 }
-

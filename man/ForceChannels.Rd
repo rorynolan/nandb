@@ -34,4 +34,3 @@ str(x)
 ForceChannels(x, 6) \%>\% str
 
 }
-
