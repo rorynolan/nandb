@@ -13,7 +13,7 @@ install:
 # Adapt as necessary starting from here
 
 environment:
-  - R_ARCH: x64
+  R_ARCH: x64
 
 build_script:
   - R -e "install.packages('rJava', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
