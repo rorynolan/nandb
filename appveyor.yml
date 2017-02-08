@@ -19,12 +19,9 @@ environment:
 build_script:
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
-  - R -e "install.packages('rJava', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
-  - R -e "install.packages('devtools', repos = 'http://cran.us.r-project.org', INSTALL_opts='--no-multiarch')"
-  - R -e "devtools::install_github('rorynolan/autothresholdr', INSTALL_opts='--no-multiarch')"
-  - travis-tool.sh install_github rorynolan/filesstrings
+  - travis-tool.sh install_github rorynolan/filesstrings rorynolan/autothresholdr
   - travis-tool.sh install_bioc BiocGenerics
-  - travis-tool.sh install_r locfit
+  - travis-tool.sh install_r locfit tiff
 
 test_script:
   - travis-tool.sh run_tests
