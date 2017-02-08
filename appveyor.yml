@@ -24,6 +24,7 @@ build_script:
   - R -e "devtools::install_github('rorynolan/autothresholdr', INSTALL_opts='--no-multiarch')"
   - travis-tool.sh install_github rorynolan/filesstrings
   - travis-tool.sh install_bioc BiocGenerics
+  - travis-tool.sh install_r locfit
 
 test_script:
   - travis-tool.sh run_tests
