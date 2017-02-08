@@ -20,7 +20,7 @@ build_script:
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_github rorynolan/filesstrings rorynolan/autothresholdr
   - travis-tool.sh install_bioc BiocGenerics
-  - travis-tool.sh install_r locfit tiff jpeg png
+  - travis-tool.sh install_r locfit tiff jpeg png fftwtools
 
 test_script:
   - travis-tool.sh run_tests
