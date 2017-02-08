@@ -114,7 +114,7 @@ ReadImageTxt <- function(file.name) {
 
 #' Write an integer array to disk as a tiff image.
 #'
-#' \link[EBImage]{EBImage}'s \code{\link[EBImage]{writeImage}} truncates all
+#' [EBImage][EBImage::EBImage]'s [writeImage][EBImage::writeImage] truncates all
 #' values above 1 to 1 and all below 0 to 0 when writing images. This function
 #' allows you to write integer-vlued arrays to disk as tiff files as you would
 #' want.

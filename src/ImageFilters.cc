@@ -6,8 +6,8 @@ using namespace Rcpp;
 
 //' Smooth and median filters with options for handling NAs.
 //'
-//' These is an alternative to \link[EBImage]{EBImage}'s
-//' \code{\link[EBImage]{filter2}} and \code{\link[EBImage]{medianFilter}} for
+//' These is an alternative to [EBImage][EBImage::EBImage]'s
+//' [filter2][EBImage::filter2] and [medianFilter][EBImage::medianFilter] for
 //' smooth and median filtering respectively. These functions have many options
 //' for dealing with \code{NA} values which \code{EBImage}'s functions lack.
 //'

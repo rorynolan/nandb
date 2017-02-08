@@ -18,7 +18,7 @@ sets them to saturated value. \code{na = 'zero'} sets them to zero, while
 \code{na = 'error'} will give an error if th image contains \code{NA}s.}
 }
 \description{
-\link\link{EBImage}{EBImage}'s \code{\link[EBImage]{writeImage}} truncates all
+\link[EBImage:EBImage]{EBImage}'s \link[EBImage:writeImage]{writeImage} truncates all
 values above 1 to 1 and all below 0 to 0 when writing images. This function
 allows you to write integer-vlued arrays to disk as tiff files as you would
 want.

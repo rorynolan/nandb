@@ -24,8 +24,8 @@ in the minority, they are ignored as in \code{median(x, na.rm = TRUE)}.}
 A matrix (the median filtered image).
 }
 \description{
-These is an alternative to \link\link{EBImage}{EBImage}'s
-\code{\link[EBImage]{filter2}} and \code{\link[EBImage]{medianFilter}} for
+These is an alternative to \link[EBImage:EBImage]{EBImage}'s
+\link[EBImage:filter2]{filter2} and \link[EBImage:medianFilter]{medianFilter} for
 smooth and median filtering respectively. These functions have many options
 for dealing with \code{NA} values which \code{EBImage}'s functions lack.
 }

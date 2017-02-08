@@ -126,6 +126,32 @@ PillarsListToArr <- function(pillars.list, dim) {
   arr3d
 }
 
+#' Make each pillar of a 3D array into a column of a tibble
+#'
+#' Create a data frame (tibble) where pillar \code{[i, j, ]} is column \code{i +
+#' n1 * (j - 1)}.
+#'
+#' @param arr3d A 3-dimensional array.
+#'
+#' @return A [tibble][tibble::tibble].
+#'
+#' @examples
+#' arr <- array(1:27, dim = rep(3, 3))
+#' print(arr)
+#' ListPillars(arr)
+#' PillarsDF(arr)
+#'
+#' @export
+PillarsDF <- function(arr3d) {
+  pillars.list <- ListPillars(arr3d)
+  d <- dim(arr3d)
+  namez <- expand.grid(seq_len(d[1]), seq_len(d[2])) %>% {
+    stringr::str_c(.$Var1, ",", .$Var2)
+  }
+  names(pillars.list) <- namez
+  tibble::as_tibble(pillars.list)
+}
+
 BrightnessVec <- function(vec) {
   if (AllEqual(vec, 0))
     return(0)
