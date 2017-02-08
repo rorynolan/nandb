@@ -24,13 +24,13 @@ that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{tau}{If this is specified, bleaching correction is performed with
-\code{\link{CorrectForBleaching}} which uses exponential filtering with
+\code{\link[=CorrectForBleaching]{CorrectForBleaching()}} which uses exponential filtering with
 time constant \code{tau} (where the unit of time is the time between
 frames). If this is set to \code{'auto'}, then the value of \code{tau} is
-calculated automatically via \code{\link{BestTau}}.}
+calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-number (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+number (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
 \emph{method} here.}
 
 \item{skip.consts}{An image array with only one value (a 'constant array')
@@ -43,7 +43,7 @@ exceeeding the threshold be set?}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the number image using
-\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+\code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter the
 number image in a different way, first calculate the numbers without
@@ -77,12 +77,12 @@ csv files written to disk (in the same folder as the input images).
 Given a time stack of images, \code{Number} performs a calculation of the
 number for each pixel. \code{NumberTxtFolder} does this
 calculation for an entire folder, writing the results as text files via
-\code{\link{WriteImageTxt}}. \code{Numbers} calculates the numbers for
+\code{\link[=WriteImageTxt]{WriteImageTxt()}}. \code{Numbers} calculates the numbers for
 several image series in parallel.
 }
 \details{
 Do not try to parallelize the use of \code{Number} and friends yourself (e.g.
-with \code{\link{mclapply}}) because it will throw an error (this is because
+with \code{\link[=mclapply]{mclapply()}}) because it will throw an error (this is because
 the \code{autothresholdr} package does not work in parallel (indeed anything
 run using the \code{rJava} package won't)). Always use \code{Numbers} for
 this purpose (this has a workaround whereby it does the thresholding in

@@ -2,32 +2,30 @@
 #'
 #' Read in an image file from the disk as an array of pixel intensities.
 #'
-#' This function wraps \code{\link[EBImage]{readImage}} and
-#' \code{\link[EBImage]{imageData}} from the \code{\link[EBImage]{EBImage}}
-#' package. By default, \code{readImage} reads in pixel intensities in the range
-#' [0, 1]. \code{ReadImageData} reads in pixel intensities as integers as they
-#' would be represented in a tiff file and displayed therefrom in ImageJ. This
-#' is necessary when calculating number and brightness, where we need pixel
-#' values to be in units of 'counts'.
+#' This function wraps [EBImage::readImage()] and [EBImage::imageData()]. By
+#' default, `readImage` reads in pixel intensities in the range \code{[0, 1]}.
+#' `ReadImageData` reads in pixel intensities as integers as they would be
+#' represented in a tiff file and displayed therefrom in ImageJ. This is
+#' necessary when calculating number and brightness, where we need pixel values
+#' to be in units of 'counts'.
 #'
-#' Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
-#' }\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
-#' j]} where the \eqn{x} axis points right and the \eqn{y} axis points down.
-#' This is in accordance with how \code{\link[EBImage]{EBImage}}'s
-#' \code{\link[EBImage]{readImage}} (which this function wraps). However, when
-#' one prints a matrix in a console (or views it in a program such as excel),
-#' the value in position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from
-#' \code{mat[j, i]}, so if you're confused about a phantom transposition, this
-#' is why.
+#' Thinking of the read image as a matrix `mat`, the pixel at \eqn{x = }`i`,
+#' \eqn{y = }`j` has colour based on the value of \code{mat[i, j]} where the
+#' \eqn{x} axis points right and the \eqn{y} axis points down. This is in
+#' accordance with how [EBImage::EBImage]'s [EBImage::readImage()] (which this
+#' function wraps). However, when one prints a matrix in a console (or views it
+#' in a program such as excel), the value in position \eqn{x = }`i`, \eqn{y =
+#' }`j` is from `mat[j, i]`, so if you're confused about a phantom
+#' transposition, this is why.
 #'
 #' @param image.name The path to the image file on disk. The file extension must
 #'   be one of '.jpeg', '.png', '.tiff' or '.tif'.
-#' @param fix.lut When reading in images (via \code{\link[EBImage]{readImage}}),
-#'   R can give an array of different dimensionality than you expect. If you
-#'   suspect this happening, set the value of this parameter to the \emph{number
-#'   of dimensions} that you expect your read image to have and this function
-#'   will try to automatically give you the image array in the form you want.
-#'   Read \code{\link{FixLUTError}} to find out more.
+#' @param fix.lut When reading in images (via [EBImage::readImage()]), R can
+#'   give an array of different dimensionality than you expect. If you suspect
+#'   this happening, set the value of this parameter to the \emph{number of
+#'   dimensions} that you expect your read image to have and this function will
+#'   try to automatically give you the image array in the form you want. Read
+#'   [FixLUTError()] to find out more.
 #'
 #' @return An array of integers representing the image.
 #'
@@ -60,7 +58,7 @@ ReadImageData <- function(image.name, fix.lut = NULL) {
 #' write one file for each slice, numbering it with the slice number.
 #'
 #' The image slices are transposed prior to being written to disk to ensure that
-#' displaying an image with \code{\link[EBImage]{display}} in R will yield the
+#' displaying an image with [EBImage::display()] in R will yield the
 #' same result (as opposed to a transposed image) as displaying the written text
 #' file in ImageJ (i.e. I've made a modification to ensure the files display
 #' correctly in ImageJ). These functions do not work for 4-dimensional arrays
@@ -114,18 +112,17 @@ ReadImageTxt <- function(file.name) {
 
 #' Write an integer array to disk as a tiff image.
 #'
-#' [EBImage][EBImage::EBImage]'s [writeImage][EBImage::writeImage] truncates all
-#' values above 1 to 1 and all below 0 to 0 when writing images. This function
-#' allows you to write integer-vlued arrays to disk as tiff files as you would
-#' want.
+#' [EBImage::writeImage] truncates all values above 1 to 1 and all below 0 to 0
+#' when writing images. This function allows you to write integer-vlued arrays
+#' to disk as tiff files as you would want.
 #'
 #' @param img.arr An integer array.
 #' @param file.name The name of the tif file (with or without the .tif) that you
 #'   wish to write.
-#' @param na How do you want to treat \code{NA} values? R can only write integer
-#'   values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'}
-#'   sets them to saturated value. \code{na = 'zero'} sets them to zero, while
-#'   \code{na = 'error'} will give an error if th image contains \code{NA}s.
+#' @param na How do you want to treat `NA` values? R can only write integer
+#'   values (and hence not `NA`s) to tiff pixels. `na = 'saturate'` sets them to
+#'   saturated value. `na = 'zero'` sets them to zero, while `na = 'error'` will
+#'   give an error if th image contains `NA`s.
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
@@ -172,11 +169,11 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
 #' would like, but when you read it into R, it has just mashed all the channels
 #' (which you would like to be separated somehow) into a stack. In my
 #' expreience, it always does so in a way that, say you have a stack of 3
-#' channels and 5 z positions, then the red images would occupy \code{[, , 1]},
-#' \code{[, , 6]} and \code{[, , 11]}. This is the type of fixing that this
+#' channels and 5 z positions, then the red images would occupy `[, , 1]`,
+#' `[, , 6]` and `[, , 11]`. This is the type of fixing that this
 #' function performs. So in that example it would have a 3d array as input and a
 #' 4d as output with dimensions (assuming our images are 256x256 pixels)
-#' \code{256, 256, 3, 5}.
+#' `256, 256, 3, 5`.
 #'
 #' @param img.arr An array, the read image.
 #' @param n.ch The number of channels that you want the read image to have.

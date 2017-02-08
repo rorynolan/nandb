@@ -42,17 +42,17 @@ AllEqual <- function(a, b = NA, allow = TRUE, cn = FALSE) {
 
 #' Apply a function to each pillar of a 3-dimensional array.
 #'
-#' Define a 'pillar' of a 3-dimensional array as pillar \code{i,j} off array
-#' \code{arr} being \code{arr[i, j, ]}. This function applies a specified
+#' Define a 'pillar' of a 3-dimensional array as pillar `i,j` off array
+#' `arr` being `arr[i, j, ]`. This function applies a specified
 #' function to each pillar.
 #'
 #' @param mat3d A 3-dimensional array.
 #' @param FUN A function which takes a vector as imput and, for a given input
 #'   length, outputs a vector of constant length (can be 1).
 #'
-#' @return If \code{FUN} is returning length 1 vectors, a matrix whereby
-#'   \code{mat[i, j] = FUN(mat3d[i, j, ])}. If FUN is returning vectors of
-#'   length \code{l > 1}, a 3-dimensional array whereby \code{arr[i, j, ] =
+#' @return If `FUN` is returning length 1 vectors, a matrix whereby
+#'   `mat[i, j] = FUN(mat3d[i, j, ])`. If FUN is returning vectors of
+#'   length `l > 1`, a 3-dimensional array whereby \code{arr[i, j, ] =
 #'   FUN(mat3d[i, j, ])}.
 #' @export
 ApplyOnPillars <- function(mat3d, FUN) {
@@ -73,9 +73,9 @@ ApplyOnPillars <- function(mat3d, FUN) {
 
 #' Turn a 3d array into a list of pillars
 #'
-#' Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar \code{[i,
-#' j, ]} is list element \code{i + n1 * (j - 1)}, so the first element is pillar
-#' \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
+#' Suppose the array is of dimension `n1 * n2 * n3`, then pillar \code{[i,
+#' j, ]} is list element `i + n1 * (j - 1)`, so the first element is pillar
+#' `[1, 1, ]`, the second is pillar `[1, 2, ]` and so on.
 #'
 #' @param arr3d A 3-dimensional array.
 #'
@@ -98,9 +98,9 @@ ListPillars <- function(arr3d) {
 
 #' Make a list of pillars back into a 3D array.
 #'
-#' #' Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar
-#' \code{[i, j, ]} is list element \code{i + n1 * (j - 1)}, so the first element
-#' is pillar \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
+#' #' Suppose the array is of dimension `n1 * n2 * n3`, then pillar
+#' `[i, j, ]` is list element `i + n1 * (j - 1)`, so the first element
+#' is pillar `[1, 1, ]`, the second is pillar `[1, 2, ]` and so on.
 #'
 #' @param pillars.list The list of pillars
 #' @param dim The desired dimension of the output array.
@@ -128,7 +128,7 @@ PillarsListToArr <- function(pillars.list, dim) {
 
 #' Make each pillar of a 3D array into a column of a tibble
 #'
-#' Create a data frame (tibble) where pillar \code{[i, j, ]} is column \code{i +
+#' Create a data frame (tibble) where pillar `[i, j, ]` is column \code{i +
 #' n1 * (j - 1)}.
 #'
 #' @param arr3d A 3-dimensional array.
@@ -162,8 +162,8 @@ BrightnessVec <- function(vec) {
 #'
 #' Even if an image stored on disk has 1 channel only, if it has an associated
 #' LUT (lookup table, to tell programs like ImageJ to display them in (for
-#' example) green rather than grey, then \code{\link[EBImage]{readImage}} and
-#' hence \code{\link{ReadImageData}} will read in the image as a 3-channel rgb
+#' example) green rather than grey, then [EBImage::readImage()] and
+#' hence [ReadImageData()] will read in the image as a 3-channel rgb
 #' colour image, where two of the channels have all-zero intensity values and
 #' one of them has the values you wanted. This function deletes the zero
 #' channels from the array. If there were no such LUT errors and the image read
@@ -246,7 +246,7 @@ MCMapply <- function(fun, ..., mcc = parallel::detectCores()) {
 #' @param n.out A natural number. How many ranges should the output have?
 #' @param preserve A vector. Are there any original ranges that you'd like to
 #'   preserve? If so set them here. The first range is the interval
-#'   [\code{ranges[1]}, \code{ranges[2]}) and so on.
+#'   [`ranges[1]`, `ranges[2]`) and so on.
 #' @param prefer.low Are you more interested in the lower ranges? If so, set
 #'   this to true and all the high ranges will be collapsed into one.
 #' @param prefer.high Are you more interested in the higher ranges? If so, set
@@ -430,7 +430,7 @@ GroupClose <- function(vec.ascending, max.gap = 1) {
 #' The idea is to, for an interval of size \eqn{s}, put in \eqn{floor(s / (n -
 #' m))} numbers into each of these intervals. Then, if there any numbers left
 #' over, put exactly one into each of the intervals with the biggest \eqn{(s /
-#' (n - m)) - \code{floor}(s / (n - m))} (starting with the biggest and working
+#' (n - m)) - `floor`(s / (n - m))} (starting with the biggest and working
 #' one's way down) until there are no numbers left to assign. The end intervals
 #' need special treatment since (assuming the ends are not in the specific
 #' numbers), the end intervals are open on one side (one boundary has no point
@@ -441,7 +441,7 @@ GroupClose <- function(vec.ascending, max.gap = 1) {
 #' @param specific A numeric vector. The specific numbers that one wants to be
 #'   part of our spread.
 #' @param n A number. The total number of numbers that you want to be in the
-#'   spread (including the number(s) in \code{specific}).
+#'   spread (including the number(s) in `specific`).
 #' @param log Measure the difference between adjacent elements as the difference
 #'   in their log instead?
 #'

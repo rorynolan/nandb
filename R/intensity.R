@@ -1,39 +1,39 @@
 #' Calculate mean intensity from image series.
 #'
-#' Given a time stack of images, \code{MeanIntensity} calculates the mean
-#' intensity for each pixel, returning a matrix. \code{MeanIntensityTxtFolder}
+#' Given a time stack of images, `MeanIntensity` calculates the mean
+#' intensity for each pixel, returning a matrix. `MeanIntensityTxtFolder`
 #' does this for every image in a folder, writing the results as text files via
-#' \code{\link{WriteImageTxt}}.
+#' [WriteImageTxt()].
 #'
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   mean intensities (via \code{\link{MeanStackThresh}})? If so, set your
+#'   mean intensities (via [MeanStackThresh()])? If so, set your
 #'   thresholding \emph{method} here. Pixels failing to exceed the threshold are
-#'   set to \code{NA}.
+#'   set to `NA`.
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
-#'   by setting this parameter to \code{TRUE}, the array would instead be
+#'   by setting this parameter to `TRUE`, the array would instead be
 #'   skipped (the function will return the original array) and give a warning.
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeeding the threshold be set?
-#' @param filt Do you want to smooth (\code{filt = 'smooth'}) or median
-#'   (\code{filt = 'median'}) filter the mean intensity image using
-#'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
+#'   (`filt = 'median'`) filter the mean intensity image using
+#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option \code{na_count = TRUE}. If you want to smooth/median filter the mean
+#'   option `na_count = TRUE`. If you want to smooth/median filter the mean
 #'   intensity image in a different way, first calculate the mean intensities
-#'   without filtering (\code{filt = NULL}) using this function and then perform
+#'   without filtering (`filt = NULL`) using this function and then perform
 #'   your desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   \code{MeanIntensityTxtFolder}, does not work with multiple cores) and to
-#'   tell when \code{MeanIntensityTxtFolder} is done.
+#'   `MeanIntensityTxtFolder`, does not work with multiple cores) and to
+#'   tell when `MeanIntensityTxtFolder` is done.
 #'
-#' @return \code{Brightness} returns a matrix, the brightness image. The result
-#'   of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
+#' @return `Brightness` returns a matrix, the brightness image. The result
+#'   of `BrightnessTxtFolder` is the text csv files written to disk (in the
 #'   same folder as the input images).
 #'
 #' @examples

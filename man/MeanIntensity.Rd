@@ -22,13 +22,13 @@ that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-mean intensities (via \code{\link{MeanStackThresh}})? If so, set your
+mean intensities (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
 thresholding \emph{method} here. Pixels failing to exceed the threshold are
 set to \code{NA}.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the mean intensity image using
-\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+\code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter the mean
 intensity image in a different way, first calculate the mean intensities
@@ -71,7 +71,7 @@ same folder as the input images).
 Given a time stack of images, \code{MeanIntensity} calculates the mean
 intensity for each pixel, returning a matrix. \code{MeanIntensityTxtFolder}
 does this for every image in a folder, writing the results as text files via
-\code{\link{WriteImageTxt}}.
+\code{\link[=WriteImageTxt]{WriteImageTxt()}}.
 }
 \examples{
 library(EBImage)

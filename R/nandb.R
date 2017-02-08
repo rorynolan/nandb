@@ -19,7 +19,7 @@ if (getRversion() >= "2.15.1") {
 
 #' nandb: Number and brightness in R.
 #'
-#' The \code{nandb} package is gives functions for calculation of molecular
+#' The `nandb` package is gives functions for calculation of molecular
 #' number and brightness from images, as detailed in Digman et al. 2008. This is
 #' (to the best of my knowledge) the first free, open-source software available
 #' for this purpose and comes with an implementation of the novel 'automatic

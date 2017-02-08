@@ -18,13 +18,13 @@ that has not yet been read in, set this argument to the path to that file
 successive brightnesses.}
 
 \item{tau}{If this is specified, bleaching correction is performed with
-\code{\link{CorrectForBleaching}} which uses exponential filtering with
+\code{\link[=CorrectForBleaching]{CorrectForBleaching()}} which uses exponential filtering with
 time constant \code{tau} (where the unit of time is the time between
 frames). If this is set to \code{'auto'}, then the value of \code{tau} is
-calculated automatically via \code{\link{BestTau}}.}
+calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link{MeanStackThresh}})? If so, set your
+brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{skip.consts}{An image array with only one value (a 'constant array')
@@ -34,7 +34,7 @@ skipped (the function will return the original array) and give a warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
-\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+\code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter the
 brightness image in a different way, first calculate the brightnesses
@@ -55,7 +55,7 @@ Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of
 them to create one brightness image, the next \code{frames.per.set} of them
 to create the next brightness image and so on to get a time-series of
 brightness images. If \code{tau} is specified, bleaching correction is
-performed via \code{\link{CorrectForBleaching}}.
+performed via \code{\link[=CorrectForBleaching]{CorrectForBleaching()}}.
 }
 \details{
 This may discard some images, for example if 175 frames are in the input and
@@ -72,5 +72,5 @@ filt = 'median', mcc = 2)
 
 }
 \seealso{
-\code{\link{Brightness}}.
+\code{\link[=Brightness]{Brightness()}}.
 }

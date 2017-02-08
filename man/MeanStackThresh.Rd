@@ -11,7 +11,7 @@ MeanStackThresh(mat3d, method, fail = NA, skip.consts = FALSE)
 slice is the \eqn{n}th image in the time series.}
 
 \item{method}{The thresholding method to use. See
-\code{\link[autothresholdr]{auto_thresh}}.}
+\code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}}.}
 
 \item{fail}{To which value should pixels not exceeeding the threshold be set?}
 
@@ -25,7 +25,7 @@ The thresholded stack, pillars not exceeding the threshold are set to
 zero. The attribute 'threshold' gives the value used for thresholding.
 }
 \description{
-Via the \code{\link[autothresholdr]{auto_thresh}} function from the
+Via the \code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}} function from the
 \code{autothresholdr} package, apply a threshold to the image stack before
 calculating brightness, such as to only have nonzero brightnesses in areas
 where the cell is.

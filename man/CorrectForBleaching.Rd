@@ -14,7 +14,7 @@ that has not yet been read in, set this argument to the path to that file
 
 \item{tau}{The time constant for the exponential filtering. If this is set to
 \code{'auto'}, then the value of \code{tau} is calculated automatically via
-\code{\link{BestTau}}.}
+\code{\link[=BestTau]{BestTau()}}.}
 }
 \value{
 The detrended image series.

@@ -1,15 +1,15 @@
 #' Calculate number from image series.
 #'
-#' Given a time stack of images, \code{Number} performs a calculation of the
-#' number for each pixel. \code{NumberTxtFolder} does this
+#' Given a time stack of images, `Number` performs a calculation of the
+#' number for each pixel. `NumberTxtFolder` does this
 #' calculation for an entire folder, writing the results as text files via
-#' \code{\link{WriteImageTxt}}. \code{Numbers} calculates the numbers for
+#' [WriteImageTxt()]. `Numbers` calculates the numbers for
 #' several image series in parallel.
 #'
-#' Do not try to parallelize the use of \code{Number} and friends yourself (e.g.
-#' with \code{\link{mclapply}}) because it will throw an error (this is because
-#' the \code{autothresholdr} package does not work in parallel (indeed anything
-#' run using the \code{rJava} package won't)). Always use \code{Numbers} for
+#' Do not try to parallelize the use of `Number` and friends yourself (e.g.
+#' with [mclapply()]) because it will throw an error (this is because
+#' the `autothresholdr` package does not work in parallel (indeed anything
+#' run using the `rJava` package won't)). Always use `Numbers` for
 #' this purpose (this has a workaround whereby it does the thresholding in
 #' series and does the rest in parallel).
 #'
@@ -18,33 +18,33 @@
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param tau If this is specified, bleaching correction is performed with
-#'   \code{\link{CorrectForBleaching}} which uses exponential filtering with
-#'   time constant \code{tau} (where the unit of time is the time between
-#'   frames). If this is set to \code{'auto'}, then the value of \code{tau} is
-#'   calculated automatically via \code{\link{BestTau}}.
+#'   [CorrectForBleaching()] which uses exponential filtering with
+#'   time constant `tau` (where the unit of time is the time between
+#'   frames). If this is set to `'auto'`, then the value of `tau` is
+#'   calculated automatically via [BestTau()].
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   number (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+#'   number (via [MeanStackThresh()])? If so, set your thresholding
 #'   \emph{method} here.
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
-#'   by setting this parameter to \code{TRUE}, the array would instead be
+#'   by setting this parameter to `TRUE`, the array would instead be
 #'   skipped (the function will return the original array) and give a warning.
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeeding the threshold be set?
-#' @param filt Do you want to smooth (\code{filt = 'smooth'}) or median
-#'   (\code{filt = 'median'}) filter the number image using
-#'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
+#'   (`filt = 'median'`) filter the number image using
+#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option \code{na_count = TRUE}. If you want to smooth/median filter the
+#'   option `na_count = TRUE`. If you want to smooth/median filter the
 #'   number image in a different way, first calculate the numbers without
-#'   filtering (\code{filt = NULL}) using this function and then perform your
+#'   filtering (`filt = NULL`) using this function and then perform your
 #'   desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   \code{NumberTxtFolder}, does not work with multiple cores).
+#'   `NumberTxtFolder`, does not work with multiple cores).
 #'
-#' @return \code{Number} returns a matrix, the number image; \code{Numbers}
-#'   returns a list of these. The result of \code{NumberTxtFolder} is the text
+#' @return `Number` returns a matrix, the number image; `Numbers`
+#'   returns a list of these. The result of `NumberTxtFolder` is the text
 #'   csv files written to disk (in the same folder as the input images).
 #'
 #' @examples
@@ -107,14 +107,14 @@ Number <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
 
 #' Create a number time-series.
 #'
-#' Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of them to
-#' create one number image, the next \code{frames.per.set} of them to create
+#' Given a stack of images `mat3d`, use the first `frames.per.set` of them to
+#' create one number image, the next `frames.per.set` of them to create
 #' the next number image and so on to get a time-series of number
-#' images. If \code{tau} is specified, bleaching correction is performed via
-#' \code{\link{CorrectForBleaching}}.
+#' images. If `tau` is specified, bleaching correction is performed via
+#' [CorrectForBleaching()].
 #'
 #' This may discard some images, for example if 175 frames are in the input and
-#' \code{frames.per.set = 50}, then the last 25 are discarded. If bleaching
+#' `frames.per.set = 50`, then the last 25 are discarded. If bleaching
 #' correction is selected, it is performed on the whole image stack before the
 #' sectioning is done for calculation of numbers.
 #'
@@ -123,7 +123,7 @@ Number <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #'   successive numbers.
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th number image.
-#' @seealso \code{\link{Number}}.
+#' @seealso [Number()].
 #'
 #' @examples
 #' library(EBImage)

@@ -24,13 +24,13 @@ that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{tau}{If this is specified, bleaching correction is performed with
-\code{\link{CorrectForBleaching}} which uses exponential filtering with
+\code{\link[=CorrectForBleaching]{CorrectForBleaching()}} which uses exponential filtering with
 time constant \code{tau} (where the unit of time is the time between
 frames). If this is set to \code{'auto'}, then the value of \code{tau} is
-calculated automatically via \code{\link{BestTau}}.}
+calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link{MeanStackThresh}})? If so, set your
+brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{skip.consts}{An image array with only one value (a 'constant array')
@@ -43,7 +43,7 @@ exceeeding the threshold be set?}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
-\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+\code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter the
 brightness image in a different way, first calculate the brightnesses
@@ -78,12 +78,12 @@ same folder as the input images).
 Given a time stack of images, \code{Brightness} performs a calculation of the
 brightness for each pixel. \code{BrightnessTxtFolder} does this calculation
 for an entire folder, writing the results as text files via
-\code{\link{WriteImageTxt}}. \code{Brightnesses} calculates the brightnesses
+\code{\link[=WriteImageTxt]{WriteImageTxt()}}. \code{Brightnesses} calculates the brightnesses
 for several image series in parallel.
 }
 \details{
 Do not try to parallelize the use of \code{Brightness} and friends yourself
-(e.g. with \code{\link{mclapply}}) because it will throw an error (this is
+(e.g. with \code{\link[=mclapply]{mclapply()}}) because it will throw an error (this is
 because the \code{autothresholdr} package does not work in parallel (indeed
 anything run using the \code{rJava} package won't)). Always use
 \code{Brightnesses} for this purpose (this has a workaround whereby it does

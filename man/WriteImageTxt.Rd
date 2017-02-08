@@ -24,7 +24,7 @@ write one file for each slice, numbering it with the slice number.
 }
 \details{
 The image slices are transposed prior to being written to disk to ensure that
-displaying an image with \code{\link[EBImage]{display}} in R will yield the
+displaying an image with \code{\link[EBImage:display]{EBImage::display()}} in R will yield the
 same result (as opposed to a transposed image) as displaying the written text
 file in ImageJ (i.e. I've made a modification to ensure the files display
 correctly in ImageJ). These functions do not work for 4-dimensional arrays

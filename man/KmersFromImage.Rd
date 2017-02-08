@@ -14,7 +14,7 @@ KmersFromImagesFolder(folder.path = ".", monomer.med, tau = NA,
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array that one would might input to
-\code{\link{Brightness}} \emph{or} the path to an image file on disk.}
+\code{\link[=Brightness]{Brightness()}} \emph{or} the path to an image file on disk.}
 
 \item{monomer.med}{The median brightness of a monomer. You must know what
 this is to use this function correctly. This must be greater than 1 (this
@@ -22,10 +22,10 @@ is the 'apparent brightness' of a monomer). If you're reading the Digman et
 al. (2008) paper, this is \eqn{1 + \epsilon}.}
 
 \item{tau}{The time constant for the exponential filtering (see
-\code{\link{Brightness}}).}
+\code{\link[=Brightness]{Brightness()}}).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
 \emph{method} here.}
 
 \item{skip.consts}{An image array with only one value (a 'constant array')
@@ -35,7 +35,7 @@ skipped (the function will return the original array) and give a warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
-\code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+\code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. If you want to smooth/median filter
 the brightness image in a different way, first calculate the brightnesses
@@ -68,8 +68,8 @@ of these vectors for each image. This vector also has an attribute
 }
 \description{
 Given an image (as a file path or an array), \code{KmersFromImage} does the
-brightness calculation via \code{\link{Brightness}} and then counts the
-numbers of each kmer via \code{\link{KmersFromBrightnesses}}.
+brightness calculation via \code{\link[=Brightness]{Brightness()}} and then counts the
+numbers of each kmer via \code{\link[=KmersFromBrightnesses]{KmersFromBrightnesses()}}.
 \code{KmersFromImagesFolder} does this for an entire folder (directory) of
 images and outputs a csv file of the results.
 }

@@ -1,17 +1,17 @@
 #' Make a raster plot of a matrix.
 #'
-#' Given a matrix \code{mat}, make a raster plot of the matrix whereby in the
-#' plot, the pixel at \eqn{x = }\code{i}, \eqn{y = }\code{j} has colour based on
-#' the value of \code{mat[i, j]} and the \eqn{x} axis points right and the
+#' Given a matrix `mat`, make a raster plot of the matrix whereby in the
+#' plot, the pixel at \eqn{x = }`i`, \eqn{y = }`j` has colour based on
+#' the value of `mat[i, j]` and the \eqn{x} axis points right and the
 #' \eqn{y} axis points down (see 'Details').
 #'
-#' The pixel at \eqn{x = }\code{i}, \eqn{y = }\code{j} has colour based on the
-#' value of \code{mat[i, j]} where the \eqn{x} axis points right and the \eqn{y}
+#' The pixel at \eqn{x = }`i`, \eqn{y = }`j` has colour based on the
+#' value of `mat[i, j]` where the \eqn{x} axis points right and the \eqn{y}
 #' axis points down. This is in accordance with how
-#' \code{\link[EBImage]{EBImage}} and \code{\link{ReadImageData}} (which wraps
-#' EBImage's \code{\link[EBImage]{readImage}}). However, when one prints a
+#' [EBImage::EBImage()] and [ReadImageData()] (which wraps
+#' EBImage's [EBImage::readImage()]). However, when one prints a
 #' matrix in a console (or views it in a program such as excel), the value in
-#' position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from \code{mat[j, i]}, so
+#' position \eqn{x = }`i`, \eqn{y = }`j` is from `mat[j, i]`, so
 #' if you're confused about a transposed plot, this is why.
 #'
 #' @param mat The matrix you wish to plot.
@@ -19,49 +19,49 @@
 #'   plot.
 #' @param limits This gives the user the option to set all values outside a
 #'   certain range to their nearest value within that range (if \code{clip =
-#'   TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
-#'   values outside the range [1.5, 2.6) to \code{NA}, use \code{limits = c(1.5,
+#'   TRUE}) or to `NA` (if `clip = FALSE`. For example, to set all
+#'   values outside the range [1.5, 2.6) to `NA`, use \code{limits = c(1.5,
 #'   2.6), clip = FALSE}. The colour range will cover all values within these
 #'   specified limits.
 #' @param ranges A numeric vector. If you want specific ranges of values to have
 #'   the same color, specify these ranges via an increasing numeric vector. For
 #'   example, if you want the ranges 0.5-1.2 and 1.2-3, use \code{ranges =
-#'   c(0.5, 1.2, 3)}. If \code{ranges} is specified as a number (a numeric
-#'   vector of length 1) \code{n}, this is equivalent to setting ranges to be
-#'   \code{n} equal-length intervals within the range of the matrix, i.e. it is
+#'   c(0.5, 1.2, 3)}. If `ranges` is specified as a number (a numeric
+#'   vector of length 1) `n`, this is equivalent to setting ranges to be
+#'   `n` equal-length intervals within the range of the matrix, i.e. it is
 #'   equivalent to setting \code{ranges = seq(min(mat), max(mat), length.out = n
-#'   + 1)}. At most one of \code{ranges} and \code{limits} should be set. If
+#'   + 1)}. At most one of `ranges` and `limits` should be set. If
 #'   ranges is set, the behaviour for values which are not in any of the ranges
-#'   are set by the \code{clip} arguments as in the \code{limits} argument.
+#'   are set by the `clip` arguments as in the `limits` argument.
 #' @param range.names A character vector. If your colour scale is discrete, here
 #'   you can set the names which will label each range in the legend.
-#' @param colours If you have set \code{ranges}, here you may specify which
+#' @param colours If you have set `ranges`, here you may specify which
 #'   colors you wish to colour each range. It must have the same length as the
-#'   number of intervals you have specified in \code{ranges}.  If you have not
-#'   specified \code{ranges}, here you may specify the colours (to be passed to
-#'   \code{\link[ggplot2]{scale_fill_gradientn}}) to create the continuous
+#'   number of intervals you have specified in `ranges`.  If you have not
+#'   specified `ranges`, here you may specify the colours (to be passed to
+#'   [ggplot2::scale_fill_gradientn()]) to create the continuous
 #'   colour band. It is specified as a character vector, with the colors
-#'   specified either as the values in \code{\link{colors}} or as in the value
-#'   of the \code{\link{rgb}} function. Note that this allows the use of
-#'   \code{\link[grDevices]{rainbow}} and friends. The default uses
-#'   \code{\link[viridis]{viridis}}.
-#' @param na.colour Which colour should the \code{NA} pixels be? Default is
+#'   specified either as the values in [colors()] or as in the value
+#'   of the [rgb()] function. Note that this allows the use of
+#'   [grDevices::rainbow()] and friends. The default uses
+#'   [viridis::viridis()].
+#' @param na.colour Which colour should the `NA` pixels be? Default is
 #'   black.
-#' @param clip If either \code{limits} or \code{ranges} are set (one should
+#' @param clip If either `limits` or `ranges` are set (one should
 #'   never set both), there may be values that fall outside the specified
-#'   limits/ranges. If \code{clip = TRUE}, values outside these limits/ranges
-#'   are set to their nearest values within them, but if \code{clip = FALSE},
-#'   these values are set to NA. Note that setting \code{clip = TRUE} is
-#'   equivalent to setting both \code{clip.low} and \code{clip.high} to
-#'   \code{TRUE}.
-#' @param clip.low Setting this to \code{TRUE} (and leaving \code{clip = FALSE},
-#'   \code{clip.high = FALSE}) will set all values falling below the specified
+#'   limits/ranges. If `clip = TRUE`, values outside these limits/ranges
+#'   are set to their nearest values within them, but if `clip = FALSE`,
+#'   these values are set to NA. Note that setting `clip = TRUE` is
+#'   equivalent to setting both `clip.low` and `clip.high` to
+#'   `TRUE`.
+#' @param clip.low Setting this to `TRUE` (and leaving `clip = FALSE`,
+#'   `clip.high = FALSE`) will set all values falling below the specified
 #'   limits/ranges to their nearest value within them, but all values falling
-#'   above those limits/ranges will be set to \code{NA}.
-#' @param clip.high Setting this to \code{TRUE} (and leaving \code{clip =
-#'   FALSE}, \code{clip.low = FALSE}) will set all values falling above the
+#'   above those limits/ranges will be set to `NA`.
+#' @param clip.high Setting this to `TRUE` (and leaving \code{clip =
+#'   FALSE}, `clip.low = FALSE`) will set all values falling above the
 #'   specified limits/ranges to their nearest value within them, but all values
-#'   falling below those limits/ranges will be set to \code{NA}.
+#'   falling below those limits/ranges will be set to `NA`.
 #' @param log.trans Do you want to log-transform the colour scaling?
 #' @param breaks Where do you want tick marks to appear on the legend colour
 #'   scale?
@@ -70,7 +70,7 @@
 #'   those specific ones here
 #'
 #' @return In the graphics console, a raster plot (via
-#'   \code{\link[ggplot2]{geom_raster}}) will appear with the matrix values
+#'   [ggplot2::geom_raster()]) will appear with the matrix values
 #'   represented as pixel colours, with a named scale bar.
 #'
 #' @examples
@@ -239,7 +239,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
 #' @param monomer.brightness The (median) brightness of a monomer.
 #' @param log.trans Do you want to log-transform the colour scaling?
 #'
-#' This is a \code{ggplot2} object and can be manipulated thus.
+#' This is a `ggplot2` object and can be manipulated thus.
 #'
 #' @examples
 #' library(EBImage)
@@ -299,10 +299,10 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
 #'   folder that are brightness images. The default matches any .csv files which
 #'   contains 'Brightness' or 'brightness' in its name.
 #' @param verbose Get a real time report on progress?
-#' @param ... Parameters to pass to \code{\link{MatrixRasterPlot}} (these
+#' @param ... Parameters to pass to [MatrixRasterPlot()] (these
 #'   \emph{must} be named arguments).
 #'
-#' @return This is a \code{ggplot2} object and can be manipulated thus.
+#' @return This is a `ggplot2` object and can be manipulated thus.
 #'
 BrightnessPlotFolder <- function(folder.path = ".",
   patt = ".*[Bb]rightness.*\\.csv$", verbose = TRUE, ...) {
@@ -335,19 +335,19 @@ BrightnessPlotFolder <- function(folder.path = ".",
 #' Plot the values of two arrays of identical dimension against each other using
 #' a hexagonal heatmap.
 #'
-#' @param arr.x,arr.y The two arrays. The \code{arrx} values will be along the \eqn{x} axis and the \code{arry} values along the \eqn{y} axis.
-#' @param bins Passed to \code{\link[ggplot2]{geom_hex}}.
+#' @param arr.x,arr.y The two arrays. The `arrx` values will be along the \eqn{x} axis and the `arry` values along the \eqn{y} axis.
+#' @param bins Passed to [ggplot2::geom_hex()].
 #' @param log.trans Do you want to log-transform the colour scaling?
 #' @param colours Here you may specify the colours (to be passed to
-#'   \code{\link[ggplot2]{scale_fill_gradientn}}) to create the continuous
+#'   [ggplot2::scale_fill_gradientn()]) to create the continuous
 #'   colour band. It is specified as a character vector, with the colors
-#'   specified either as the values in \code{\link{colors}} or as in the value
-#'   of the \code{\link{rgb}} function. Note that this allows the use of
-#'   \code{\link[grDevices]{rainbow}} and friends. The default uses
-#'   \code{\link[viridis]{viridis}}.
+#'   specified either as the values in [colors()] or as in the value
+#'   of the [rgb()] function. Note that this allows the use of
+#'   [grDevices::rainbow()] and friends. The default uses
+#'   [viridis::viridis()].
 #' @param limits A numeric vector of length two providing limits of the scale.
 #'
-#' @return This is a \code{ggplot2} object and can be manipulated thus.
+#' @return This is a `ggplot2` object and can be manipulated thus.
 #'
 #' @examples
 #' library(EBImage)

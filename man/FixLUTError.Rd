@@ -18,8 +18,8 @@ will have one less dimension than the input array.
 \description{
 Even if an image stored on disk has 1 channel only, if it has an associated
 LUT (lookup table, to tell programs like ImageJ to display them in (for
-example) green rather than grey, then \code{\link[EBImage]{readImage}} and
-hence \code{\link{ReadImageData}} will read in the image as a 3-channel rgb
+example) green rather than grey, then \code{\link[EBImage:readImage]{EBImage::readImage()}} and
+hence \code{\link[=ReadImageData]{ReadImageData()}} will read in the image as a 3-channel rgb
 colour image, where two of the channels have all-zero intensity values and
 one of them has the values you wanted. This function deletes the zero
 channels from the array. If there were no such LUT errors and the image read

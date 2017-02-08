@@ -11,9 +11,9 @@
 #'   al. (2008) paper, this is \eqn{1 + \epsilon}.
 #'
 #'   This function takes the brightnesses in the range (1, 1 + 2 *
-#'   \code{monomer.med} to be monomers, those in the range (1 + 2 *
-#'   \code{monomer.med}, 1 + 4 * \code{monomer.med} to be dimers, (1 + 4 *
-#'   \code{monomer.med}, 1 + 6 * \code{monomer.med} to be trimers and so on.
+#'   `monomer.med` to be monomers, those in the range (1 + 2 *
+#'   `monomer.med`, 1 + 4 * `monomer.med` to be dimers, (1 + 4 *
+#'   `monomer.med`, 1 + 6 * `monomer.med` to be trimers and so on.
 #'
 #' @return A named vector (named '1mers' '2mers' '3mers' and so on) with each
 #'   element detailing the number of that kmer found.
@@ -43,43 +43,43 @@ KmersFromBrightnesses <- function(brightnesses, monomer.med) {
 
 #' Calculate numbers of kmers based on an image time-series
 #'
-#' Given an image (as a file path or an array), \code{KmersFromImage} does the
-#' brightness calculation via \code{\link{Brightness}} and then counts the
-#' numbers of each kmer via \code{\link{KmersFromBrightnesses}}.
-#' \code{KmersFromImagesFolder} does this for an entire folder (directory) of
+#' Given an image (as a file path or an array), `KmersFromImage` does the
+#' brightness calculation via [Brightness()] and then counts the
+#' numbers of each kmer via [KmersFromBrightnesses()].
+#' `KmersFromImagesFolder` does this for an entire folder (directory) of
 #' images and outputs a csv file of the results.
 #'
 #' @param mat3d A 3-dimensional array that one would might input to
-#'   \code{\link{Brightness}} \emph{or} the path to an image file on disk.
+#'   [Brightness()] \emph{or} the path to an image file on disk.
 #' @param monomer.med The median brightness of a monomer. You must know what
 #'   this is to use this function correctly. This must be greater than 1 (this
 #'   is the 'apparent brightness' of a monomer). If you're reading the Digman et
 #'   al. (2008) paper, this is \eqn{1 + \epsilon}.
 #' @param tau The time constant for the exponential filtering (see
-#'   \code{\link{Brightness}}).
+#'   [Brightness()]).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via \code{\link{MeanStackThresh}})? If so, set your thresholding
+#'   brightness (via [MeanStackThresh()])? If so, set your thresholding
 #'   \emph{method} here.
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
-#'   by setting this parameter to \code{TRUE}, the array would instead be
+#'   by setting this parameter to `TRUE`, the array would instead be
 #'   skipped (the function will return the original array) and give a warning.
-#' @param filt Do you want to smooth (\code{filt = 'smooth'}) or median
-#'   (\code{filt = 'median'}) filter the brightness image using
-#'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
+#'   (`filt = 'median'`) filter the brightness image using
+#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option \code{na_count = TRUE}. If you want to smooth/median filter
+#'   option `na_count = TRUE`. If you want to smooth/median filter
 #'   the brightness image in a different way, first calculate the brightnesses
-#'   without filtering (\code{filt = NULL}) using this function and then perform
+#'   without filtering (`filt = NULL`) using this function and then perform
 #'   your desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   \code{BrightnessFolder}, does not work with multiple cores) and to tell
-#'   when \code{KmersFromImagesFolder} is done.
+#'   `BrightnessFolder`, does not work with multiple cores) and to tell
+#'   when `KmersFromImagesFolder` is done.
 #'
 #' @return A named vector (named '1mers' '2mers' '3mers' and so on) with each
 #'   element detailing the number of that kmer found, or for
-#'   \code{KmersFromImagesFolder}, a csv file is written to disk detailing one
+#'   `KmersFromImagesFolder`, a csv file is written to disk detailing one
 #'   of these vectors for each image. This vector also has an attribute
 #'   'mean.intensity' giving the mean intensity of the input image.
 #' @export
@@ -170,14 +170,14 @@ KmerArray <- function(brightness.arr, monomer.brightness) {
 #' Create kmer tiff files from brightness csvs
 #'
 #' For each brightness csv image in a folder, given a monomeric brightness,
-#' create a tiff file of the kmer positions using \code{\link{KmerArray}}.
+#' create a tiff file of the kmer positions using [KmerArray()].
 #'
 #' @param csv.paths The paths to the brightness csv files, defaults to
-#'   \code{list.files(pattern = '[Bb]rightness.*\\.csv')}.
+#'   `list.files(pattern = '[Bb]rightness.*\\.csv')`.
 #' @param monomer.brightness The (median) brightness of a monomer.
 #' @param out.names The names you want the output files to have (will be forced
 #'   to .tif).
-#' @param na See \code{\link{WriteIntImage}}.
+#' @param na See [WriteIntImage()].
 #' @param mcc The number of parallel cores to use for the processing.
 #' @param verbose Do you want to print a message when the function is done?
 #'

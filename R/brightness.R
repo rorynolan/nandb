@@ -1,16 +1,16 @@
 #' Calculate brightness from image series.
 #'
-#' Given a time stack of images, \code{Brightness} performs a calculation of the
-#' brightness for each pixel. \code{BrightnessTxtFolder} does this calculation
+#' Given a time stack of images, `Brightness` performs a calculation of the
+#' brightness for each pixel. `BrightnessTxtFolder` does this calculation
 #' for an entire folder, writing the results as text files via
-#' \code{\link{WriteImageTxt}}. \code{Brightnesses} calculates the brightnesses
+#' [WriteImageTxt()]. `Brightnesses` calculates the brightnesses
 #' for several image series in parallel.
 #'
-#' Do not try to parallelize the use of \code{Brightness} and friends yourself
-#' (e.g. with \code{\link{mclapply}}) because it will throw an error (this is
-#' because the \code{autothresholdr} package does not work in parallel (indeed
-#' anything run using the \code{rJava} package won't)). Always use
-#' \code{Brightnesses} for this purpose (this has a workaround whereby it does
+#' Do not try to parallelize the use of `Brightness` and friends yourself
+#' (e.g. with [mclapply()]) because it will throw an error (this is
+#' because the `autothresholdr` package does not work in parallel (indeed
+#' anything run using the `rJava` package won't)). Always use
+#' `Brightnesses` for this purpose (this has a workaround whereby it does
 #' the thresholding in series and does the rest in parallel).
 #'
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -18,34 +18,34 @@
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param tau If this is specified, bleaching correction is performed with
-#'   \code{\link{CorrectForBleaching}} which uses exponential filtering with
-#'   time constant \code{tau} (where the unit of time is the time between
-#'   frames). If this is set to \code{'auto'}, then the value of \code{tau} is
-#'   calculated automatically via \code{\link{BestTau}}.
+#'   [CorrectForBleaching()] which uses exponential filtering with
+#'   time constant `tau` (where the unit of time is the time between
+#'   frames). If this is set to `'auto'`, then the value of `tau` is
+#'   calculated automatically via [BestTau()].
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via \code{\link{MeanStackThresh}})? If so, set your
+#'   brightness (via [MeanStackThresh()])? If so, set your
 #'   thresholding \emph{method} here.
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
-#'   by setting this parameter to \code{TRUE}, the array would instead be
+#'   by setting this parameter to `TRUE`, the array would instead be
 #'   skipped (the function will return the original array) and give a warning.
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeeding the threshold be set?
-#' @param filt Do you want to smooth (\code{filt = 'smooth'}) or median
-#'   (\code{filt = 'median'}) filter the brightness image using
-#'   \code{\link{SmoothFilterB}} or \code{\link{MedianFilterB}} respectively? If
+#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
+#'   (`filt = 'median'`) filter the brightness image using
+#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option \code{na_count = TRUE}. If you want to smooth/median filter the
+#'   option `na_count = TRUE`. If you want to smooth/median filter the
 #'   brightness image in a different way, first calculate the brightnesses
-#'   without filtering (\code{filt = NULL}) using this function and then perform
+#'   without filtering (`filt = NULL`) using this function and then perform
 #'   your desired filtering routine on the result.
 #' @param verbose If mat3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   \code{BrightnessTxtFolder}, does not work with multiple cores).
+#'   `BrightnessTxtFolder`, does not work with multiple cores).
 #'
-#' @return \code{Brightness} returns a matrix, the brightness image;
-#'   \code{Brightnesses} returns a list of these. The result of
-#'   \code{BrightnessTxtFolder} is the text csv files written to disk (in the
+#' @return `Brightness` returns a matrix, the brightness image;
+#'   `Brightnesses` returns a list of these. The result of
+#'   `BrightnessTxtFolder` is the text csv files written to disk (in the
 #'   same folder as the input images).
 #'
 #' @examples
@@ -110,14 +110,14 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
 
 #' Create a Brightness time-series.
 #'
-#' Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of
-#' them to create one brightness image, the next \code{frames.per.set} of them
+#' Given a stack of images `mat3d`, use the first `frames.per.set` of
+#' them to create one brightness image, the next `frames.per.set` of them
 #' to create the next brightness image and so on to get a time-series of
-#' brightness images. If \code{tau} is specified, bleaching correction is
-#' performed via \code{\link{CorrectForBleaching}}.
+#' brightness images. If `tau` is specified, bleaching correction is
+#' performed via [CorrectForBleaching()].
 #'
 #' This may discard some images, for example if 175 frames are in the input and
-#' \code{frames.per.set = 50}, then the last 25 are discarded. If bleaching
+#' `frames.per.set = 50`, then the last 25 are discarded. If bleaching
 #' correction is selected, it is performed on the whole image stack before the
 #' sectioning is done for calculation of brightnesses.
 #'
@@ -126,7 +126,7 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #'   successive brightnesses.
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
-#' @seealso \code{\link{Brightness}}.
+#' @seealso [Brightness()].
 #'
 #' @examples
 #' library(EBImage)

@@ -17,7 +17,7 @@ KmerTIFFsFromBrightnessCSVs(monomer.brightness, csv.paths = NULL,
 \item{out.names}{The names you want the output files to have (will be forced
 to .tif).}
 
-\item{na}{See \code{\link{WriteIntImage}}.}
+\item{na}{See \code{\link[=WriteIntImage]{WriteIntImage()}}.}
 
 \item{mcc}{The number of parallel cores to use for the processing.}
 
@@ -25,5 +25,5 @@ to .tif).}
 }
 \description{
 For each brightness csv image in a folder, given a monomeric brightness,
-create a tiff file of the kmer positions using \code{\link{KmerArray}}.
+create a tiff file of the kmer positions using \code{\link[=KmerArray]{KmerArray()}}.
 }

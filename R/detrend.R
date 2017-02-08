@@ -8,8 +8,8 @@
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param tau The time constant for the exponential filtering. If this is set to
-#'   \code{'auto'}, then the value of \code{tau} is calculated automatically via
-#'   \code{\link{BestTau}}.
+#'   `'auto'`, then the value of `tau` is calculated automatically via
+#'   [BestTau()].
 #'
 #' @references Stroud, P. D.: A recursive exponential filter for time-sensitive
 #'   data, Los Alamos national Laboratory, LAUR-99-5573,
@@ -49,7 +49,7 @@ CorrectForBleaching <- function(mat3d, tau) {
 #' Find the best tau for exponential filtering detrend.
 #'
 #' Say you have an image series that you wish to detrend before performing a
-#' brightness calculation. This function finds the best \code{tau} for an
+#' brightness calculation. This function finds the best `tau` for an
 #' exponential filtering detrend. See \code{vignette('Adaptive Detrending',
 #' package = 'nandb')} for more details.
 #'
@@ -58,17 +58,17 @@ CorrectForBleaching <- function(mat3d, tau) {
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via \code{\link{MeanStackThresh}})? If so, set your
+#'   brightness (via [MeanStackThresh()])? If so, set your
 #'   thresholding \emph{method} here.
-#' @param tol What size of error in the estimate of the \emph{ideal} \code{tau}
+#' @param tol What size of error in the estimate of the \emph{ideal} `tau`
 #'   (aside from the error introduced by the random image simulation, see
-#'   \code{vignette('AdaptiveDetrend', package = 'nandb')}) are you willing
+#'   `vignette('AdaptiveDetrend', package = 'nandb')`) are you willing
 #'   to tolerate? The default is 1.
 #'
-#' @return A number. The estimate of the ideal \code{tau} to use, with an
-#'   attribute '\code{brightness.immobile}' giving the brightness of the
+#' @return A number. The estimate of the ideal `tau` to use, with an
+#'   attribute '`brightness.immobile`' giving the brightness of the
 #'   simulated (from all immobile particles) image series after detrending with
-#'   this \code{tau} (this should be very close to 1).
+#'   this `tau` (this should be very close to 1).
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))

@@ -1,7 +1,7 @@
 #' Threshold every image in a stack based on their mean.
 #'
-#' Via the \code{\link[autothresholdr]{auto_thresh}} function from the
-#' \code{autothresholdr} package, apply a threshold to the image stack before
+#' Via the [autothresholdr::auto_thresh()] function from the
+#' `autothresholdr` package, apply a threshold to the image stack before
 #' calculating brightness, such as to only have nonzero brightnesses in areas
 #' where the cell is.
 #'
@@ -13,11 +13,11 @@
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series.
 #' @param method The thresholding method to use. See
-#'   \code{\link[autothresholdr]{auto_thresh}}.
+#'   [autothresholdr::auto_thresh()].
 #' @param fail To which value should pixels not exceeeding the threshold be set?
 #' @param skip.consts An array with only one value (a 'constant array') won't
 #'   threshold properly. By default the function would give an error, but by
-#'   setting this parameter to \code{TRUE}, the array would instead be skipped
+#'   setting this parameter to `TRUE`, the array would instead be skipped
 #'   (the function will return the original array) and give a warning.
 #'
 #' @return The thresholded stack, pillars not exceeding the threshold are set to

@@ -33,7 +33,7 @@ adjacent elements.
 The idea is to, for an interval of size \eqn{s}, put in \eqn{floor(s / (n -
 m))} numbers into each of these intervals. Then, if there any numbers left
 over, put exactly one into each of the intervals with the biggest \eqn{(s /
-(n - m)) - \code{floor}(s / (n - m))} (starting with the biggest and working
+(n - m)) - `floor`(s / (n - m))} (starting with the biggest and working
 one's way down) until there are no numbers left to assign. The end intervals
 need special treatment since (assuming the ends are not in the specific
 numbers), the end intervals are open on one side (one boundary has no point

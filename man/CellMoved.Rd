@@ -13,7 +13,7 @@ CellMoved(mat3d, thresh, method = "Huang")
 
 \item{method}{We want to decide how many consecutive \emph{low} values are
 too many. This will be done by using
-\code{\link[autothresholdr]{auto_thresh}}, so here you set the method for
+\code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}}, so here you set the method for
 that function.}
 }
 \value{
@@ -27,11 +27,11 @@ as the frames go on, the intensity at that pixel will go from low (absence of
 cell) to high (presence of cell). We detect this movement in a given pixel by
 detecting the series of consecutive low values. The 'low' values are those
 failing to exceed a certain threshold (set by thresholding the whole image
-via \code{\link[autothresholdr]{auto_thresh}}). Of course this also works for
+via \code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}}). Of course this also works for
 cells moving out of pixels.
 }
 \details{
 This assumes that you've already thresholded out pixels where the cell
-\emph{never} was (perhaps via \code{\link[autothresholdr]{auto_thresh}}),
+\emph{never} was (perhaps via \code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}}),
 setting those to \code{NA}.
 }

@@ -10,12 +10,12 @@ ReadImageData(image.name, fix.lut = NULL)
 \item{image.name}{The path to the image file on disk. The file extension must
 be one of '.jpeg', '.png', '.tiff' or '.tif'.}
 
-\item{fix.lut}{When reading in images (via \code{\link[EBImage]{readImage}}),
-R can give an array of different dimensionality than you expect. If you
-suspect this happening, set the value of this parameter to the \emph{number
-of dimensions} that you expect your read image to have and this function
-will try to automatically give you the image array in the form you want.
-Read \code{\link{FixLUTError}} to find out more.}
+\item{fix.lut}{When reading in images (via \code{\link[EBImage:readImage]{EBImage::readImage()}}), R can
+give an array of different dimensionality than you expect. If you suspect
+this happening, set the value of this parameter to the \emph{number of
+dimensions} that you expect your read image to have and this function will
+try to automatically give you the image array in the form you want. Read
+\code{\link[=FixLUTError]{FixLUTError()}} to find out more.}
 }
 \value{
 An array of integers representing the image.
@@ -24,23 +24,21 @@ An array of integers representing the image.
 Read in an image file from the disk as an array of pixel intensities.
 }
 \details{
-This function wraps \code{\link[EBImage]{readImage}} and
-\code{\link[EBImage]{imageData}} from the \code{\link[EBImage]{EBImage}}
-package. By default, \code{readImage} reads in pixel intensities in the range
-\link{0, 1}. \code{ReadImageData} reads in pixel intensities as integers as they
-would be represented in a tiff file and displayed therefrom in ImageJ. This
-is necessary when calculating number and brightness, where we need pixel
-values to be in units of 'counts'.
+This function wraps \code{\link[EBImage:readImage]{EBImage::readImage()}} and \code{\link[EBImage:imageData]{EBImage::imageData()}}. By
+default, \code{readImage} reads in pixel intensities in the range \code{[0, 1]}.
+\code{ReadImageData} reads in pixel intensities as integers as they would be
+represented in a tiff file and displayed therefrom in ImageJ. This is
+necessary when calculating number and brightness, where we need pixel values
+to be in units of 'counts'.
 
-Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x =
-}\code{i}, \eqn{y = }\code{j} has colour based on the value of \code{mat[i,
-j]} where the \eqn{x} axis points right and the \eqn{y} axis points down.
-This is in accordance with how \code{\link[EBImage]{EBImage}}'s
-\code{\link[EBImage]{readImage}} (which this function wraps). However, when
-one prints a matrix in a console (or views it in a program such as excel),
-the value in position \eqn{x = }\code{i}, \eqn{y = }\code{j} is from
-\code{mat[j, i]}, so if you're confused about a phantom transposition, this
-is why.
+Thinking of the read image as a matrix \code{mat}, the pixel at \eqn{x = }\code{i},
+\eqn{y = }\code{j} has colour based on the value of \code{mat[i, j]} where the
+\eqn{x} axis points right and the \eqn{y} axis points down. This is in
+accordance with how \link[EBImage:EBImage]{EBImage::EBImage}'s \code{\link[EBImage:readImage]{EBImage::readImage()}} (which this
+function wraps). However, when one prints a matrix in a console (or views it
+in a program such as excel), the value in position \eqn{x = }\code{i}, \eqn{y =
+}\code{j} is from \code{mat[j, i]}, so if you're confused about a phantom
+transposition, this is why.
 }
 \examples{
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
