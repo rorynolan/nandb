@@ -57,12 +57,6 @@ AllEqual <- function(a, b = NA, allow = TRUE, cn = FALSE) {
 #' @export
 ApplyOnPillars <- function(mat3d, FUN) {
   apply(mat3d, c(1, 2), FUN) %>% {
-    # This applies FUN over pillars of mat3d (c(1, 2) means
-    # iterate over the first two slots of mat3d so FUN is
-    # recursively applied to mat3d[i, j, ] (notice i and j
-    # occupying the first two slots there) for all possible i, j)
-    # where the result from pillar [i, j, ] goes into column [,
-    # i, j] of the result.
     if (length(dim(.)) == 3) {
       return(aperm(., c(2, 3, 1)))
       # After the apply step, we have the column [, i, j] containing what we
@@ -76,6 +70,28 @@ ApplyOnPillars <- function(mat3d, FUN) {
     }
   }
 }
+
+#' Turn a 3d array into a list of pillars
+#'
+#' Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar \code{[i, j, ]} is list element \code{i + n1 * (j - 1)}, so the first element is pillar \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
+#'
+#' @param arr3d A 3-dimensional array.
+#'
+#' @return A list.
+#'
+#' @examples
+#' arr <- array(1:27, dim = rep(3, 3))
+#' print(arr)
+#' ListPillars(arr)
+#'
+#' @export
+ListPillars <- function(arr3d) {
+  d <- dim(arr3d)
+  lapply(seq_len(prod(d[1:2])), function(x) {
+    arr3d[((x - 1) %% d[1]) + 1, ((x - 1) %/% d[1]) + 1, ]
+  })
+}
+
 BrightnessVec <- function(vec) {
   if (AllEqual(vec, 0))
     return(0)

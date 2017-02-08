@@ -11,7 +11,7 @@ An R package for performing number and brightness analysis as in Digman et al. 2
 
 [![Travis-CI Build Status](https://travis-ci.org/rorynolan/nandb.svg?branch=master)](https://travis-ci.org/rorynolan/nandb)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rorynolan/nandb?branch=master&svg=true)](https://ci.appveyor.com/project/rorynolan/nandb)
-[![Coverage Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](https://codecov.io/github/rorynolan/nandb?branch=master)
+<!--[![Coverage Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](https://codecov.io/github/rorynolan/nandb?branch=master)-->
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
 
 ## Installation
@@ -34,10 +34,10 @@ On **Windows**, you need to go to https://cran.r-project.org/bin/windows/Rtools/
 Then, everyone, open R and run:
 
 ```{r, eval=FALSE}
-install.packages(c("devtools", "knitr", "rmarkdown", 
-                   "XML", "xml2", "gstat", "gridExtra"))
+install.packages(c("devtools", "knitr", "rmarkdown", "locfit", "tiff", "jpeg", 
+                   "png", "fftwtools", "XML", "xml2", "gstat", "gridExtra"))
 source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
+biocLite(c("BiocGenerics", "EBImage", "BiocParallel"))
 ```
 If you get a message saying `Update all/some/none? [a/s/n]: `, type `a`. 
 Then run
