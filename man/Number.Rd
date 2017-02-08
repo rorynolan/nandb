@@ -70,8 +70,8 @@ files (a character vector).}
 }
 \value{
 \code{Number} returns a matrix, the number image; \code{Numbers}
-  returns a list of these. The result of \code{NumberTxtFolder} is the text
-  csv files written to disk (in the same folder as the input images).
+returns a list of these. The result of \code{NumberTxtFolder} is the text
+csv files written to disk (in the same folder as the input images).
 }
 \description{
 Given a time stack of images, \code{Number} performs a calculation of the

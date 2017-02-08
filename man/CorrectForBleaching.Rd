@@ -25,8 +25,8 @@ method described in Digman et al. 2008.
 }
 \references{
 Stroud, P. D.: A recursive exponential filter for time-sensitive
-  data, Los Alamos national Laboratory, LAUR-99-5573,
-  \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
+data, Los Alamos national Laboratory, LAUR-99-5573,
+\url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
 
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 tau10 <- CorrectForBleaching(img, 10)

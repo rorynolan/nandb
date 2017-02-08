@@ -73,11 +73,15 @@ ApplyOnPillars <- function(mat3d, FUN) {
 
 #' Turn a 3d array into a list of pillars
 #'
-#' Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar \code{[i, j, ]} is list element \code{i + n1 * (j - 1)}, so the first element is pillar \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
+#' Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar \code{[i,
+#' j, ]} is list element \code{i + n1 * (j - 1)}, so the first element is pillar
+#' \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
 #'
 #' @param arr3d A 3-dimensional array.
 #'
 #' @return A list.
+#'
+#' @seealso [PillarsListToArr]
 #'
 #' @examples
 #' arr <- array(1:27, dim = rep(3, 3))
@@ -90,6 +94,36 @@ ListPillars <- function(arr3d) {
   lapply(seq_len(prod(d[1:2])), function(x) {
     arr3d[((x - 1) %% d[1]) + 1, ((x - 1) %/% d[1]) + 1, ]
   })
+}
+
+#' Make a list of pillars back into a 3D array.
+#'
+#' #' Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar
+#' \code{[i, j, ]} is list element \code{i + n1 * (j - 1)}, so the first element
+#' is pillar \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
+#'
+#' @param pillars.list The list of pillars
+#' @param dim The desired dimension of the output array.
+#'
+#' @return A 3-dimensional array.
+#'
+#' @seealso [ListPillars]
+#'
+#' @examples
+#' arr <- array(1:27, dim = rep(3, 3))
+#' print(arr)
+#' ListPillars(arr)
+#' PillarsListToArr(ListPillars(arr), dim(arr))
+#'
+#' @export
+PillarsListToArr <- function(pillars.list, dim) {
+  arr3d <- array(0, dim = dim)
+  for (i in seq_along(pillars.list)) {
+    arr3d[((i - 1) %% dim[1]) + 1,
+          ((i - 1) %/% dim[1]) + 1,
+          ] <- pillars.list[[i]]
+  }
+  arr3d
 }
 
 BrightnessVec <- function(vec) {

@@ -14,6 +14,6 @@ detrending' technique.
 }
 \references{
 Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of
-  Molecules and Brightness in the Laser Scanning Microscope. Biophysical
-  Journal. 2008;94(6):2320-2332. doi:10.1529/biophysj.107.114645.
+Molecules and Brightness in the Laser Scanning Microscope. Biophysical
+Journal. 2008;94(6):2320-2332. doi:10.1529/biophysj.107.114645.
 }

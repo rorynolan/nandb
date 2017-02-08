@@ -70,9 +70,9 @@ files (a character vector).}
 }
 \value{
 \code{Brightness} returns a matrix, the brightness image;
-  \code{Brightnesses} returns a list of these. The result of
-  \code{BrightnessTxtFolder} is the text csv files written to disk (in the
-  same folder as the input images).
+\code{Brightnesses} returns a list of these. The result of
+\code{BrightnessTxtFolder} is the text csv files written to disk (in the
+same folder as the input images).
 }
 \description{
 Given a time stack of images, \code{Brightness} performs a calculation of the

@@ -64,8 +64,8 @@ files (a character vector).}
 }
 \value{
 \code{Brightness} returns a matrix, the brightness image. The result
-  of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
-  same folder as the input images).
+of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
+same folder as the input images).
 }
 \description{
 Given a time stack of images, \code{MeanIntensity} calculates the mean

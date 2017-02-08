@@ -14,8 +14,8 @@ length, outputs a vector of constant length (can be 1).}
 }
 \value{
 If \code{FUN} is returning length 1 vectors, a matrix whereby
-  \code{mat[i, j] = FUN(mat3d[i, j, ])}. If FUN is returning vectors of
-  length \code{l > 1}, a 3-dimensional array whereby \code{arr[i, j, ] =
+\code{mat[i, j] = FUN(mat3d[i, j, ])}. If FUN is returning vectors of
+length \code{l > 1}, a 3-dimensional array whereby \code{arr[i, j, ] =
   FUN(mat3d[i, j, ])}.
 }
 \description{

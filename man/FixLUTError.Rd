@@ -13,7 +13,7 @@ FixLUTError(arr, ndim.out)
 }
 \value{
 An array. If the function implemented a 'fix', then the output array
-  will have one less dimension than the input array.
+will have one less dimension than the input array.
 }
 \description{
 Even if an image stored on disk has 1 channel only, if it has an associated

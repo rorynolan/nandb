@@ -23,9 +23,9 @@ to tolerate? The default is 1.}
 }
 \value{
 A number. The estimate of the ideal \code{tau} to use, with an
-  attribute '\code{brightness.immobile}' giving the brightness of the
-  simulated (from all immobile particles) image series after detrending with
-  this \code{tau} (this should be very close to 1).
+attribute '\code{brightness.immobile}' giving the brightness of the
+simulated (from all immobile particles) image series after detrending with
+this \code{tau} (this should be very close to 1).
 }
 \description{
 Say you have an image series that you wish to detrend before performing a

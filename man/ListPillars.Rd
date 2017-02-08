@@ -13,11 +13,16 @@ ListPillars(arr3d)
 A list.
 }
 \description{
-Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar \code{[i, j, ]} is list element \code{i + n1 * (j - 1)}, so the first element is pillar \code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
+Suppose the array is of dimension \code{n1 * n2 * n3}, then pillar \code{[i,
+j, ]} is list element \code{i + n1 * (j - 1)}, so the first element is pillar
+\code{[1, 1, ]}, the second is pillar \code{[1, 2, ]} and so on.
 }
 \examples{
 arr <- array(1:27, dim = rep(3, 3))
 print(arr)
 ListPillars(arr)
 
+}
+\seealso{
+\link{PillarsListToArr}
 }

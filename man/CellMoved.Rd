@@ -18,8 +18,8 @@ that function.}
 }
 \value{
 A logical matrix (or vector or array) with \code{TRUE} for pixels
-  that have too many consecutive low values and \code{FALSE} for the others
-  (so \code{TRUE} for the \emph{bad} pixels).
+that have too many consecutive low values and \code{FALSE} for the others
+(so \code{TRUE} for the \emph{bad} pixels).
 }
 \description{
 If a cell moves into a pixel during the course of a multi-frame acquisition,

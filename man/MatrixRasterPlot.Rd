@@ -17,19 +17,19 @@ plot.}
 
 \item{limits}{This gives the user the option to set all values outside a
 certain range to their nearest value within that range (if \code{clip =
-TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
+  TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
 values outside the range [1.5, 2.6) to \code{NA}, use \code{limits = c(1.5,
-2.6), clip = FALSE}. The colour range will cover all values within these
+  2.6), clip = FALSE}. The colour range will cover all values within these
 specified limits.}
 
 \item{ranges}{A numeric vector. If you want specific ranges of values to have
 the same color, specify these ranges via an increasing numeric vector. For
 example, if you want the ranges 0.5-1.2 and 1.2-3, use \code{ranges =
-c(0.5, 1.2, 3)}. If \code{ranges} is specified as a number (a numeric
+  c(0.5, 1.2, 3)}. If \code{ranges} is specified as a number (a numeric
 vector of length 1) \code{n}, this is equivalent to setting ranges to be
 \code{n} equal-length intervals within the range of the matrix, i.e. it is
 equivalent to setting \code{ranges = seq(min(mat), max(mat), length.out = n
-+ 1)}. At most one of \code{ranges} and \code{limits} should be set. If
+  + 1)}. At most one of \code{ranges} and \code{limits} should be set. If
 ranges is set, the behaviour for values which are not in any of the ranges
 are set by the \code{clip} arguments as in the \code{limits} argument.}
 
@@ -64,7 +64,7 @@ limits/ranges to their nearest value within them, but all values falling
 above those limits/ranges will be set to \code{NA}.}
 
 \item{clip.high}{Setting this to \code{TRUE} (and leaving \code{clip =
-FALSE}, \code{clip.low = FALSE}) will set all values falling above the
+  FALSE}, \code{clip.low = FALSE}) will set all values falling above the
 specified limits/ranges to their nearest value within them, but all values
 falling below those limits/ranges will be set to \code{NA}.}
 
@@ -79,8 +79,8 @@ those specific ones here}
 }
 \value{
 In the graphics console, a raster plot (via
-  \code{\link[ggplot2]{geom_raster}}) will appear with the matrix values
-  represented as pixel colours, with a named scale bar.
+\code{\link[ggplot2]{geom_raster}}) will appear with the matrix values
+represented as pixel colours, with a named scale bar.
 }
 \description{
 Given a matrix \code{mat}, make a raster plot of the matrix whereby in the

@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Number and Brightness Image Analysis
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
                   role = c("aut", "cre"))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
@@ -35,7 +35,8 @@ Imports:
     ggplot2,
     grDevices,
     RcppRoll
-RoxygenNote: 6.0.0
+RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)
 Suggests: knitr,
     rmarkdown,
     hexbin,

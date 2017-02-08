@@ -13,7 +13,7 @@ ForceChannels(img.arr, n.ch)
 }
 \value{
 An array, channel indices in the third slot, slice indices in the
-  fourth.
+fourth.
 }
 \description{
 Sometimes, when you open an image in ImageJ, it displays the channels as you

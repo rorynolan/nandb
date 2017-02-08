@@ -27,7 +27,7 @@ Read in an image file from the disk as an array of pixel intensities.
 This function wraps \code{\link[EBImage]{readImage}} and
 \code{\link[EBImage]{imageData}} from the \code{\link[EBImage]{EBImage}}
 package. By default, \code{readImage} reads in pixel intensities in the range
-[0, 1]. \code{ReadImageData} reads in pixel intensities as integers as they
+\link{0, 1}. \code{ReadImageData} reads in pixel intensities as integers as they
 would be represented in a tiff file and displayed therefrom in ImageJ. This
 is necessary when calculating number and brightness, where we need pixel
 values to be in units of 'counts'.

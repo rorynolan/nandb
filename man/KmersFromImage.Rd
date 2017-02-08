@@ -61,10 +61,10 @@ are files that you don't want to process, take them out of the folder.}
 }
 \value{
 A named vector (named '1mers' '2mers' '3mers' and so on) with each
-  element detailing the number of that kmer found, or for
-  \code{KmersFromImagesFolder}, a csv file is written to disk detailing one
-  of these vectors for each image. This vector also has an attribute
-  'mean.intensity' giving the mean intensity of the input image.
+element detailing the number of that kmer found, or for
+\code{KmersFromImagesFolder}, a csv file is written to disk detailing one
+of these vectors for each image. This vector also has an attribute
+'mean.intensity' giving the mean intensity of the input image.
 }
 \description{
 Given an image (as a file path or an array), \code{KmersFromImage} does the
