@@ -7,8 +7,7 @@ NULL
 ## quiet concerns of R CMD check re: the .'s that appear in
 ## pipelines
 if (getRversion() >= "2.15.1") {
-  utils::globalVariables(c(".", "Var1", "Var2", "value", "x",
-    "y", "colour"))
+  utils::globalVariables(c(".", "Var1", "Var2", "value", "x", "y", "colour"))
 }
 
 .onLoad <- function(libname, pkgname) {
@@ -18,7 +17,7 @@ if (getRversion() >= "2.15.1") {
 }
 
 .onUnload <- function (libpath) {
-  library.dynam.unload("filesstrings", libpath)
+  library.dynam.unload("nandb", libpath)
 }
 
 #' nandb: Number and brightness in R.
@@ -33,5 +32,5 @@ if (getRversion() >= "2.15.1") {
 #' @name nandb
 #' @references Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of
 #'   Molecules and Brightness in the Laser Scanning Microscope. Biophysical
-#'   Journal. 2008;94(6):2320-2332. doi:10.1529/biophysj.107.114645.
+#'   Journal. 2008;94(6):2320-2332. <doi:10.1529/biophysj.107.114645>.
 NULL

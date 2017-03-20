@@ -41,6 +41,8 @@ library(rJava)
 ## [1] "1.8.0_112-b16" 
 ```
 
+Thanks to @aoles for these instructions. Check out his great work on image analysis in R at <https://github.com/aoles>.
+
 ##### Other stuff
 
 This is slightly painful but you'll only have to do it once. First of all, if you're on **Ubuntu** (similarly for other debian **linux**), you need to do:

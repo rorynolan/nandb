@@ -150,17 +150,16 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
   if (frames.per.set > d[3]) {
     stop("frames.per.set must not be greater than the depth of mat3d")
   }
-  if (!is.na(tau))
-    mat3d <- CorrectForBleaching(mat3d, tau)
-  n.sets <- floor(d[3]/frames.per.set)
+  if (!is.null(mst)) mat3d <- MeanStackThresh(mat3d, mst)
+  if (!is.na(tau)) mat3d <- CorrectForBleaching(mat3d, tau)
+  n.sets <- d[3] %/% frames.per.set
   set.indices <- lapply(seq_len(n.sets), function(x) {
     ((x - 1) * frames.per.set + 1):(x * frames.per.set)
   })
   sets <- lapply(set.indices, Slices, mat3d)
   brightnesses <- Brightnesses(sets, tau = NA, mst = NULL,
     skip.consts = skip.consts, filt = filt, mcc = mcc) %>%
-    Reduce(function(x, y) abind::abind(x, y, along = 3),
-      .)
+    Reduce(function(x, y) abind::abind(x, y, along = 3), .)
   if (length(dim(brightnesses)) == 2) {
     brightnesses <- abind::abind(brightnesses, along = 3)
   }

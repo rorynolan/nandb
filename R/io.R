@@ -82,14 +82,14 @@ WriteImageTxt <- function(img.arr, file.name) {
   if (nd == 2) {
     img.arr <- t(img.arr)
     as.data.frame(img.arr) %>%
-      readr::write_csv(filesstrings::MakeExtName(file.name, "csv"),
+      readr::write_csv(filesstrings::GiveExt(file.name, "csv"),
                        col_names = FALSE)
   } else {
     img.arr <- aperm(img.arr, c(2, 1, 3))
     slices.dfs <- lapply(seq_len(d[3]), Slices, img.arr) %>%
       lapply(as.data.frame)
     file.names <- paste0(file.name, "_", seq_len(d[3])) %>%
-      vapply(filesstrings::MakeExtName, character(1), "csv") %>%
+      vapply(filesstrings::GiveExt, character(1), "csv") %>%
       (filesstrings::NiceNums)
     mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE) %>%
       invisible
@@ -159,7 +159,7 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
     if (na == "zero")
       img.arr[is.na(img.arr)] <- 0
   }
-  file.name <- filesstrings::MakeExtName(file.name, "tif")
+  file.name <- filesstrings::GiveExt(file.name, "tif")
   EBImage::writeImage(img.arr, file.name, bits.per.sample = bits.per.sample)
 }
 
@@ -225,7 +225,7 @@ ForceChannels <- function(img.arr, n.ch) {
 #' file.remove(c('50_1.tif', '50_2.tif', '50_1_2.tif'))
 #' @export
 Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
-  out.name <- filesstrings::MakeExtName(out.name, "tif")
+  out.name <- filesstrings::GiveExt(out.name, "tif")
   images <- BiocParallel::bplapply(file.names, EBImage::readImage,
     BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
   dims <- lapply(images, dim)

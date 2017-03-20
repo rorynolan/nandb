@@ -322,7 +322,7 @@ BrightnessPlotFolder <- function(folder.path = ".",
     if (verbose) {
       paste0("Now processing ", bld, ".") %>% message
     }
-    pdf.file.name <- filesstrings::MakeExtName(bld, "pdf")
+    pdf.file.name <- filesstrings::GiveExt(bld, "pdf")
     grDevices::pdf(pdf.file.name)
     c(list(mat = brightness.matrices[[i]]), dots) %>% do.call(MatrixRasterPlot,
       .) %>% print
