@@ -3,12 +3,45 @@ nandb
 
 An R package for performing number and brightness analysis as in Digman et al. 2008.
 
-[![Travis-CI Build Status](https://travis-ci.org/rorynolan/nandb.svg?branch=master)](https://travis-ci.org/rorynolan/nandb) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rorynolan/nandb?branch=master&svg=true)](https://ci.appveyor.com/project/rorynolan/nandb) <!--[![Coverage Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](https://codecov.io/github/rorynolan/nandb?branch=master)--> [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
+[![Travis-CI Build Status](https://travis-ci.org/rorynolan/nandb.svg?branch=master)](https://travis-ci.org/rorynolan/nandb) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rorynolan/nandb?branch=master&svg=true)](https://ci.appveyor.com/project/rorynolan/nandb) [![codecov](https://codecov.io/gh/rorynolan/nandb/branch/master/graph/badge.svg)](https://codecov.io/gh/rorynolan/nandb) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb) ![RStudio CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/nandb) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 
 Installation
 ------------
 
 ### Platform Dependencies
+
+#### Java Stuff
+
+##### Everyone except Mac OS X
+
+Install the latest [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+
+##### Mac OS X
+
+Mac OS X comes with a legacy Apple Java 6. Update your Java installation to a newer version provided by Oracle.
+
+1.  Install [Oracle JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+
+2.  Update R Java configuration by executing from the command line (you might have to run it as a super user by prepending `sudo` depending on your installation).
+
+        R CMD javareconf
+
+3.  Re-install *rJava* from sources in order to properly link to the non-system Java installation.
+
+    ``` r
+    install.packages("rJava", type="source")
+    ```
+
+You can verify your configuration by running the following commands. This should return the Java version string corresponding to the one downloaded and installed in step 1.
+
+``` r
+library(rJava)
+.jinit()
+.jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
+## [1] "1.8.0_112-b16" 
+```
+
+##### Other stuff
 
 This is slightly painful but you'll only have to do it once. First of all, if you're on **Ubuntu** (similarly for other debian **linux**), you need to do:
 
@@ -32,13 +65,11 @@ source("https://bioconductor.org/biocLite.R")
 biocLite(c("BiocGenerics", "EBImage", "BiocParallel"))
 ```
 
-If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. Then run
+If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. If you get the chance to install some packages from source, it's safest to decline. Then run
 
 ``` r
 options(unzip = "internal")
-devtools::install_github(paste0("rorynolan/", 
-                                c("filesstrings", "autothresholdr", "nandb")),
-               build_vignettes = TRUE)
+devtools::install_github("rorynolan/nandb"), build_vignettes = TRUE)
 ```
 
 Done.
@@ -53,12 +84,10 @@ To update the package, you just need to do the same thing:
 
 ``` r
 options(unzip = "internal")
-devtools::install_github(paste0("rorynolan/", 
-                                c("filesstrings", "autothresholdr", "nandb")),
-               build_vignettes = TRUE)
+devtools::install_github("rorynolan/nandb"), build_vignettes = TRUE)
 ```
 
-To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page <https://github.com/rorynolan/filesstrings> (you're probably there right now) and look for the version in the DESCRIPTION file.
+To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page <https://github.com/rorynolan/nandb> (you're probably there right now) and look for the version in the DESCRIPTION file.
 
 If you don't want to bother checking and you just want to make sure you have the latest version, just run those two lines of code.
 

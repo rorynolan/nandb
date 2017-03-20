@@ -7,7 +7,7 @@ NULL
 ## quiet concerns of R CMD check re: the .'s that appear in
 ## pipelines
 if (getRversion() >= "2.15.1") {
-  utils::globalVariables(c(".", "Var1", "Var2", "value", "x", 
+  utils::globalVariables(c(".", "Var1", "Var2", "value", "x",
     "y", "colour"))
 }
 
@@ -15,6 +15,10 @@ if (getRversion() >= "2.15.1") {
   ## Workaround needed for BiocParallel MulticoreParam to work
   ## on mac
   options(bphost = "localhost")
+}
+
+.onUnload <- function (libpath) {
+  library.dynam.unload("filesstrings", libpath)
 }
 
 #' nandb: Number and brightness in R.

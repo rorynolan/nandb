@@ -2,8 +2,14 @@ Package: nandb
 Type: Package
 Title: Number and Brightness Image Analysis
 Version: 0.1.0.9000
-Authors@R: person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
-                  role = c("aut", "cre"))
+Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
+                    role = c("aut", "cre", "cph")),
+             person("Luis", "Alvarez", email = "lalvarez@well.ox.ac.uk",
+                    role = "ctb"),
+             person("Maro", "Iliopoulou", email = "maroilio@well.ox.ac.uk",
+                    role = "ctb"),
+             person("Sergi", "Padilla-Parra", email = "spadilla@well.ox.ac.uk",
+                    role = c("ctb", "ths", "cph")))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
 URL: https://github.com/rorynolan/filesstrings
 BugReports: https://github.com/rorynolan/filesstrings/issues
