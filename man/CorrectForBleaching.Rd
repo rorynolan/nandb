@@ -2,9 +2,13 @@
 % Please edit documentation in R/detrend.R
 \name{CorrectForBleaching}
 \alias{CorrectForBleaching}
+\alias{CorrectForBleachingFolder}
 \title{Detrend an image series}
 \usage{
 CorrectForBleaching(mat3d, tau)
+
+CorrectForBleachingFolder(folder.path = ".", tau = NA, mst = NULL,
+  ext = "\\\\.tif$", na = "error", mcc = parallel::detectCores())
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -15,13 +19,55 @@ that has not yet been read in, set this argument to the path to that file
 \item{tau}{The time constant for the exponential filtering. If this is set to
 \code{'auto'}, then the value of \code{tau} is calculated automatically via
 \code{\link[=BestTau]{BestTau()}}.}
+
+\item{folder.path}{The path (relative or absolute) to the folder you wish to
+process.}
+
+\item{mst}{Do you want to apply an intensity threshold prior to calculating
+brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
+\emph{method} here.}
+
+\item{ext}{the file extension of the images in the folder that you wish to
+process (can be rooted in regular expression for extra-safety, as in the
+default). You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder. The
+default is for tiff files.}
+
+\item{na}{How do you want to treat \code{NA} values? R can only write integer
+values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'} sets them to
+saturated value. \code{na = 'zero'} sets them to zero, while \code{na = 'error'} will
+give an error if the image contains \code{NA}s. Note that if you threshold, you
+are almost certain to get \code{NA}s.}
+
+\item{mcc}{The number of cores to use for the parallel processing.}
 }
 \value{
-The detrended image series.
+\code{CorrectForBleaching} returns the detrended image series.
 }
 \description{
-Apply detrending to an image time series using the bleaching correction
-method described in Digman et al. 2008.
+\code{CorrectForBleaching} applies detrending to an image time series using the
+method described in Nolan et al. 2017. \code{CorrectForBleachingFolder} performs
+this correction on all images in a folder, writing the corrected images to
+disk.
+}
+\details{
+If you wish to apply thresholding and bleaching correction, aplpluy the
+thresholding first. \code{CorrectforBleachingFolder} takes care of this for you.
+}
+\examples{
+img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+tau10 <- CorrectForBleaching(img, 10)
+autotau <- CorrectForBleaching(img, "auto")
+
+setwd(tempdir())
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+WriteIntImage(img, '50.tif')
+WriteIntImage(img, '50again.tif')
+set.seed(33)
+CorrectForBleachingFolder(tau = 'auto', mst = 'tri', mcc = 2, na = "s")
+list.files()
+file.remove(list.files())
+
 }
 \references{
 Stroud, P. D.: A recursive exponential filter for time-sensitive
@@ -29,6 +75,6 @@ data, Los Alamos national Laboratory, LAUR-99-5573,
 \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
 
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-tau10 <- CorrectForBleaching(img, 10)
-autotau <- CorrectForBleaching(img, 'auto')
+tau10 <- CorrectForBleaching(img, 10) autotau <- CorrectForBleaching(img,
+'auto')
 }

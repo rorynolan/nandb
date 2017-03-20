@@ -64,9 +64,8 @@ correction is selected, it is performed on the whole image stack before the
 sectioning is done for calculation of brightnesses.
 }
 \examples{
-library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-display(normalize(img[, , 1]), method = 'raster')
+EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
 filt = 'median', mcc = 2)
 

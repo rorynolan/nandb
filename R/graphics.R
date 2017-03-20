@@ -335,15 +335,15 @@ BrightnessPlotFolder <- function(folder.path = ".",
 #' Plot the values of two arrays of identical dimension against each other using
 #' a hexagonal heatmap.
 #'
-#' @param arr.x,arr.y The two arrays. The `arrx` values will be along the \eqn{x} axis and the `arry` values along the \eqn{y} axis.
+#' @param arr.x,arr.y The two arrays. The `arrx` values will be along the
+#'   \eqn{x} axis and the `arry` values along the \eqn{y} axis.
 #' @param bins Passed to [ggplot2::geom_hex()].
 #' @param log.trans Do you want to log-transform the colour scaling?
 #' @param colours Here you may specify the colours (to be passed to
-#'   [ggplot2::scale_fill_gradientn()]) to create the continuous
-#'   colour band. It is specified as a character vector, with the colors
-#'   specified either as the values in [colors()] or as in the value
-#'   of the [rgb()] function. Note that this allows the use of
-#'   [grDevices::rainbow()] and friends. The default uses
+#'   [ggplot2::scale_fill_gradientn()]) to create the continuous colour band. It
+#'   is specified as a character vector, with the colors specified either as the
+#'   values in [colors()] or as in the value of the [rgb()] function. Note that
+#'   this allows the use of [grDevices::rainbow()] and friends. The default uses
 #'   [viridis::viridis()].
 #' @param limits A numeric vector of length two providing limits of the scale.
 #'

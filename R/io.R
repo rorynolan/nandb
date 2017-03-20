@@ -122,7 +122,7 @@ ReadImageTxt <- function(file.name) {
 #' @param na How do you want to treat `NA` values? R can only write integer
 #'   values (and hence not `NA`s) to tiff pixels. `na = 'saturate'` sets them to
 #'   saturated value. `na = 'zero'` sets them to zero, while `na = 'error'` will
-#'   give an error if th image contains `NA`s.
+#'   give an error if the image contains `NA`s.
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
@@ -169,11 +169,10 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
 #' would like, but when you read it into R, it has just mashed all the channels
 #' (which you would like to be separated somehow) into a stack. In my
 #' expreience, it always does so in a way that, say you have a stack of 3
-#' channels and 5 z positions, then the red images would occupy `[, , 1]`,
-#' `[, , 6]` and `[, , 11]`. This is the type of fixing that this
-#' function performs. So in that example it would have a 3d array as input and a
-#' 4d as output with dimensions (assuming our images are 256x256 pixels)
-#' `256, 256, 3, 5`.
+#' channels and 5 z positions, then the red images would occupy `[, , 1]`, `[, ,
+#' 6]` and `[, , 11]`. This function fixes this kind of confusion. So, in that
+#' example it would have a 3d array as input and a 4d as output with dimensions
+#' (assuming our images are 256x256 pixels) `256, 256, 3, 5`.
 #'
 #' @param img.arr An array, the read image.
 #' @param n.ch The number of channels that you want the read image to have.
@@ -227,7 +226,7 @@ ForceChannels <- function(img.arr, n.ch) {
 Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
   out.name <- filesstrings::GiveExt(out.name, "tif")
   images <- BiocParallel::bplapply(file.names, EBImage::readImage,
-    BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+    BPPARAM = bpp(mcc))
   dims <- lapply(images, dim)
   u <- unique(dims)
   if (length(u) != 1) {

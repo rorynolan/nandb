@@ -60,7 +60,8 @@ process.}
 \item{ext}{the file extension of the images in the folder that you wish to
 process (can be rooted in regular expression for extra-safety, as in the
 default). You must wish to process all files with this extension; if there
-are files that you don't want to process, take them out of the folder.}
+are files that you don't want to process, take them out of the folder. The
+default is for tiff files.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
@@ -90,16 +91,17 @@ anything run using the \code{rJava} package won't)). Always use
 the thresholding in series and does the rest in parallel).
 }
 \examples{
-library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-display(normalize(img[, , 1]), method = 'raster')
+EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
 MatrixRasterPlot(brightness, log.trans = TRUE)
-dir.create('tempdir')
-WriteIntImage(img, 'tempdir/50.tif')
-WriteIntImage(img, 'tempdir/50again.tif')
-BrightnessTxtFolder('tempdir', tau = 'auto', mst = 'tri', mcc = 2)
-filesstrings::RemoveDirs('tempdir')
+setwd(tempdir())
+WriteIntImage(img, '50.tif')
+WriteIntImage(img, '50again.tif')
+set.seed(33)
+BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+list.files()
+file.remove(list.files())  # cleanup
 img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
 brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
 

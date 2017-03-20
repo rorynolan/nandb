@@ -511,3 +511,7 @@ Mat2ColList <- function(mat) {
 Mat2RowList <- function(mat) {
   lapply(seq_len(ncol(mat)), function(i) mat[i, ])
 }
+
+bpp <- function(mcc) {
+  suppressWarnings(BiocParallel::MulticoreParam(workers = mcc))
+}

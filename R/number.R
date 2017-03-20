@@ -99,7 +99,7 @@ Number <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
   }
   attributes(number) <- c(attributes(number), list(frames = d[3],
     tau = as.character(ifelse(tau.auto, ifelse(is.na(tau), "auto=NA",
-      stringr::str_c("auto=", round(tau, 2))), tau)),
+      stringr::str_c("auto=", round(tau))), tau)),
     filter = ifelse(is.null(filt), NA, filt),
     mst = ifelse(is.null(mst), NA, mst)))
   number
@@ -224,14 +224,12 @@ Numbers <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
   fail = NA, filt = NULL, verbose = FALSE, mcc = parallel::detectCores()) {
   if (is.null(mst)) {
     numbers <- BiocParallel::bplapply(mat3d.list, Number,
-      tau = tau, filt = filt, verbose = verbose,
-      BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
+      tau = tau, filt = filt, verbose = verbose, BPPARAM = bpp(mcc))
   } else if (is.list(mat3d.list)) {
     mat3d.list <- lapply(mat3d.list, MeanStackThresh, method = mst,
       fail = fail, skip.consts = skip.consts)
     numbers <- BiocParallel::bplapply(mat3d.list, Number,
-      tau = tau, filt = filt, verbose = verbose,
-      BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
+      tau = tau, filt = filt, verbose = verbose, BPPARAM = bpp(mcc))
   } else {
     if (!is.character(mat3d.list)) {
       stop("mat3d.list must either be a list of 3d arrays, ",
@@ -247,8 +245,7 @@ Numbers <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
       threshed <- lapply(arrays, MeanStackThresh, method = mst,
         fail = fail, skip.consts = skip.consts)
       numbers.i <- BiocParallel::bplapply(threshed, Number,
-        tau = tau, filt = filt, verbose = verbose,
-        BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
+        tau = tau, filt = filt, verbose = verbose, BPPARAM = bpp(mcc))
       numbers[i] <- numbers.i
     }
   }

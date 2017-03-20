@@ -49,9 +49,8 @@
 #'   same folder as the input images).
 #'
 #' @examples
-#' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' display(normalize(img[, , 1]), method = 'raster')
+#' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 #' brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
 #' MatrixRasterPlot(brightness, log.trans = TRUE)
 #' @export
@@ -99,7 +98,7 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
     }
   }
   tau <- ifelse(tau.auto, ifelse(is.na(tau), "auto=NA", stringr::str_c("auto=",
-    round(tau, 2))), tau)
+    round(tau))), tau)
   filter <- ifelse(is.null(filt), NA, filt)
   mst <- ifelse(is.null(mst), NA, mst)
   new.brightness.attrs <- list(frames = d[3], tau = tau, filter = filter,
@@ -129,9 +128,8 @@ Brightness <- function(mat3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #' @seealso [Brightness()].
 #'
 #' @examples
-#' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' display(normalize(img[, , 1]), method = 'raster')
+#' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 #' bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
 #' filt = 'median', mcc = 2)
 #'
@@ -173,15 +171,18 @@ BrightnessTimeSeries <- function(mat3d, frames.per.set, tau = NA,
 #' @param ext the file extension of the images in the folder that you wish to
 #'   process (can be rooted in regular expression for extra-safety, as in the
 #'   default). You must wish to process all files with this extension; if there
-#'   are files that you don't want to process, take them out of the folder.
+#'   are files that you don't want to process, take them out of the folder. The
+#'   default is for tiff files.
 #' @param mcc The number of cores to use for the parallel processing.
 #'
 #' @examples
-#' dir.create('tempdir')
-#' WriteIntImage(img, 'tempdir/50.tif')
-#' WriteIntImage(img, 'tempdir/50again.tif')
-#' BrightnessTxtFolder('tempdir', tau = 'auto', mst = 'tri', mcc = 2)
-#' filesstrings::RemoveDirs('tempdir')
+#' setwd(tempdir())
+#' WriteIntImage(img, '50.tif')
+#' WriteIntImage(img, '50again.tif')
+#' set.seed(33)
+#' BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+#' list.files()
+#' file.remove(list.files())  # cleanup
 #' @export
 BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
   mst = NULL, skip.consts = FALSE, filt = NULL, ext = "\\.tif$",
@@ -229,14 +230,12 @@ Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
   fail = NA, filt = NULL, verbose = FALSE, mcc = parallel::detectCores()) {
   if (is.null(mst)) {
     brightnesses <- BiocParallel::bplapply(mat3d.list, Brightness,
-      tau = tau, filt = filt, verbose = verbose,
-      BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
+      tau = tau, filt = filt, verbose = verbose, BPPARAM = bpp(mcc))
   } else if (is.list(mat3d.list)) {
     mat3d.list <- lapply(mat3d.list, MeanStackThresh, method = mst,
       fail = fail, skip.consts = skip.consts)
     brightnesses <- BiocParallel::bplapply(mat3d.list, Brightness,
-      tau = tau, filt = filt, verbose = verbose,
-      BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
+      tau = tau, filt = filt, verbose = verbose, BPPARAM = bpp(mcc))
   } else {
     if (!is.character(mat3d.list)) {
       stop("mat3d.list must either be a list of 3d arrays, ",
@@ -253,7 +252,7 @@ Brightnesses <- function(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
         fail = fail, skip.consts = skip.consts)
       brightnesses.i <- BiocParallel::bplapply(threshed,
         Brightness, tau = tau, filt = filt, verbose = verbose,
-        BPPARAM = suppressWarnings(BiocParallel::MulticoreParam(workers = mcc)))
+        BPPARAM = bpp(mcc))
       brightnesses[i] <- brightnesses.i
     }
   }

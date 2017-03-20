@@ -117,7 +117,7 @@ KmersFromImagesFolder <- function(folder.path = ".", monomer.med,
   tif.names <- list.files(pattern = ext)
   kmerss <- tif.names %>% BiocParallel::bplapply(KmersFromImage,
     tau, monomer.med, verbose = verbose,
-    BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+    BPPARAM = bpp(mcc))
   means <- vapply(kmerss, function(x) attr(x, "mean.intensity"), numeric(1))
   max.ks <- vapply(kmerss, length, integer(1))
   # for each image, the maximum k for which that image contains
@@ -199,11 +199,11 @@ KmerTIFFsFromBrightnessCSVs <- function(monomer.brightness, csv.paths = NULL,
   out.names <- vapply(out.names, filesstrings::GiveExt, character(1),
     "tif", replace = TRUE)
   brightnesses <- BiocParallel::bplapply(csv.paths, ReadImageTxt,
-    BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+    BPPARAM = bpp(mcc))
   kmer.mats <- BiocParallel::bplapply(brightnesses, KmerArray,
-    monomer.brightness, BPPARAM = BiocParallel::MulticoreParam(workers = mcc))
+    monomer.brightness, BPPARAM = bpp(mcc))
   BiocParallel::bpmapply(WriteIntImage, kmer.mats, out.names,
-    na = na, BPPARAM = BiocParallel::MulticoreParam(workers = mcc)) %>%
+    na = na, BPPARAM = bpp(mcc)) %>%
     invisible
   if (verbose)
     print("Done. Please check folder.")

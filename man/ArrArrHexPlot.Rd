@@ -8,18 +8,18 @@ ArrArrHexPlot(arr.x, arr.y, bins = 60, log.trans = FALSE, colours = NULL,
   limits = NULL)
 }
 \arguments{
-\item{arr.x, arr.y}{The two arrays. The \code{arrx} values will be along the \eqn{x} axis and the \code{arry} values along the \eqn{y} axis.}
+\item{arr.x, arr.y}{The two arrays. The \code{arrx} values will be along the
+\eqn{x} axis and the \code{arry} values along the \eqn{y} axis.}
 
 \item{bins}{Passed to \code{\link[ggplot2:geom_hex]{ggplot2::geom_hex()}}.}
 
 \item{log.trans}{Do you want to log-transform the colour scaling?}
 
 \item{colours}{Here you may specify the colours (to be passed to
-\code{\link[ggplot2:scale_fill_gradientn]{ggplot2::scale_fill_gradientn()}}) to create the continuous
-colour band. It is specified as a character vector, with the colors
-specified either as the values in \code{\link[=colors]{colors()}} or as in the value
-of the \code{\link[=rgb]{rgb()}} function. Note that this allows the use of
-\code{\link[grDevices:rainbow]{grDevices::rainbow()}} and friends. The default uses
+\code{\link[ggplot2:scale_fill_gradientn]{ggplot2::scale_fill_gradientn()}}) to create the continuous colour band. It
+is specified as a character vector, with the colors specified either as the
+values in \code{\link[=colors]{colors()}} or as in the value of the \code{\link[=rgb]{rgb()}} function. Note that
+this allows the use of \code{\link[grDevices:rainbow]{grDevices::rainbow()}} and friends. The default uses
 \code{\link[viridis:viridis]{viridis::viridis()}}.}
 
 \item{limits}{A numeric vector of length two providing limits of the scale.}

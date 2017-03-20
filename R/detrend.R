@@ -1,7 +1,12 @@
 #' Detrend an image series
 #'
-#' Apply detrending to an image time series using the bleaching correction
-#' method described in Digman et al. 2008.
+#' `CorrectForBleaching` applies detrending to an image time series using the
+#' method described in Nolan et al. 2017. `CorrectForBleachingFolder` performs
+#' this correction on all images in a folder, writing the corrected images to
+#' disk.
+#'
+#' If you wish to apply thresholding and bleaching correction, aplpluy the
+#' thresholding first. `CorrectforBleachingFolder` takes care of this for you.
 #'
 #' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
@@ -15,22 +20,31 @@
 #'   data, Los Alamos national Laboratory, LAUR-99-5573,
 #'   \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
 #'
-#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' tau10 <- CorrectForBleaching(img, 10)
-#' autotau <- CorrectForBleaching(img, 'auto')
+#'   img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#'   tau10 <- CorrectForBleaching(img, 10) autotau <- CorrectForBleaching(img,
+#'   'auto')
 #'
-#' @return The detrended image series.
+#' @return `CorrectForBleaching` returns the detrended image series.
+#'
+#' @examples
+#' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+#' tau10 <- CorrectForBleaching(img, 10)
+#' autotau <- CorrectForBleaching(img, "auto")
+#'
 #' @export
 CorrectForBleaching <- function(mat3d, tau) {
   d <- dim(mat3d)
-  if (length(d) != 3)
-    stop("mat3d must be a three-dimensional array")
-  if (is.na(tau))
+  if (length(d) != 3) stop("mat3d must be a three-dimensional array")
+  auto.tau <- FALSE
+  if (is.na(tau)) {
+    attr(mat3d, "tau") <- NA
     return(mat3d)  # option to do nothing
+  }
   if (is.character(tau)) {
     tau <- tolower(tau)
     if (startsWith("auto", tau)) {
       tau <- BestTau(mat3d)
+      auto.tau <- TRUE
     } else {
       stop("If tau is a string, it must be 'auto'.")
     }
@@ -43,7 +57,63 @@ CorrectForBleaching <- function(mat3d, tau) {
   corrected <- filtered + as.vector(means)
   # as it so happens, this will add the means to the pillars as we desire
   corrected[corrected < 0] <- 0
-  round(corrected)  # return the array back to integer counts
+  corrected <- round(corrected)  # return the array back to integer counts
+  attr(corrected, "tau") <- ifelse(auto.tau, paste0("auto=", round(tau)),
+                                   as.character(tau))
+  corrected
+}
+
+#' @rdname CorrectForBleaching
+#' @param folder.path The path (relative or absolute) to the folder you wish to
+#'   process.
+#' @param mst Do you want to apply an intensity threshold prior to calculating
+#'   brightness (via [MeanStackThresh()])? If so, set your thresholding
+#'   \emph{method} here.
+#' @param ext the file extension of the images in the folder that you wish to
+#'   process (can be rooted in regular expression for extra-safety, as in the
+#'   default). You must wish to process all files with this extension; if there
+#'   are files that you don't want to process, take them out of the folder. The
+#'   default is for tiff files.
+#' @param na How do you want to treat `NA` values? R can only write integer
+#'   values (and hence not `NA`s) to tiff pixels. `na = 'saturate'` sets them to
+#'   saturated value. `na = 'zero'` sets them to zero, while `na = 'error'` will
+#'   give an error if the image contains `NA`s. Note that if you threshold, you
+#'   are almost certain to get `NA`s.
+#' @param mcc The number of cores to use for the parallel processing.
+#'
+#'
+#' @examples
+#' setwd(tempdir())
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' WriteIntImage(img, '50.tif')
+#' WriteIntImage(img, '50again.tif')
+#' set.seed(33)
+#' CorrectForBleachingFolder(tau = 'auto', mst = 'tri', mcc = 2, na = "s")
+#' list.files()
+#' file.remove(list.files())
+#'
+#' @export
+CorrectForBleachingFolder <- function(folder.path = ".", tau = NA, mst = NULL,
+                                      ext = "\\.tif$", na = "error",
+                                      mcc = parallel::detectCores()) {
+  cwd <- getwd()
+  on.exit(setwd(cwd))
+  setwd(folder.path)
+  file.paths <- list.files(pattern = ext)
+  BiocParallel::bplapply(file.paths, CorrectForBleachingFile,
+                         tau = tau, mst = mst, na = na, BPPARAM = bpp(mcc))
+}
+
+CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
+                                    na = "error") {
+  arr3d <- ReadImageData(file.path)
+  stopifnot(length(dim(arr3d)) == 3)
+  if (!is.null(mst)) arr3d <- MeanStackThresh(arr3d, mst)
+  corrected <- CorrectForBleaching(arr3d, tau)
+  out.name <- filesstrings::BeforeLastDot(file.path) %>%
+    paste0("_tau=", attr(corrected, "tau"), ".",
+           filesstrings::StrAfterNth(file.path, stringr::coll("."), -1))
+  WriteIntImage(corrected, out.name, na = na)
 }
 
 #' Find the best tau for exponential filtering detrend.
@@ -96,14 +166,14 @@ BestTau <- function(mat3d, mst = NULL, tol = 1) {
       detrended <- sim.img.arr - ExpSmoothRows(sim.img.arr,
         tau) + rowMeans(sim.img.arr)
     }
-    brightnesses <- matrixStats::rowVars(detrended)/rowMeans(detrended)
+    brightnesses <- matrixStats::rowVars(detrended) / rowMeans(detrended)
     mean(brightnesses)
   }
-  notau.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr,
-    NA)
+  notau.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr, NA)
   if (notau.sim.brightness.mean <= 1) {
-    # In this case, no bleaching is detected, therefore no
-    # detrend is needed
+    # This is when the original image had mean brightness greater than 1 but the
+    # simulated image had mean brightness <= 1.
+    # In this case, no bleaching is detected, therefore no detrend is needed
     return(NA)
   }
   tau2.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr,

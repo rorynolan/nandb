@@ -20,11 +20,9 @@ Sometimes, when you open an image in ImageJ, it displays the channels as you
 would like, but when you read it into R, it has just mashed all the channels
 (which you would like to be separated somehow) into a stack. In my
 expreience, it always does so in a way that, say you have a stack of 3
-channels and 5 z positions, then the red images would occupy \code{[, , 1]},
-\code{[, , 6]} and \code{[, , 11]}. This is the type of fixing that this
-function performs. So in that example it would have a 3d array as input and a
-4d as output with dimensions (assuming our images are 256x256 pixels)
-\code{256, 256, 3, 5}.
+channels and 5 z positions, then the red images would occupy \code{[, , 1]}, \code{[, , 6]} and \code{[, , 11]}. This function fixes this kind of confusion. So, in that
+example it would have a 3d array as input and a 4d as output with dimensions
+(assuming our images are 256x256 pixels) \code{256, 256, 3, 5}.
 }
 \examples{
 library(magrittr)
