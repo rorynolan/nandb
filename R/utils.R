@@ -515,3 +515,9 @@ Mat2RowList <- function(mat) {
 bpp <- function(mcc) {
   suppressWarnings(BiocParallel::MulticoreParam(workers = mcc))
 }
+
+ListChannels <- function(arr4d) {
+  d <- dim(arr4d)
+  stopifnot(length(d) == 4)
+  purrr::map(seq_len(d[3]), ~ arr4d[, , ., ])
+}
