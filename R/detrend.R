@@ -66,8 +66,8 @@ CorrectForBleaching <- function(mat3d, tau) {
 #' @rdname CorrectForBleaching
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
-#' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via [MeanStackThresh()])? If so, set your thresholding
+#' @param mst Do you want to apply an intensity threshold prior to correcting
+#'   for bleaching (via [MeanStackThresh()])? If so, set your thresholding
 #'   \emph{method} here.
 #' @param ext the file extension of the images in the folder that you wish to
 #'   process (can be rooted in regular expression for extra-safety, as in the

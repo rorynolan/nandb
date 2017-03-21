@@ -69,30 +69,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// MostConsecutiveLEs
-int MostConsecutiveLEs(NumericVector x, double thresh);
-RcppExport SEXP nandb_MostConsecutiveLEs(SEXP xSEXP, SEXP threshSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< double >::type thresh(threshSEXP);
-    rcpp_result_gen = Rcpp::wrap(MostConsecutiveLEs(x, thresh));
-    return rcpp_result_gen;
-END_RCPP
-}
-// MostConsecutiveLEsPillars
-IntegerMatrix MostConsecutiveLEsPillars(NumericVector mat3d, double thresh);
-RcppExport SEXP nandb_MostConsecutiveLEsPillars(SEXP mat3dSEXP, SEXP threshSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type mat3d(mat3dSEXP);
-    Rcpp::traits::input_parameter< double >::type thresh(threshSEXP);
-    rcpp_result_gen = Rcpp::wrap(MostConsecutiveLEsPillars(mat3d, thresh));
-    return rcpp_result_gen;
-END_RCPP
-}
 // MeanPillars
 NumericMatrix MeanPillars(NumericVector mat3d);
 RcppExport SEXP nandb_MeanPillars(SEXP mat3dSEXP) {

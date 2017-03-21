@@ -23,8 +23,8 @@ that has not yet been read in, set this argument to the path to that file
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
 
-\item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
+\item{mst}{Do you want to apply an intensity threshold prior to correcting
+for bleaching (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
 \emph{method} here.}
 
 \item{ext}{the file extension of the images in the folder that you wish to
