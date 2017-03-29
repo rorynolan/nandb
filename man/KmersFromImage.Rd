@@ -2,21 +2,27 @@
 % Please edit documentation in R/kmers.R
 \name{KmersFromImage}
 \alias{KmersFromImage}
+\alias{KmersFromImages}
 \alias{KmersFromImagesFolder}
 \title{Calculate numbers of kmers based on an image time-series}
 \usage{
-KmersFromImage(mat3d, monomer.med, tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, verbose = TRUE)
+KmersFromImage(arr3d, monomer, tau = NA, mst = NULL, skip.consts = FALSE,
+  filt = NULL, verbose = TRUE)
 
-KmersFromImagesFolder(folder.path = ".", monomer.med, tau = NA,
-  mst = NULL, filt = NULL, out.name = "results", ext = "\\\\.tif$",
-  mcc = parallel::detectCores(), verbose = TRUE)
+KmersFromImages(arrs3d, monomer, tau = NA, mst = NULL,
+  skip.consts = FALSE, filt = NULL, verbose = TRUE,
+  mcc = parallel::detectCores(), seed = NULL)
+
+KmersFromImagesFolder(folder.path = ".", monomer, tau = NA, mst = NULL,
+  skip.consts = FALSE, filt = NULL, out.name = "results",
+  ext = "\\\\.tif$", mcc = parallel::detectCores(), seed = NULL,
+  verbose = TRUE)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array that one would might input to
+\item{arr3d}{A 3-dimensional array that one would might input to
 \code{\link[=Brightness]{Brightness()}} \emph{or} the path to an image file on disk.}
 
-\item{monomer.med}{The median brightness of a monomer. You must know what
+\item{monomer}{The median brightness of a monomer. You must know what
 this is to use this function correctly. This must be greater than 1 (this
 is the 'apparent brightness' of a monomer). If you're reading the Digman et
 al. (2008) paper, this is \eqn{1 + \epsilon}.}
@@ -42,10 +48,19 @@ the brightness image in a different way, first calculate the brightnesses
 without filtering (\code{filt = NULL}) using this function and then perform
 your desired filtering routine on the result.}
 
-\item{verbose}{If mat3d is specified as a file name, print a message to tell
+\item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
 \code{BrightnessFolder}, does not work with multiple cores) and to tell
 when \code{KmersFromImagesFolder} is done.}
+
+\item{arrs3d}{A list of 3d arrays. To perform this on files
+that have not yet been read in, set this argument to the path to these
+files (a character vector).}
+
+\item{mcc}{The number of cores to use for the parallel processing.}
+
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
 
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
@@ -56,8 +71,6 @@ process.}
 process (can be rooted in regular expression for extra-safety, as in the
 default). You must wish to process all files with this extension; if there
 are files that you don't want to process, take them out of the folder.}
-
-\item{mcc}{The number of parallel cores to use for the processing.}
 }
 \value{
 A named vector (named '1mers' '2mers' '3mers' and so on) with each
@@ -72,4 +85,16 @@ brightness calculation via \code{\link[=Brightness]{Brightness()}} and then coun
 numbers of each kmer via \code{\link[=KmersFromBrightnesses]{KmersFromBrightnesses()}}.
 \code{KmersFromImagesFolder} does this for an entire folder (directory) of
 images and outputs a csv file of the results.
+}
+\examples{
+img <- system.file('extdata', '50.tif', package = 'nandb')
+KmersFromImage(img, 1.1, tau = "auto", mst = "huang")
+
+KmersFromImages(c(img, img), 1.1, tau = "auto", mst = "huang")
+
+setwd(tempdir())
+file.copy(img, ".")
+KmersFromImagesFolder(monomer = 1.11)
+file.remove(list.files())  # cleanup
+
 }

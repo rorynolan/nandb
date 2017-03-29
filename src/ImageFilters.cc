@@ -76,6 +76,12 @@ NumericMatrix MedianFilterB(NumericMatrix mat, int size = 1,
 }
 
 //' @rdname MedianFilterB
+//'
+//' @examples
+//' MedianFilterB(m)
+//' MedianFilterB(m, na_rm = TRUE)
+//' MedianFilterB(m, na_count = TRUE)
+//'
 //' @export
 // [[Rcpp::export]]
 NumericMatrix SmoothFilterB(NumericMatrix mat, int size = 1,

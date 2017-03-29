@@ -31,9 +31,10 @@ correctly in ImageJ). These functions do not work for 4-dimensional arrays
 (e.g. a z stack with several channels).
 }
 \examples{
+setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteImageTxt(img, 'temp')
 
 img <- ReadImageTxt('temp_01.csv')
-file.remove(list.files(pattern = '^temp.*\\\\.csv$'))
+file.remove(list.files())  # cleanup
 }

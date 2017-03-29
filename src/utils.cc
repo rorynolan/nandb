@@ -18,11 +18,6 @@ IntegerVector WhichIntervalC(NumericVector numbers, NumericMatrix ranges) {
 }
 
 // [[Rcpp::export]]
-int SplitEverykGives(IntegerVector vec, int k) {
-  return(sum(ceiling(as<NumericVector>(vec) / k)));
-}
-
-// [[Rcpp::export]]
 IntegerVector SpreadSpecificHelper(NumericVector interval_lengths,
                                    IntegerVector interval_pops,  //populations
                                    int m) {

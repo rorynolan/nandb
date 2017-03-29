@@ -4,12 +4,11 @@
 \alias{KmerTIFFsFromBrightnessCSVs}
 \title{Create kmer tiff files from brightness csvs}
 \usage{
-KmerTIFFsFromBrightnessCSVs(monomer.brightness, csv.paths = NULL,
-  out.names = NULL, na = "saturate", mcc = parallel::detectCores(),
-  verbose = TRUE)
+KmerTIFFsFromBrightnessCSVs(monomer, csv.paths = NULL, out.names = NULL,
+  na = "saturate", mcc = parallel::detectCores(), verbose = TRUE)
 }
 \arguments{
-\item{monomer.brightness}{The (median) brightness of a monomer.}
+\item{monomer}{The (median) brightness of a monomer.}
 
 \item{csv.paths}{The paths to the brightness csv files, defaults to
 \code{list.files(pattern = '[Bb]rightness.*\\.csv')}.}
@@ -26,4 +25,13 @@ to .tif).}
 \description{
 For each brightness csv image in a folder, given a monomeric brightness,
 create a tiff file of the kmer positions using \code{\link[=KmerArray]{KmerArray()}}.
+}
+\examples{
+img <- system.file('extdata', '50.tif', package = 'nandb')
+setwd(tempdir())
+file.copy(img, ".")
+BrightnessTxtFolder()
+KmerTIFFsFromBrightnessCSVs(1.111)
+file.remove(list.files())  # cleanup
+
 }

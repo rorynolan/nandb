@@ -26,6 +26,9 @@ img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
 brightness <- Brightness(img, tau = 10, mst = 'Huang')
 KmerPlot(brightness, 1.02)
+KmerPlot(brightness, 1.12)
+KmerPlot(brightness, 100)
+KmerPlot(brightness, 1.02, log.trans = TRUE)
 KmerPlot(MedianFilterB(brightness), 1.02)
 
 }

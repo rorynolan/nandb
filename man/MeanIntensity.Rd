@@ -6,47 +6,44 @@
 \alias{MeanIntensities}
 \title{Calculate mean intensity from image series.}
 \usage{
-MeanIntensity(mat3d, mst = NULL, filt = NULL, skip.consts = FALSE,
+MeanIntensity(arr3d, mst = NULL, filt = NULL, skip.consts = FALSE,
   fail = NA, verbose = FALSE)
 
 MeanIntensityTxtFolder(folder.path = ".", mst = NULL, ext = "\\\\.tif$",
   mcc = parallel::detectCores(), verbose = TRUE)
 
-MeanIntensities(mat3d.list, mst = NULL, skip.consts = FALSE, fail = NA,
+MeanIntensities(arr3d.list, mst = NULL, skip.consts = FALSE, fail = NA,
   filt = NULL, verbose = FALSE, mcc = parallel::detectCores())
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-mean intensities (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
-thresholding \emph{method} here. Pixels failing to exceed the threshold are
-set to \code{NA}.}
+mean intensities (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
+\emph{method} here. Pixels failing to exceed the threshold are set to \code{NA}.}
 
-\item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
-(\code{filt = 'median'}) filter the mean intensity image using
-\code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
-selected, these are invoked here with a filter radius of 1 and with the
-option \code{na_count = TRUE}. If you want to smooth/median filter the mean
-intensity image in a different way, first calculate the mean intensities
-without filtering (\code{filt = NULL}) using this function and then perform
-your desired filtering routine on the result.}
+\item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the mean intensity image using \code{\link[=SmoothFilterB]{SmoothFilterB()}} or
+\code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If selected, these are invoked here with a
+filter radius of 1 and with the option \code{na_count = TRUE}. If you want to
+smooth/median filter the mean intensity image in a different way, first
+calculate the mean intensities without filtering (\code{filt = NULL}) using this
+function and then perform your desired filtering routine on the result.}
 
 \item{skip.consts}{An image array with only one value (a 'constant array')
 won't threshold properly. By default the function would give an error, but
-by setting this parameter to \code{TRUE}, the array would instead be
-skipped (the function will return the original array) and give a warning.}
+by setting this parameter to \code{TRUE}, the array would instead be skipped
+(the function will return the original array) and give a warning.}
 
 \item{fail}{If thresholding is done, to which value should pixels not
 exceeeding the threshold be set?}
 
-\item{verbose}{If mat3d is specified as a file name, print a message to tell
+\item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
-\code{MeanIntensityTxtFolder}, does not work with multiple cores) and to
-tell when \code{MeanIntensityTxtFolder} is done.}
+\code{MeanIntensityTxtFolder}, does not work with multiple cores) and to tell
+when \code{MeanIntensityTxtFolder} is done.}
 
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
@@ -58,19 +55,20 @@ are files that you don't want to process, take them out of the folder.}
 
 \item{mcc}{The number of parallel cores to use for the processing.}
 
-\item{mat3d.list}{A list of 3-dimensional arrays. To perform this on files
+\item{arr3d.list}{A list of 3-dimensional arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these
 files (a character vector).}
 }
 \value{
-\code{Brightness} returns a matrix, the brightness image. The result
-of \code{BrightnessTxtFolder} is the text csv files written to disk (in the
-same folder as the input images).
+\code{MeanIntensity} returns a matrix, the mean-intensity image.
+\code{MeanIntensities} returns a list of these. The result of
+\code{MeanIntensityTxtFolder} is csv files written to disk (in the same folder
+as the input images).
 }
 \description{
-Given a time stack of images, \code{MeanIntensity} calculates the mean
-intensity for each pixel, returning a matrix. \code{MeanIntensityTxtFolder}
-does this for every image in a folder, writing the results as text files via
+Given a time stack of images, \code{MeanIntensity} calculates the mean intensity
+for each pixel, returning a matrix. \code{MeanIntensityTxtFolder} does this for
+every image in a folder, writing the results as text files via
 \code{\link[=WriteImageTxt]{WriteImageTxt()}}.
 }
 \examples{
@@ -79,12 +77,11 @@ img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
 mean.intensity <- MeanIntensity(img, mst = 'Huang', filt = 'median')
 display(normalize(mean.intensity), method = 'r')
+setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-dir.create('tempdir')
-WriteIntImage(img, 'tempdir/50.tif')
-WriteIntImage(img, 'tempdir/50again.tif')
-MeanIntensityTxtFolder('tempdir', mcc = 2)
-filesstrings::RemoveDirs('tempdir')
+WriteIntImage(img, '50.tif')
+WriteIntImage(img, '50again.tif')
+MeanIntensityTxtFolder(mcc = 2)
 
 img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
 mean.intensities <- MeanIntensities(img.paths, mst = 'Huang', mcc = 2)

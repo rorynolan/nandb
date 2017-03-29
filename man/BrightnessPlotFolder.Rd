@@ -27,3 +27,14 @@ This is a \code{ggplot2} object and can be manipulated thus.
 This requires that the folder already have the brightnesses saved as csv
 files. Output images are saved as pdf.
 }
+\examples{
+setwd(tempdir())
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+WriteIntImage(img, '50.tif')
+WriteIntImage(img, '50again.tif')
+BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+BrightnessPlotFolder()
+list.files()
+file.remove(list.files())  # cleanup
+
+}

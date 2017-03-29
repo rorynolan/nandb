@@ -13,31 +13,11 @@ WhichInterval <- function(numbers, interval.mat) {
   # increasing, non-intersecting, half-open (open at the right)
   # intervals on the real line
   sq <- as.vector(t(interval.mat))  # transposed interval matrix
-  if (!all(diff(sq) >= 0) && all(interval.mat[, 1] < interval.mat[,
-    2])) {
+  if (!(all(diff(sq) >= 0) && all(interval.mat[, 1] < interval.mat[, 2]))) {
     stop("interval.mat must be a two-column matrix where the rows are ",
       "increasing, non-intersecting, half-open intervals on the real line.")
   }
   WhichIntervalC(numbers, interval.mat)
-}
-AllEqual <- function(a, b = NA, allow = TRUE, cn = FALSE) {
-  if (is.na(b[1])) {
-    return(length(unique(a)) == 1)
-  } else {
-    if (allow) {
-      if (length(a) == 1) {
-        a <- rep(a, length(b))
-        if (is.array(b))
-          b <- as.vector(b)
-      }
-      if (length(b) == 1) {
-        b <- rep(b, length(a))
-        if (is.array(a))
-          a <- as.vector(a)
-      }
-    }
-    return(isTRUE(all.equal(a, b, check.names = cn)))
-  }
 }
 
 #' Apply a function to each pillar of a 3-dimensional array.
@@ -153,8 +133,7 @@ PillarsDF <- function(arr3d) {
 }
 
 BrightnessVec <- function(vec) {
-  if (AllEqual(vec, 0))
-    return(0)
+  if (filesstrings::AllEqual(vec, 0)) return(0)
   stats::var(vec)/mean(vec)
 }
 
@@ -174,6 +153,16 @@ BrightnessVec <- function(vec) {
 #'
 #' @return An array. If the function implemented a 'fix', then the output array
 #'   will have one less dimension than the input array.
+#'
+#' @examples
+#' has.lut.error <- abind::abind(matrix(0, nrow = 2, ncol = 2),
+#'                               matrix(1:4, nrow = 2),
+#'                               matrix(0, nrow = 2, ncol = 2),
+#'                               along = 3)
+#' has.lut.error
+#' FixLUTError(has.lut.error, 2)
+#' has.lut.error3d <- abind::abind(has.lut.error, has.lut.error, along = 4)
+#' FixLUTError(has.lut.error3d, 3)
 #' @export
 FixLUTError <- function(arr, ndim.out) {
   d <- dim(arr)
@@ -203,7 +192,8 @@ FixLUTError <- function(arr, ndim.out) {
     R.utils::extract(arr, seq_len(d[1]), seq_len(d[2]), x,
       drop = TRUE)
   })
-  nonzero <- !vapply(third.solos, AllEqual, logical(1), 0)
+  nonzero <- !vapply(lapply(third.solos, as.vector), filesstrings::AllEqual,
+                     logical(1), 0)
   if (sum(nonzero) != 1) {
     err.msg <- paste0("This function expects that in the read image, ",
                       "the third array slot is the rgb colour slot and that ",
@@ -216,19 +206,27 @@ FixLUTError <- function(arr, ndim.out) {
     drop = TRUE)
 }
 
-Closest <- function(x, vec) {
-  which.min(abs(x - vec)) %>% {
-    vec[.]
-  }
-}
 
-MCMapply <- function(fun, ..., mcc = parallel::detectCores()) {
-  dots <- list(...)
-  x <- dots[[1]]
-  if (tolower(.Platform$OS.type) == "windows")
-    mcc <- 1
-  args <- list(FUN = fun, ... = ..., mc.cores = mcc)
-  do.call(parallel::mcmapply, args)
+#' What's the closest value in a vector?
+#'
+#' Given a number `x` and a numeric vector `vec`, what's the closest value to
+#' `x` in `vec`?
+#'
+#' @param x A number.
+#' @param vec A numeric vector.
+#' @param index If set to `TRUE`, return the index (rather than the value) of
+#'   the closest element.
+#'
+#' @return A number.
+#'
+#' @examples
+#' Closest(pi, 0:10)
+#' Closest(pi, 0:10, index = TRUE)
+#'
+#' @export
+Closest <- function(x, vec, index = FALSE) {
+  ind <- which.min(abs(x - vec))
+  ifelse(index, ind, vec[ind])
 }
 
 #' Collapse a big set of ranges into a smaller set.
@@ -246,7 +244,7 @@ MCMapply <- function(fun, ..., mcc = parallel::detectCores()) {
 #' @param n.out A natural number. How many ranges should the output have?
 #' @param preserve A vector. Are there any original ranges that you'd like to
 #'   preserve? If so set them here. The first range is the interval
-#'   [`ranges[1]`, `ranges[2]`) and so on.
+#'   \code{[ranges[1], ranges[2])} and so on.
 #' @param prefer.low Are you more interested in the lower ranges? If so, set
 #'   this to true and all the high ranges will be collapsed into one.
 #' @param prefer.high Are you more interested in the higher ranges? If so, set
@@ -452,8 +450,7 @@ GroupClose <- function(vec.ascending, max.gap = 1) {
 #'
 #' @export
 SpreadSpecific <- function(interval, specific, n, log = FALSE) {
-  stopifnot(length(interval) == 2, length(specific) > 0, length(n) ==
-    1)
+  stopifnot(length(interval) == 2, length(specific) > 0, length(n) == 1)
   interval <- sort(interval)
   if (log) {
     if (interval[1] <= 0) {
@@ -461,19 +458,12 @@ SpreadSpecific <- function(interval, specific, n, log = FALSE) {
            "the interval must be on the positive real line")
     }
   }
-  if (any(specific < interval[1]) | any(specific > interval[2])) {
+  if (any(specific <= interval[1]) | any(specific >= interval[2])) {
     stop("All members of specific must fall in interval.")
   }
   specific <- sort(unique(specific))
   lspec <- length(specific)
   interval.pops.init <- c(1, rep(2, lspec - 1), 1)
-  left.closed <- interval[1] == specific[1]
-  right.closed <- interval[2] == specific[length(specific)]
-  if (left.closed)
-    interval.pops.init <- interval.pops.init[-1]
-  if (right.closed) {
-    interval.pops.init <- interval.pops.init[-length(interval.pops.init)]
-  }
   intervals <- unique(c(interval[1], specific, interval[2]))
   if (log) {
     interval.lengths <- diff(log(intervals))
@@ -484,8 +474,8 @@ SpreadSpecific <- function(interval, specific, n, log = FALSE) {
   interval.pops.final <- SpreadSpecificHelper(interval.lengths,
     interval.pops.init, n - lspec)
   interval.pops.add <- interval.pops.final - interval.pops.init
-  intervals.list <- cbind(dplyr::lag(intervals), intervals)[-1,
-    ] %>% Mat2RowList
+  intervals.list <- cbind(dplyr::lag(intervals), intervals)[-1, ] %>%
+    Mat2RowList
   to.be.added.to <- interval.pops.add > 0
   intervals.list.to.add <- intervals.list[to.be.added.to]
   interval.pops.final.to.add <- interval.pops.final[to.be.added.to]
@@ -502,18 +492,45 @@ SpreadSpecific <- function(interval, specific, n, log = FALSE) {
         length.out = interval.pops.final.to.add[i])
     }
   }
-  sort(unique(c(specific, unlist(intervals.list.to.add))))
+  out <- sort(unique(c(specific, unlist(intervals.list.to.add))))
+  diff.out <- diff(out)
+  below.tol <- diff.out < 1.5e-8
+  out[!below.tol]
+}
+
+ScaleBreaksFun <- function(include.breaks = NULL, log = FALSE) {
+  if (is.null(include.breaks) && (!log)) return(waiver())
+  function(x) {
+    if (is.null(include.breaks)) {
+      if (log) {
+        untruncated <- exp(seq(log(min(x)), log(max(x)), length.out = 5))
+      }
+    } else {
+      untruncated <- SpreadSpecific(x, include.breaks, 5, log = log)
+    }
+    min.sep <- min(diff(untruncated))
+    roundn <- log10(min.sep) %>% {
+      # get a sensible amount of digits for breaks
+      ifelse(. >= 1, 0, -floor(.))
+    }
+    brks <- ifelse(untruncated %in% include.breaks,
+                   untruncated, round(untruncated, roundn))
+    # if (brks[1] < min(x)) brks[1] <- brks[1] + 10 ^ -roundn
+    lbrks <- length(brks)
+    # if (brks[lbrks] > max(x)) brks[lbrks] <- brks[lbrks] - 10 ^ -roundn
+    brks
+  }
 }
 
 Mat2ColList <- function(mat) {
   lapply(seq_len(ncol(mat)), function(i) mat[, i])
 }
 Mat2RowList <- function(mat) {
-  lapply(seq_len(ncol(mat)), function(i) mat[i, ])
+  lapply(seq_len(nrow(mat)), function(i) mat[i, ])
 }
 
-bpp <- function(mcc) {
-  suppressWarnings(BiocParallel::MulticoreParam(workers = mcc))
+bpp <- function(mcc, seed = NULL) {
+  suppressWarnings(BiocParallel::MulticoreParam(workers = mcc, RNGseed = seed))
 }
 
 ListChannels <- function(arr4d) {

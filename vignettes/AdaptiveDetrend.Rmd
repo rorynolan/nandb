@@ -149,7 +149,7 @@ GetDensityDF <- function(mat, detrend) {
   d <- density(mat[!is.na(mat)], range.x = c(0, 5), gridsize = 2^16)
   tibble(detrend = detrend, brightness = d$x, frequency = d$y)
 }
-brightnesses <- lapply(c(NA, 10, tau, tau.again), Brightness, mat3d = eg.img,
+brightnesses <- lapply(c(NA, 10, tau, tau.again), Brightness, arr3d = eg.img,
                        mst = "tri")
 plot.df <- mapply(GetDensityDF, brightnesses, 
                   c("no detrend", "tau = 10", paste0("tau = ", round(tau)),
@@ -163,5 +163,5 @@ It seems that the brightnesses without detrend and those with detrends of $\tau 
 
 Finally, just in case you don't believe me that "the brightnesses without detrend and those with detrends of $\tau = `r round(tau)`$ and tau = `r round(tau.again)` roughly overlap, but the detrend of `tau = 10` has a significant shift," I'll \emph{prove} it to you by checking their values at 1.5. 
 ```{r PS}
-nandb:::Closest(1.5, plot.df$brightness) %>% {filter(plot.df, brightness == .)}
+Closest(1.5, plot.df$brightness) %>% {filter(plot.df, brightness == .)}
 ```

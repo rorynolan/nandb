@@ -67,7 +67,7 @@
 #'   scale?
 #' @param include.breaks If you don't want to specify all the breaks, but you
 #'   want some specific ones to be included on the legend colour scale, specify
-#'   those specific ones here
+#'   those specific ones here.
 #'
 #' @return In the graphics console, a raster plot (via
 #'   [ggplot2::geom_raster()]) will appear with the matrix values
@@ -81,9 +81,23 @@
 #' MatrixRasterPlot(brightness, scale.name = 'brightness')
 #' MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE)
 #' MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,
-#' breaks = 1:3)
+#'                  include.breaks = 1.35)
+#' MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,
+#'                  breaks = 1:3)
 #' MatrixRasterPlot(brightness, scale.name = 'brightness',
-#' ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, 'mer'))
+#'   ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, 'mer'))
+#' MatrixRasterPlot(brightness, scale.name = "brightness",
+#'                  ranges = seq(0.5, 3, length.out = 6),
+#'                  range.names = paste0(1:5, "mer"), log.trans = TRUE)
+#' MatrixRasterPlot(brightness, scale.name = "brightness",
+#'   include.breaks = 1.25, range.names = NULL, log.trans = FALSE)
+#' MatrixRasterPlot(brightness, scale.name = "brightness",
+#'                  include.breaks = 1.25, log.trans = TRUE)
+#' MatrixRasterPlot(brightness, scale.name = "brightness",
+#'                  limits = c(1, 1.25), clip = TRUE)
+#' MatrixRasterPlot(brightness, scale.name = "brightness",
+#'                  include.breaks = 1.25)
+#'
 #' @export
 MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
   ranges = NULL, range.names = NULL, colours = NULL, na.colour = "black",
@@ -95,6 +109,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
     legend.key.height = unit(1, "cm"))
   rownames(mat) <- NULL
   colnames(mat) <- NULL
+  include.breaks <- unique(include.breaks)
   df <- reshape2::melt(mat) %>% dplyr::transmute(x = Var1,
     y = 1 + max(Var2) - Var2, value = value)
   if (!is.null(ranges)) {
@@ -130,12 +145,10 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
       range.names <- levels(colours.ranges)
     }
     ggplot(df, aes(x, y, fill = colour)) + scale_fill_manual(scale.name,
-      values = colours %T>% {
-        names(.) <- as.character(seq_along(colours))
-      }, na.value = na.colour, labels = range.names %T>%
-        {
-          names(.) <- as.character(seq_along(colours))
-        }) + geom_raster() + plain.theme + coord_fixed()
+      values = magrittr::set_names(colours, seq_along(colours)),
+      na.value = na.colour,
+      labels = magrittr::set_names(range.names, seq_along(colours))) +
+      geom_raster() + plain.theme + coord_fixed()
   } else {
     if (is.null(limits)) {
       if (is.null(include.breaks)) {
@@ -148,16 +161,13 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
       if (!is.null(include.breaks))
         limits <- range(c(limits, include.breaks))
     }
-    if (is.null(colours))
-      colours <- viridis::viridis(9)
+    if (is.null(colours)) colours <- viridis::viridis(99)
     if (clip) {
       clip.low <- TRUE
       clip.high <- TRUE
     }
-    if (clip.low)
-      df$value[df$value < limits[1]] <- limits[1]
-    if (clip.high)
-      df$value[df$value > limits[2]] <- limits[2]
+    if (clip.low) df$value[df$value < limits[1]] <- limits[1]
+    if (clip.high) df$value[df$value > limits[2]] <- limits[2]
     if (is.null(breaks)) {
       if (log.trans) {
         if (min(limits) <= 0) {
@@ -165,60 +175,18 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
           "therefore a log-transformation is not possible.")
         }
         if (is.null(include.breaks)) {
-          breaks <- function(x) {
-          untruncated <- exp(seq(log(min(x)), log(max(x)),
-            length.out = 5))
-          min.sep <- min(diff(untruncated))
-          roundn <- log10(min.sep) %>% {
-            # get a sensible amount of digits for breaks
-            ifelse(. >= 1, 0, -floor(.))
-          }
-          brks <- round(untruncated, roundn)
-          if (brks[1] < min(x))
-            brks[1] <- brks[1] + 10^-roundn
-          lbrks <- length(brks)
-          if (brks[lbrks] > max(x))
-            brks[lbrks] <- brks[lbrks] - 10^-roundn
-          brks
-          }
+          breaks <- ScaleBreaksFun(include.breaks = include.breaks,
+                                   log = log.trans)
         } else {
-          breaks <- function(x) {
-          untruncated <- SpreadSpecific(x, include.breaks,
-            5, log = TRUE)
-          min.sep <- min(diff(untruncated))
-          roundn <- log10(min.sep) %>% {
-            # get a sensible amount of digits for breaks
-            ifelse(. >= 1, 0, -floor(.))
-          }
-          brks <- round(untruncated, roundn)
-          if (brks[1] < min(x))
-            brks[1] <- brks[1] + 10^-roundn
-          lbrks <- length(brks)
-          if (brks[lbrks] > max(x))
-            brks[lbrks] <- brks[lbrks] - 10^-roundn
-          brks
-          }
+          breaks <- ScaleBreaksFun(include.breaks = include.breaks,
+                                   log = log.trans)
         }
       } else {
         if (is.null(include.breaks)) {
           breaks <- waiver()
         } else {
-          breaks <- function(x) {
-          untruncated <- SpreadSpecific(x, include.breaks,
-            5)  # bs for breaks
-          min.sep <- min(diff(untruncated))
-          roundn <- log10(min.sep) %>% {
-            # get a sensible amount of digits for breaks
-            ifelse(. >= 1, 0, -floor(.))
-          }
-          brks <- round(untruncated, roundn)
-          if (brks[1] < min(x))
-            brks[1] <- brks[1] + 10^-roundn
-          lbrks <- length(brks)
-          if (brks[lbrks] > max(x))
-            brks[lbrks] <- brks[lbrks] - 10^-roundn
-          brks
-          }
+          breaks <- ScaleBreaksFun(include.breaks = include.breaks,
+                                   log = log.trans)
         }
       }
     }
@@ -247,6 +215,9 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
 #' display(normalize(img[, , 1]), method = 'raster')
 #' brightness <- Brightness(img, tau = 10, mst = 'Huang')
 #' KmerPlot(brightness, 1.02)
+#' KmerPlot(brightness, 1.12)
+#' KmerPlot(brightness, 100)
+#' KmerPlot(brightness, 1.02, log.trans = TRUE)
 #' KmerPlot(MedianFilterB(brightness), 1.02)
 #'
 #' @export
@@ -256,12 +227,10 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
   max.b <- max(brightness.mat, na.rm = TRUE)
   if (max.b > monomer.brightness) {
     ranges <- c(0, seq(1 + 0.5 * (monomer.brightness - 1),
-      max.b, monomer.brightness - 1), max.b) %>% unique %>%
-      {
+      max.b, monomer.brightness - 1), max.b) %>% unique %>% {
         # the unique avoids the unlikely possibility of repeating the
         # max at the end
         if (length(.) < 13) {
-          print(1)
           .
         } else {
           CollapseRanges(., 13, prefer.low = TRUE)
@@ -304,6 +273,17 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
 #'
 #' @return This is a `ggplot2` object and can be manipulated thus.
 #'
+#' @examples
+#' setwd(tempdir())
+#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+#' WriteIntImage(img, '50.tif')
+#' WriteIntImage(img, '50again.tif')
+#' BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+#' BrightnessPlotFolder()
+#' list.files()
+#' file.remove(list.files())  # cleanup
+#'
+#' @export
 BrightnessPlotFolder <- function(folder.path = ".",
   patt = ".*[Bb]rightness.*\\.csv$", verbose = TRUE, ...) {
   init.dir <- getwd()

@@ -4,12 +4,12 @@
 \alias{NumberTimeSeries}
 \title{Create a number time-series.}
 \usage{
-NumberTimeSeries(mat3d, frames.per.set, tau = NA, mst = NULL,
+NumberTimeSeries(arr3d, frames.per.set, tau = NA, mst = NULL,
   skip.consts = FALSE, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores())
+  mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
@@ -41,17 +41,20 @@ number image in a different way, first calculate the numbers without
 filtering (\code{filt = NULL}) using this function and then perform your
 desired filtering routine on the result.}
 
-\item{verbose}{If mat3d is specified as a file name, print a message to tell
+\item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
 \code{NumberTxtFolder}, does not work with multiple cores).}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
+
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
 }
 \value{
 An array where the \eqn{i}th slice is the \eqn{i}th number image.
 }
 \description{
-Given a stack of images \code{mat3d}, use the first \code{frames.per.set} of them to
+Given a stack of images \code{arr3d}, use the first \code{frames.per.set} of them to
 create one number image, the next \code{frames.per.set} of them to create
 the next number image and so on to get a time-series of number
 images. If \code{tau} is specified, bleaching correction is performed via

@@ -75,7 +75,7 @@ scale?}
 
 \item{include.breaks}{If you don't want to specify all the breaks, but you
 want some specific ones to be included on the legend colour scale, specify
-those specific ones here}
+those specific ones here.}
 }
 \value{
 In the graphics console, a raster plot (via
@@ -106,7 +106,21 @@ brightness <- Brightness(img, tau = 10, mst = 'Huang')
 MatrixRasterPlot(brightness, scale.name = 'brightness')
 MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE)
 MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,
-breaks = 1:3)
+                 include.breaks = 1.35)
+MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,
+                 breaks = 1:3)
 MatrixRasterPlot(brightness, scale.name = 'brightness',
-ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, 'mer'))
+  ranges = seq(0.5, 3, length.out = 6), range.names = paste0(1:5, 'mer'))
+MatrixRasterPlot(brightness, scale.name = "brightness",
+                 ranges = seq(0.5, 3, length.out = 6),
+                 range.names = paste0(1:5, "mer"), log.trans = TRUE)
+MatrixRasterPlot(brightness, scale.name = "brightness",
+  include.breaks = 1.25, range.names = NULL, log.trans = FALSE)
+MatrixRasterPlot(brightness, scale.name = "brightness",
+                 include.breaks = 1.25, log.trans = TRUE)
+MatrixRasterPlot(brightness, scale.name = "brightness",
+                 limits = c(1, 1.25), clip = TRUE)
+MatrixRasterPlot(brightness, scale.name = "brightness",
+                 include.breaks = 1.25)
+
 }

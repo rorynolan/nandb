@@ -4,20 +4,20 @@
 \alias{KmersFromBrightnesses}
 \title{Calculate numbers of kmers based on brightnesses}
 \usage{
-KmersFromBrightnesses(brightnesses, monomer.med)
+KmersFromBrightnesses(brightnesses, monomer)
 }
 \arguments{
 \item{brightnesses}{Vector or array of pixel brightnesses}
 
-\item{monomer.med}{The median brightness of a monomer. You must know what
+\item{monomer}{The median brightness of a monomer. You must know what
 this is to use this function correctly. This must be greater than 1 (this
 is the 'apparent brightness' of a monomer). If you're reading the Digman et
 al. (2008) paper, this is \eqn{1 + \epsilon}.
 
 This function takes the brightnesses in the range (1, 1 + 2 *
-\code{monomer.med} to be monomers, those in the range (1 + 2 *
-\code{monomer.med}, 1 + 4 * \code{monomer.med} to be dimers, (1 + 4 *
-\code{monomer.med}, 1 + 6 * \code{monomer.med} to be trimers and so on.}
+\code{monomer} to be monomers, those in the range (1 + 2 *
+\code{monomer}, 1 + 4 * \code{monomer} to be dimers, (1 + 4 *
+\code{monomer}, 1 + 6 * \code{monomer} to be trimers and so on.}
 }
 \value{
 A named vector (named '1mers' '2mers' '3mers' and so on) with each
@@ -30,6 +30,6 @@ pixels.
 }
 \examples{
 brightnesses <- runif(100, 1, 3)
-monomer.med <- 1.2
-KmersFromBrightnesses(brightnesses, monomer.med)
+monomer <- 1.2
+KmersFromBrightnesses(brightnesses, monomer)
 }

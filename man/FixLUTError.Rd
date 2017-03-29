@@ -25,3 +25,13 @@ one of them has the values you wanted. This function deletes the zero
 channels from the array. If there were no such LUT errors and the image read
 in as you desired, then this function does nothing.
 }
+\examples{
+has.lut.error <- abind::abind(matrix(0, nrow = 2, ncol = 2),
+                              matrix(1:4, nrow = 2),
+                              matrix(0, nrow = 2, ncol = 2),
+                              along = 3)
+has.lut.error
+FixLUTError(has.lut.error, 2)
+has.lut.error3d <- abind::abind(has.lut.error, has.lut.error, along = 4)
+FixLUTError(has.lut.error3d, 3)
+}

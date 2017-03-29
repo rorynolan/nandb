@@ -58,7 +58,7 @@ This is slightly painful but you'll only have to do it once. First of all, if yo
     sudo apt-get install libcurl4-openssl-dev libxml2-dev 
     sudo apt-get install default-jre default-jdk libboost-all-dev
 
-On **mac**, you need to go to <https://support.apple.com/kb/dl1572?locale=en_US> and download and install Java 6 (don't ask me why this is necessary). Then you need to install `Xcode` from the app store. Finally, you need to open a terminal and type `brew install boost`. If `brew install boost` doesn't work the google "install boost c++ library mac"; you need to have this done in order to use `nandb`.
+On **mac**, you need to go to <https://support.apple.com/kb/dl1572?locale=en_US> and download and install Java 6 (don't ask me why this is necessary). Then you need to install `Xcode` from the app store. Finally, you need to open a terminal and type `brew install boost`. If `brew install boost` doesn't work then google "install boost c++ library mac"; you need to have this done in order to use `nandb`.
 
 On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools/> and install the latest version of Rtools.
 
@@ -92,7 +92,7 @@ To update the package, you just need to do the same thing:
 
 ``` r
 options(unzip = "internal")
-devtools::install_github("rorynolan/nandb"), build_vignettes = TRUE)
+devtools::install_github("rorynolan/nandb", build_vignettes = TRUE)
 ```
 
 To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page <https://github.com/rorynolan/nandb> (you're probably there right now) and look for the version in the DESCRIPTION file.

@@ -2,39 +2,35 @@
 % Please edit documentation in R/thresh.R
 \name{MeanStackThresh}
 \alias{MeanStackThresh}
-\title{Threshold every image in a stack based on their mean.}
+\title{Threshold every image frame in a stack based on their mean.}
 \usage{
-MeanStackThresh(mat3d, method, fail = NA, skip.consts = FALSE)
+MeanStackThresh(arr3d, method, fail = NA, skip.consts = FALSE)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series.}
 
 \item{method}{The thresholding method to use. See
-\code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}}.}
+\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh}.}
 
 \item{fail}{To which value should pixels not exceeeding the threshold be set?}
 
 \item{skip.consts}{An array with only one value (a 'constant array') won't
 threshold properly. By default the function would give an error, but by
-setting this parameter to \code{TRUE}, the array would instead be skipped
-(the function will return the original array) and give a warning.}
+setting this parameter to \code{TRUE}, the array would instead be skipped (the
+function will return the original array) and give a warning.}
 }
 \value{
-The thresholded stack, pillars not exceeding the threshold are set to
-zero. The attribute 'threshold' gives the value used for thresholding.
+A 3d array, the thresholded stack. Pillars not exceeding the
+threshold are set to zero. The attribute 'threshold' gives the value used
+for thresholding.
 }
 \description{
-Via the \code{\link[autothresholdr:auto_thresh]{autothresholdr::auto_thresh()}} function from the
-\code{autothresholdr} package, apply a threshold to the image stack before
-calculating brightness, such as to only have nonzero brightnesses in areas
-where the cell is.
-}
-\details{
-This function finds a threshold based on all of the frames and then uses
-takes the mean of all the frames in the stack image to create a mask and
+This function finds a threshold based on all of the frames, then takes the
+mean of all the frames in the stack image, uses this to create a mask and
 then applies this mask to every frame in the stack (so for a given pillar in
-the image stack, either it is wiped away to zero, or it is untouched).
+the image stack, either all the pixels therein are thresholded away, all are
+untouched).
 }
 \examples{
 library(EBImage)

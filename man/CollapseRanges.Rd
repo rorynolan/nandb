@@ -15,10 +15,7 @@ elements are interpreted as the bounds of a range (or bin).}
 
 \item{preserve}{A vector. Are there any original ranges that you'd like to
 preserve? If so set them here. The first range is the interval
-[\code{ranges[1]}, \code{ranges[2]}) and so on.
-
-[`ranges[1]: R:%60ranges[1
-[2]: R:2}
+\code{[ranges[1], ranges[2])} and so on.}
 
 \item{prefer.low}{Are you more interested in the lower ranges? If so, set
 this to true and all the high ranges will be collapsed into one.}

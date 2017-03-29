@@ -6,19 +6,19 @@
 \alias{Numbers}
 \title{Calculate number from image series.}
 \usage{
-Number(mat3d, tau = NA, mst = NULL, skip.consts = FALSE, fail = NA,
+Number(arr3d, tau = NA, mst = NULL, skip.consts = FALSE, fail = NA,
   filt = NULL, verbose = FALSE)
 
 NumberTxtFolder(folder.path = ".", tau = NA, mst = NULL,
   skip.consts = FALSE, filt = NULL, ext = "\\\\.tif$",
-  mcc = parallel::detectCores(), verbose = FALSE)
+  mcc = parallel::detectCores(), seed = NULL, verbose = FALSE)
 
-Numbers(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
+Numbers(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
   fail = NA, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores())
+  mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
@@ -50,7 +50,7 @@ number image in a different way, first calculate the numbers without
 filtering (\code{filt = NULL}) using this function and then perform your
 desired filtering routine on the result.}
 
-\item{verbose}{If mat3d is specified as a file name, print a message to tell
+\item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
 \code{NumberTxtFolder}, does not work with multiple cores).}
 
@@ -64,7 +64,10 @@ are files that you don't want to process, take them out of the folder.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
-\item{mat3d.list}{A list of 3-dimensional arrays. To perform this on files
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
+
+\item{arr3d.list}{A list of 3-dimensional arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these
 files (a character vector).}
 }
@@ -93,12 +96,12 @@ library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
 number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median')
-MatrixRasterPlot(number, log.trans = TRUE)
-dir.create('tempdir')
-WriteIntImage(img, 'tempdir/50.tif')
-WriteIntImage(img, 'tempdir/50again.tif')
-NumberTxtFolder('tempdir', tau = 'auto', mst = 'tri', mcc = 2)
-filesstrings::RemoveDirs('tempdir')
+MatrixRasterPlot(number, scale.name = "number")
+setwd(tempdir())
+WriteIntImage(img, '50.tif')
+WriteIntImage(img, '50again.tif')
+NumberTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+file.remove(list.files())  # cleanup
 img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
 numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
 

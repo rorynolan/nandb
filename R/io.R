@@ -43,9 +43,10 @@ ReadImageData <- function(image.name, fix.lut = NULL) {
     }
     image.data <- FixLUTError(image.data, fix.lut)
   }
-  if (!all(CanBeInteger(image.data))) {
-    stop("Failed to read in the image as an array of integers.")
-  }
+  ## The next 3 lines are commented as the check they perform seems unnecessary
+  # if (!all(CanBeInteger(image.data))) {
+  #   stop("Failed to read in the image as an array of integers.")
+  # }
   image.data
 }
 
@@ -69,6 +70,7 @@ ReadImageData <- function(image.name, fix.lut = NULL) {
 #'   a file extension.
 #'
 #' @examples
+#' setwd(tempdir())
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' WriteImageTxt(img, 'temp')
 #'
@@ -91,7 +93,8 @@ WriteImageTxt <- function(img.arr, file.name) {
     file.names <- paste0(file.name, "_", seq_len(d[3])) %>%
       vapply(filesstrings::GiveExt, character(1), "csv") %>%
       (filesstrings::NiceNums)
-    mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE) %>%
+    mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE,
+           SIMPLIFY = FALSE) %>%
       invisible
   }
 }
@@ -100,7 +103,7 @@ WriteImageTxt <- function(img.arr, file.name) {
 #'
 #' @examples
 #' img <- ReadImageTxt('temp_01.csv')
-#' file.remove(list.files(pattern = '^temp.*\\.csv$'))
+#' file.remove(list.files())  # cleanup
 #' @export
 ReadImageTxt <- function(file.name) {
   suppressMessages(readr::read_csv(file.name, col_names = FALSE,
@@ -126,8 +129,9 @@ ReadImageTxt <- function(file.name) {
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' dir.create('tempdir')
-#' WriteIntImage(img, 'tempdir/50.tif')
+#' setwd(tempdir())
+#' WriteIntImage(img, '50.tif')
+#' file.remove(list.files())  # cleanup
 #'
 #' @export
 WriteIntImage <- function(img.arr, file.name, na = "error") {
@@ -143,10 +147,8 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
   if (na == "error" && any.nas)
     stop("img.arr contains NA values.")
   mx <- max(img.arr, na.rm = TRUE)
-  if (mx >= 2^32) {
-    stop("The maximum value in img.arr must be less than 2^32")
-  } else if (mx >= 2^16) {
-    bits.per.sample <- 32
+  if (mx >= 2^16) {
+    stop("The maximum value in img.arr must be less than 2^16")
   } else if (mx >= 2^8) {
     bits.per.sample <- 16
   } else {
@@ -217,11 +219,12 @@ ForceChannels <- function(img.arr, n.ch) {
 #' @param mcc The number of parallel cores to use for the processing.
 #'
 #' @examples
+#' setwd(tempdir())
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' WriteIntImage(img[, , 1], '50_1.tif')
 #' WriteIntImage(img[, , 2], '50_2.tif')
 #' Stack2DTifs(c('50_1.tif', '50_2.tif'), '50_1_2')
-#' file.remove(c('50_1.tif', '50_2.tif', '50_1_2.tif'))
+#' file.remove(list.files())
 #' @export
 Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
   out.name <- filesstrings::GiveExt(out.name, "tif")

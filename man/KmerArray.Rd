@@ -4,12 +4,12 @@
 \alias{KmerArray}
 \title{Get an image where each pixel represents a kmer.}
 \usage{
-KmerArray(brightness.arr, monomer.brightness)
+KmerArray(brightness.arr, monomer)
 }
 \arguments{
 \item{brightness.arr}{The brightness array.}
 
-\item{monomer.brightness}{The (median) brightness of a monomer.}
+\item{monomer}{The (median) brightness of a monomer.}
 }
 \value{
 A matrix.
@@ -18,4 +18,10 @@ A matrix.
 Based on a brightness image (array, can be more than two-dimensional), create
 a kmer image (array) where each pixel represents a kmer (0 for immobile, 1
 for monomer, 2 for dimer and so on).
+}
+\examples{
+img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
+ka <- KmerArray(brightness, 1.1)
+
 }

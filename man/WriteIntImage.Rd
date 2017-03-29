@@ -24,7 +24,8 @@ to disk as tiff files as you would want.
 }
 \examples{
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-dir.create('tempdir')
-WriteIntImage(img, 'tempdir/50.tif')
+setwd(tempdir())
+WriteIntImage(img, '50.tif')
+file.remove(list.files())  # cleanup
 
 }

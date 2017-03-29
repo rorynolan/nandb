@@ -10,7 +10,7 @@ r_github_packages:
   - rorynolan/filesstrings
   - rorynolan/autothresholdr
 after_success:
-  - Rscript -e 'covr::codecov()'
+  - Rscript -e 'covr::codecov(line_exclusions = "R/nandb.R")'
 apt_packages:
   - libssl-dev
   - libtiff4-dev

@@ -6,19 +6,19 @@
 \alias{Brightnesses}
 \title{Calculate brightness from image series.}
 \usage{
-Brightness(mat3d, tau = NA, mst = NULL, skip.consts = FALSE, fail = NA,
+Brightness(arr3d, tau = NA, mst = NULL, skip.consts = FALSE, fail = NA,
   filt = NULL, verbose = FALSE)
 
 BrightnessTxtFolder(folder.path = ".", tau = NA, mst = NULL,
   skip.consts = FALSE, filt = NULL, ext = "\\\\.tif$",
-  mcc = parallel::detectCores(), verbose = FALSE)
+  mcc = parallel::detectCores(), verbose = FALSE, seed = NULL)
 
-Brightnesses(mat3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
+Brightnesses(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
   fail = NA, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores())
+  mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
@@ -50,7 +50,7 @@ brightness image in a different way, first calculate the brightnesses
 without filtering (\code{filt = NULL}) using this function and then perform
 your desired filtering routine on the result.}
 
-\item{verbose}{If mat3d is specified as a file name, print a message to tell
+\item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
 \code{BrightnessTxtFolder}, does not work with multiple cores).}
 
@@ -65,7 +65,10 @@ default is for tiff files.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
-\item{mat3d.list}{A list of 3-dimensional arrays. To perform this on files
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
+
+\item{arr3d.list}{A list of 3-dimensional arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these
 files (a character vector).}
 }
@@ -98,7 +101,6 @@ MatrixRasterPlot(brightness, log.trans = TRUE)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
-set.seed(33)
 BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
 list.files()
 file.remove(list.files())  # cleanup

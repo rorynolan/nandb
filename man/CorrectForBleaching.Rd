@@ -8,7 +8,8 @@
 CorrectForBleaching(mat3d, tau)
 
 CorrectForBleachingFolder(folder.path = ".", tau = NA, mst = NULL,
-  ext = "\\\\.tif$", na = "error", mcc = parallel::detectCores())
+  ext = "\\\\.tif$", na = "error", mcc = parallel::detectCores(),
+  seed = NULL)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -40,6 +41,9 @@ give an error if the image contains \code{NA}s. Note that if you threshold, you
 are almost certain to get \code{NA}s.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
+
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
 }
 \value{
 \code{CorrectForBleaching} returns the detrended image series.

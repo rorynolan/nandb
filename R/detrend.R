@@ -51,13 +51,17 @@ CorrectForBleaching <- function(mat3d, tau) {
   } else if (!is.numeric(tau)) {
     stop("If tau is not numeric, then it must be NA or 'auto'.")
   }
-  smoothed <- ExpSmoothPillars(mat3d, tau)
-  filtered <- mat3d - smoothed
-  means <- MeanPillars(mat3d)
-  corrected <- filtered + as.vector(means)
-  # as it so happens, this will add the means to the pillars as we desire
-  corrected[corrected < 0] <- 0
-  corrected <- round(corrected)  # return the array back to integer counts
+  if (is.na(tau)) {
+    corrected <- mat3d
+  } else {
+    smoothed <- ExpSmoothPillars(mat3d, tau)
+    filtered <- mat3d - smoothed
+    means <- MeanPillars(mat3d)
+    corrected <- filtered + as.vector(means)
+    # as it so happens, this will add the means to the pillars as we desire
+    corrected[corrected < 0] <- 0
+    corrected <- round(corrected)  # return the array back to integer counts
+  }
   attr(corrected, "tau") <- ifelse(auto.tau, paste0("auto=", round(tau)),
                                    as.character(tau))
   corrected
@@ -80,6 +84,8 @@ CorrectForBleaching <- function(mat3d, tau) {
 #'   give an error if the image contains `NA`s. Note that if you threshold, you
 #'   are almost certain to get `NA`s.
 #' @param mcc The number of cores to use for the parallel processing.
+#' @param seed A seed for the random number generation for [BestTau]. Don't use
+#'   [set.seed], it won't work.
 #'
 #'
 #' @examples
@@ -95,13 +101,15 @@ CorrectForBleaching <- function(mat3d, tau) {
 #' @export
 CorrectForBleachingFolder <- function(folder.path = ".", tau = NA, mst = NULL,
                                       ext = "\\.tif$", na = "error",
-                                      mcc = parallel::detectCores()) {
+                                      mcc = parallel::detectCores(),
+                                      seed = NULL) {
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(folder.path)
   file.paths <- list.files(pattern = ext)
   BiocParallel::bplapply(file.paths, CorrectForBleachingFile,
-                         tau = tau, mst = mst, na = na, BPPARAM = bpp(mcc))
+                         tau = tau, mst = mst, na = na,
+                         BPPARAM = bpp(mcc, seed = seed))
 }
 
 CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
@@ -181,9 +189,11 @@ BestTau <- function(mat3d, mst = NULL, tol = 1) {
   if (tau2.sim.brightness.mean > 1) {
     stop("Even with a savage detrend of tau = 2, ",
          "the brightnesses still have mean greater than 1. ",
-        "There's probably a problem with your data. ",
-        "You should check this out, ",
-        "and if you want to work with the data as is, ",
+        "There's probably a problem with your data, ",
+        "or else your region of interest wasn't properly selected ",
+        "(perhaps by thresholding). ",
+        "You should check this out. ",
+        "If you want to work with the data as is, ",
         "then you'll have to choose your own detrend.")
   }
   lower <- 2

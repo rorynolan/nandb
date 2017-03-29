@@ -79,6 +79,12 @@ MedianFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
 }
 
 #' @rdname MedianFilterB
+#'
+#' @examples
+#' MedianFilterB(m)
+#' MedianFilterB(m, na_rm = TRUE)
+#' MedianFilterB(m, na_count = TRUE)
+#'
 #' @export
 SmoothFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
     .Call('nandb_SmoothFilterB', PACKAGE = 'nandb', mat, size, na_rm, na_count)
@@ -120,10 +126,6 @@ MedianPillars <- function(mat3d) {
 
 WhichIntervalC <- function(numbers, ranges) {
     .Call('nandb_WhichIntervalC', PACKAGE = 'nandb', numbers, ranges)
-}
-
-SplitEverykGives <- function(vec, k) {
-    .Call('nandb_SplitEverykGives', PACKAGE = 'nandb', vec, k)
 }
 
 SpreadSpecificHelper <- function(interval_lengths, interval_pops, m) {

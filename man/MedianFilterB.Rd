@@ -41,4 +41,8 @@ MedianFilterB(m)
 MedianFilterB(m, na_rm = TRUE)
 MedianFilterB(m, na_count = TRUE)
 
+MedianFilterB(m)
+MedianFilterB(m, na_rm = TRUE)
+MedianFilterB(m, na_count = TRUE)
+
 }
