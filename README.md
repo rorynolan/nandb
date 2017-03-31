@@ -77,7 +77,7 @@ If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. If you g
 
 ``` r
 options(unzip = "internal")
-devtools::install_github("rorynolan/nandb"), build_vignettes = TRUE)
+devtools::install_github("rorynolan/nandb", build_vignettes = TRUE)
 ```
 
 Done.
