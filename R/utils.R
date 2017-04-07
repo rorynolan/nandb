@@ -108,8 +108,10 @@ PillarsListToArr <- function(pillars.list, dim) {
 
 #' Make each pillar of a 3D array into a column of a tibble
 #'
-#' Create a data frame (tibble) where pillar `[i, j, ]` is column \code{i +
-#' n1 * (j - 1)}.
+#' Create a data frame (tibble) where pillar `[i, j, ]` is column \code{i + n1 *
+#' (j - 1)} with column name "i_j" (we use an underscore here rather than a
+#' comma because a comma is the delimiter in csv files so writing this data
+#' frame to a csv could cause confusion).
 #'
 #' @param arr3d A 3-dimensional array.
 #'
@@ -126,7 +128,7 @@ PillarsDF <- function(arr3d) {
   pillars.list <- ListPillars(arr3d)
   d <- dim(arr3d)
   namez <- expand.grid(seq_len(d[1]), seq_len(d[2])) %>% {
-    stringr::str_c(.$Var1, ",", .$Var2)
+    stringr::str_c(.$Var1, "_", .$Var2)
   }
   names(pillars.list) <- namez
   tibble::as_tibble(pillars.list)

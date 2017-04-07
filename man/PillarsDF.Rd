@@ -13,8 +13,10 @@ PillarsDF(arr3d)
 A \link[tibble:tibble]{tibble}.
 }
 \description{
-Create a data frame (tibble) where pillar \code{[i, j, ]} is column \code{i +
-n1 * (j - 1)}.
+Create a data frame (tibble) where pillar \code{[i, j, ]} is column \code{i + n1 *
+(j - 1)} with column name "i_j" (we use an underscore here rather than a
+comma because a comma is the delimiter in csv files so writing this data
+frame to a csv could cause confusion).
 }
 \examples{
 arr <- array(1:27, dim = rep(3, 3))
