@@ -1,6 +1,8 @@
 test_that("ExpSmooth works", {
-  expect_equal(round(ExpSmooth(1:5, 1), 1),
-               c(1.5, 2.2, 3, 3.8, 4.5))
+  expect_equal(round(ExpSmooth(1:5, 1), 2),
+               c(0.97, 1.99, 3, 4.01, 5.03))
+  expect_equal(round(ExpSmooth(c(0, 0, 3, 0, 0), 10), 2),
+               c(0.48, 0.49, 0.52, 0.49, 0.48))
 })
 
 test_that("ExpSmoothPillars works", {
@@ -28,4 +30,10 @@ test_that("MeanPillars works", {
   expect_equal(MeanPillars(m3), matrix(7:10, nrow = 2))
   expect_equal(MedianPillars(m3), matrix(7:10, nrow = 2))
   expect_equal(round(VarPillars(m3)), matrix(27, nrow = 2, ncol = 2))
+})
+
+test_that("MedReflectExtend works", {
+  expect_equal(nandb:::MedReflectExtend(1:10), (-8):19)
+  expect_equal(nandb:::MedReflectExtend(8), 8)
+  expect_equal(nandb:::ReflectIndexMed(1, 0, ""), NA_real_)
 })

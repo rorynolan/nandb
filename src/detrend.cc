@@ -1,6 +1,103 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// [[Rcpp::export]]
+double ReflectIndexMed(NumericVector vec, int ind, std::string side) {
+  int n = vec.size();
+  double out = NA_REAL;
+  double med;
+  int dist_to_end;
+  int dist_to_go;
+  double median_dist;
+  if (side == "left") {
+    NumericVector left = vec[seq(0, ind - 1)];
+    med = median(left);
+    dist_to_end = ind;
+    dist_to_go = 2 * dist_to_end;
+    median_dist = 1 + 0.5 * (dist_to_end - 1);
+    out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
+  } else if (side == "right") {
+    NumericVector right = vec[seq(ind + 1, n - 1)];
+    med = median(right);
+    dist_to_end = (n - 1) - ind;
+    dist_to_go = 2 * dist_to_end;
+    median_dist = 1 + 0.5 * (dist_to_end - 1);
+    out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
+  }
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector Smooth(NumericVector vec) {
+  int n = vec.size();
+  NumericVector smoothed(n);
+  if (n > 1) {
+    NumericVector three = vec[IntegerVector::create(0, 0, 1)];
+    smoothed[0] = mean(three);
+    three = vec[IntegerVector::create(n - 2, n - 1, n - 1)];
+    smoothed[n - 1] = mean(three);
+    for (int i = 1; i < n - 1; i++) {
+      three = vec[IntegerVector::create(i - 1, i, i + 1)];
+      smoothed[i] = mean(three);
+    }
+  }
+  return smoothed;
+}
+
+// [[Rcpp::export]]
+NumericVector MedReflectExtend(NumericVector vec, bool preserve_mean = false,
+                               bool smooth = false) {
+  int n = vec.size();
+  if (n <= 1) {
+    return vec;
+  } else {
+    NumericVector extended((n - 1) + n + (n - 1));
+    for (int i = 0; i < n - 1; i++) {
+      extended[(n - 2) - i] = ReflectIndexMed(vec, i + 1, "left");
+    }
+    for (int i = 0; i < n; i++) {
+      extended[i + (n - 1)] = vec[i];
+    }
+    for (int i = 0; i < n - 1; i++) {
+      extended[(n - 1) + n + i] = ReflectIndexMed(vec, (n - 1) - 1 - i,
+                                                  "right");
+    }
+    if (smooth) {
+      NumericVector side = extended[seq(0, n - 2)];
+      NumericVector smoothed = Smooth(side);
+      for (int i = 0; i < n - 1; i++) {
+        extended[i] = smoothed[i];
+      }
+      side = extended[seq((n - 1) + n, (n - 1) + n + (n - 2))];
+      smoothed = Smooth(side);
+      for (int i = 0; i < n; i++) {
+        extended[(n - 1) + n + i] = smoothed[i];
+      }
+    }
+    if (preserve_mean) {
+      double mean_vec = mean(vec);
+      double to_add;
+      int half_n_to_add_to = n - 1 - 1;
+      int atoms_to_add = 2 * half_n_to_add_to * (half_n_to_add_to + 1) / 2;
+      double atom;
+      int billion = pow(10, 9);
+      while (fabs(mean_vec - mean(extended)) > mean_vec / billion) {
+        // this procedure suffers from some numerical imprecision
+        // but repeating it many times yields the required result
+        to_add = mean(vec) * extended.size() - sum(extended);
+        atom = to_add / atoms_to_add;
+        for (int i = 1; i < n - 1; i++) {
+          extended[(n - 2) - i] += i * atom;
+        }
+        for (int i = 1; i < n - 1; i++) {
+          extended[(n - 1) + n + i] += i * atom;
+        }
+      }
+    }
+    return extended;
+  }
+}
+
 //' Exponentially smooth a series of observations.
 //'
 //' This function assumes that the observations are evenly spaced and separated
@@ -16,19 +113,27 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector ExpSmooth(NumericVector obs, double tau) {
   int n = obs.size();
-  NumericVector weights0(n);
-  for (int i = 0; i < n; i++) {
-    weights0[i] = exp(- i / tau);
+  NumericVector weights(2 * n - 1);
+  for (int i = 0; i < 2 * n - 1; i++) {
+    weights[i] = exp(- i / tau);
   }
-  NumericVector weights(n);
-  NumericVector new_obs(n);
+  NumericVector extended = MedReflectExtend(obs, true, true);
+  int m = extended.size();
+  NumericVector smoothed(n);
+  double numerator;
+  double denominator;
+  int i_in_extended;
   for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      weights[j] = weights0[abs(i - j)];
+    numerator = 0;
+    denominator = 0;
+    for (int j = 0; j < m; j++) {
+      i_in_extended = (n - 1) + i;
+      numerator += weights[abs(j - i_in_extended)] * extended[j];
+      denominator += weights[abs(j - i_in_extended)];
     }
-    new_obs[i] = sum(weights * obs) / sum(weights);
+    smoothed[i] = numerator / denominator;
   }
-  return new_obs;
+  return smoothed;
 }
 
 //' Exponentially smooth pillars of a 3-dimensional array
@@ -58,22 +163,12 @@ NumericVector ExpSmoothPillars(NumericVector mat3d, double tau) {
   int n_pillars = dim[0] * dim[1];
   int pillar_len = dim[2];
   NumericVector pillar_i(pillar_len);
-  NumericVector weights0(pillar_len);
-  NumericVector weights(pillar_len);
-  for (int i = 0; i < pillar_len; i++) {
-    weights0[i] = exp(- i / tau);
-  }
   NumericVector smoothed_pillar_i(pillar_len);
   for (int i = 0; i < n_pillars; i++) {
     for (int j = 0; j < pillar_len; j++) {
       pillar_i[j] = mat3d[i + j * n_pillars];
     }
-    for (int k = 0; k < pillar_len; k++) {
-      for (int l = 0; l < pillar_len; l++) {
-        weights[l] = weights0[abs(k - l)];
-      }
-      smoothed_pillar_i[k] = sum(weights * pillar_i) / sum(weights);
-    }
+    smoothed_pillar_i = ExpSmooth(pillar_i, tau);
     for (int j = 0; j < pillar_len; j++) {
       smoothed_pillars[i + j * n_pillars] = smoothed_pillar_i[j];
     }

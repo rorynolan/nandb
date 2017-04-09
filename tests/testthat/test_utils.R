@@ -10,7 +10,7 @@ test_that("PillarsDF works", {
   expect_equal(PillarsDF(arr),
                ListPillars(arr) %>%
                  set_names(apply(expand.grid(1:3, 1:3), 1,
-                                 paste, collapse = ",")) %>%
+                                 paste, collapse = "_")) %>%
                  tibble::as_tibble())
 })
 

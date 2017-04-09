@@ -171,8 +171,8 @@ BestTau <- function(mat3d, mst = NULL, tol = 1) {
     if (is.na(tau)) {
       detrended <- sim.img.arr
     } else {
-      detrended <- sim.img.arr - ExpSmoothRows(sim.img.arr,
-        tau) + rowMeans(sim.img.arr)
+      detrended <- (sim.img.arr - ExpSmoothRows(sim.img.arr, tau) +
+        rowMeans(sim.img.arr)) %>% round
     }
     brightnesses <- matrixStats::rowVars(detrended) / rowMeans(detrended)
     mean(brightnesses)
@@ -189,12 +189,12 @@ BestTau <- function(mat3d, mst = NULL, tol = 1) {
   if (tau2.sim.brightness.mean > 1) {
     stop("Even with a savage detrend of tau = 2, ",
          "the brightnesses still have mean greater than 1. ",
-        "There's probably a problem with your data, ",
-        "or else your region of interest wasn't properly selected ",
-        "(perhaps by thresholding). ",
-        "You should check this out. ",
-        "If you want to work with the data as is, ",
-        "then you'll have to choose your own detrend.")
+         "There's probably a problem with your data, ",
+         "or else your region of interest wasn't properly selected ",
+         "(perhaps by thresholding). ",
+         "You should check this out. ",
+         "If you want to work with the data as is, ",
+         "then you'll have to choose your own detrend.")
   }
   lower <- 2
   upper <- length(means)
