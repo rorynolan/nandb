@@ -9,20 +9,28 @@ double ReflectIndexMed(NumericVector vec, int ind, std::string side) {
   int dist_to_end;
   int dist_to_go;
   double median_dist;
-  if (side == "left") {
-    NumericVector left = vec[seq(0, ind - 1)];
-    med = median(left);
-    dist_to_end = ind;
-    dist_to_go = 2 * dist_to_end;
-    median_dist = 1 + 0.5 * (dist_to_end - 1);
-    out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
-  } else if (side == "right") {
-    NumericVector right = vec[seq(ind + 1, n - 1)];
-    med = median(right);
-    dist_to_end = (n - 1) - ind;
-    dist_to_go = 2 * dist_to_end;
-    median_dist = 1 + 0.5 * (dist_to_end - 1);
-    out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
+  NumericVector right(n - (ind + 1));
+  NumericVector left(ind);
+  if (ind >= 0 && ind < n) {
+    if (side == "left") {
+      for (int i = 0; i < ind; i++) {
+        left[i] = vec[i];
+      }
+      med = median(left);
+      dist_to_end = ind;
+      dist_to_go = 2 * dist_to_end;
+      median_dist = 1 + 0.5 * (dist_to_end - 1);
+      out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
+    } else if (side == "right") {
+      for (int i = 0; i < n - (ind + 1); i++) {
+        right[i] = vec[ind + i + 1];
+      }
+      med = median(right);
+      dist_to_end = (n - 1) - ind;
+      dist_to_go = 2 * dist_to_end;
+      median_dist = 1 + 0.5 * (dist_to_end - 1);
+      out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
+    }
   }
   return out;
 }
