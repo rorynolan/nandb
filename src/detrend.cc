@@ -9,10 +9,9 @@ double ReflectIndexMed(NumericVector vec, int ind, std::string side) {
   int dist_to_end;
   int dist_to_go;
   double median_dist;
-  NumericVector right(n - (ind + 1));
-  NumericVector left(ind);
   if (ind >= 0 && ind < n) {
     if (side == "left") {
+      NumericVector left(ind);
       for (int i = 0; i < ind; i++) {
         left[i] = vec[i];
       }
@@ -22,6 +21,7 @@ double ReflectIndexMed(NumericVector vec, int ind, std::string side) {
       median_dist = 1 + 0.5 * (dist_to_end - 1);
       out = vec[ind] + dist_to_go / median_dist * (med - vec[ind]);
     } else if (side == "right") {
+      NumericVector right(n - (ind + 1));
       for (int i = 0; i < n - (ind + 1); i++) {
         right[i] = vec[ind + i + 1];
       }
@@ -48,6 +48,8 @@ NumericVector Smooth(NumericVector vec) {
       three = vec[IntegerVector::create(i - 1, i, i + 1)];
       smoothed[i] = mean(three);
     }
+  } else {
+    smoothed[0] = vec[0];
   }
   return smoothed;
 }
@@ -78,7 +80,7 @@ NumericVector MedReflectExtend(NumericVector vec, bool preserve_mean = false,
       }
       side = extended[seq((n - 1) + n, (n - 1) + n + (n - 2))];
       smoothed = Smooth(side);
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n - 1; i++) {
         extended[(n - 1) + n + i] = smoothed[i];
       }
     }
