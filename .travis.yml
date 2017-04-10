@@ -20,3 +20,4 @@ apt_packages:
   - default-jre
   - default-jdk
   - libboost-all-dev
+install: travis_wait 30 mvn install
