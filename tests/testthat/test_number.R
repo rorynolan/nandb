@@ -48,12 +48,14 @@ test_that("NumberTxtFolder works", {
 
 test_that("Numbers works", {
   img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-  numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2,
-                               seed = 7)
-  expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 23.716)
-  imgs <- lapply(img.paths, ReadImageData)
-  numbers <- Numbers(imgs, mst = 'Huang', tau = 'auto', mcc = 2, seed = 7)
-  expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 23.716)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2,
+                                 seed = 7)
+    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 23.716)
+    imgs <- lapply(img.paths, ReadImageData)
+    numbers <- Numbers(imgs, mst = 'Huang', tau = 'auto', mcc = 2, seed = 7)
+    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 23.716)
+  }
   expect_error(Numbers(1:2, mst = "tri"),
                "must either be a list of 3d arrays")
 })

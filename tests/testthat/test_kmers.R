@@ -50,7 +50,7 @@ test_that("KmerTIFFsFromBrightnessCSVs works", {
   BrightnessTxtFolder(tau = "auto", mst = "tri")
   KmerTIFFsFromBrightnessCSVs(1.111)
   expect_equal(round(mean(ReadImageData(list.files(pattern = "tau.*tif"))), 2),
-               0.85)
+               0.85, tolerance = 0.1)
   expect_error(KmerTIFFsFromBrightnessCSVs(1.111, csv.paths = "a",
                                            out.names = c("a", "b")))
   suppressWarnings(file.remove(list.files()))
