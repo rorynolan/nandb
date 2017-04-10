@@ -42,12 +42,12 @@ Imports:
     grDevices,
     RcppRoll,
     tibble,
-    purrr
+    purrr,
+    hexbin
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,
     rmarkdown,
-    hexbin,
     covr,
     testthat
 VignetteBuilder: knitr
