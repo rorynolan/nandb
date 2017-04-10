@@ -59,12 +59,13 @@ test_that("KmerTIFFsFromBrightnessCSVs works", {
 })
 
 test_that("KmerArray works", {
+  set.seed(0)
   img <- ReadImageData(system.file("extdata", "50.tif",
                                    package = "nandb"))
   brightness <- Brightness(img, tau = "auto", mst = "Huang",
                            filt = "median")
   ka <- KmerArray(brightness, 1.1)
-  expect_equal(round(mean(ka), 4), 0.4725)
+  expect_equal(round(mean(ka), 3), 0.418)
   ka0 <- KmerArray(brightness, max(brightness + 1, na.rm = TRUE))
   expect_true(all(unique(ka0) %in% c(NA, 0)))
 })
