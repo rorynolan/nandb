@@ -34,8 +34,36 @@
 #'
 #' @export
 ReadImageData <- function(image.name, fix.lut = NULL) {
-  image.data <- suppressWarnings(EBImage::imageData(
-    EBImage::readImage(image.name, as.is = TRUE)))
+  EBIrid <- function(path) {
+    suppressWarnings(EBImage::imageData(
+      EBImage::readImage(path, as.is = TRUE)))
+  }
+  image.data <- EBIrid(image.name)
+  if (stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    # The following checks are necessary due to an issue with the tiff package
+    cwd <- getwd()
+    td <- paste0(tempdir(), "/")
+    tmptif <- paste0(td, "tmp.tif")
+    WriteIntImage(image.data, tmptif)
+    tmp <- EBIrid(tmptif)
+    if (!filesstrings::AllEqual(image.data, tmp)) {
+      minus1 <- (image.data - 1) %T>% {.[. < 0] <- 0}
+      minus1.path <- paste0(td, "tmp_minus1.tif")
+      WriteIntImage(minus1, minus1.path)
+      minus1.read <- EBIrid(minus1.path)
+      if (filesstrings::AllEqual(minus1.read, image.data)) {
+        image.data <- minus1
+      } else {
+        if (all(image.data - minus1.read) %in% c(-1, 0, 1)) {
+          image.data <- ifelse(image.data == minus1.read,
+                               minus1, image.data)
+        } else {
+          stop("There was an error with the TIFF package ",
+               "that couldn't be corrected for.")
+        }
+      }
+    }
+  }
   if (!is.null(fix.lut)) {
     if (isTRUE(fix.lut)) {
       stop("If fix.lut is not set to false, it must be specified as an integer",
@@ -43,10 +71,6 @@ ReadImageData <- function(image.name, fix.lut = NULL) {
     }
     image.data <- FixLUTError(image.data, fix.lut)
   }
-  ## The next 3 lines are commented as the check they perform seems unnecessary
-  # if (!all(CanBeInteger(image.data))) {
-  #   stop("Failed to read in the image as an array of integers.")
-  # }
   image.data
 }
 
@@ -144,8 +168,7 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
   na <- RSAGA::match.arg.ext(na, c("saturate", "zero", "error"),
     ignore.case = TRUE)
   any.nas <- anyNA(img.arr)
-  if (na == "error" && any.nas)
-    stop("img.arr contains NA values.")
+  if (na == "error" && any.nas) stop("img.arr contains NA values.")
   mx <- max(img.arr, na.rm = TRUE)
   if (mx >= 2^16) {
     stop("The maximum value in img.arr must be less than 2^16")
@@ -154,7 +177,7 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
   } else {
     bits.per.sample <- 8
   }
-  img.arr <- img.arr/(2^bits.per.sample - 1)
+  img.arr <- img.arr / (2 ^ bits.per.sample - 1)
   if (any.nas) {
     if (na == "saturate")
       img.arr[is.na(img.arr)] <- 1

@@ -11,8 +11,7 @@ test_that("Stack2DTifs works", {
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
-  img <- ReadImageData(system.file("extdata", "50.tif",
-    package = "nandb"))
+  img <- array(0:8, dim = rep(2, 3))
   WriteIntImage(img[, , 1], "50_1.tif")
   WriteIntImage(img[, , 2], "50_2.tif")
   Stack2DTifs(c("50_1.tif", "50_2.tif"), "50_1_2")
