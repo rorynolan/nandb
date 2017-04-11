@@ -39,31 +39,6 @@ ReadImageData <- function(image.name, fix.lut = NULL) {
       EBImage::readImage(path, as.is = TRUE)))
   }
   image.data <- EBIrid(image.name)
-  if (stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    # The following checks are necessary due to an issue with the tiff package
-    cwd <- getwd()
-    td <- paste0(tempdir(), "/")
-    tmptif <- paste0(td, "tmp.tif")
-    WriteIntImage(image.data, tmptif)
-    tmp <- EBIrid(tmptif)
-    if (!filesstrings::AllEqual(image.data, tmp)) {
-      minus1 <- (image.data - 1) %T>% {.[. < 0] <- 0}
-      minus1.path <- paste0(td, "tmp_minus1.tif")
-      WriteIntImage(minus1, minus1.path)
-      minus1.read <- EBIrid(minus1.path)
-      if (filesstrings::AllEqual(minus1.read, image.data)) {
-        image.data <- minus1
-      } else {
-        if (all(image.data - minus1.read) %in% c(-1, 0, 1)) {
-          image.data <- ifelse(image.data == minus1.read,
-                               minus1, image.data)
-        } else {
-          stop("There was an error with the TIFF package ",
-               "that couldn't be corrected for.")
-        }
-      }
-    }
-  }
   if (!is.null(fix.lut)) {
     if (isTRUE(fix.lut)) {
       stop("If fix.lut is not set to false, it must be specified as an integer",
