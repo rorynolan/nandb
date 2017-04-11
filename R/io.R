@@ -34,25 +34,11 @@
 #'
 #' @export
 ReadImageData <- function(image.name, fix.lut = NULL) {
-  EBIrid <- function(path, as.is = FALSE) {
+  EBIrid <- function(path) {
     suppressWarnings(EBImage::imageData(
-      EBImage::readImage(path, as.is = as.is)))
+      EBImage::readImage(path, as.is = TRUE)))
   }
-  ints <- EBIrid(image.name, TRUE)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    # This is an attempt to cope with an issue with readTIFF(..., as.is = TRUE)
-    reals <- EBIrid(image.name, FALSE)
-    possible.bit.factors <- round(2 ^ c(8, 12, 16, 32) - 1)
-    factors <- (ints / reals) %>% {.[. < Inf]}
-    if (length(factors) == 0) {
-      bit.factor <- 2 ^ 8 - 1
-    } else {
-      bit.factor <- Closest(mean(factors, na.rm = TRUE), possible.bit.factors)
-    }
-    image.data <- round(bit.factor * reals)
-  } else {
-    image.data <- ints
-  }
+  image.data <- EBIrid(image.name)
   if (!is.null(fix.lut)) {
     if (isTRUE(fix.lut)) {
       stop("If fix.lut is not set to false, it must be specified as an integer",

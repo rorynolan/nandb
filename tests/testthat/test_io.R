@@ -1,7 +1,8 @@
 test_that("ForceChannels works", {
   library(magrittr)
   x <- lapply(1:300, function(x) matrix(runif(4), nrow = 2)) %>%
-    Reduce(function(x, y) abind::abind(x, y, along = 3), .)
+    Reduce(function(x, y) abind::abind(x, y, along = 3),
+      .)
   expect_equal(ForceChannels(x, 6) %>% dim, c(2, 2, 6, 50))
   expect_error(ForceChannels(x, 7), "multiple")
 })
@@ -47,12 +48,16 @@ test_that("WriteImageTxt works", {
 })
 
 test_that("WriteIntImage works", {
-  img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
+  img <- ReadImageData(system.file("extdata", "50.tif",
+    package = "nandb"))
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
   WriteIntImage(img, "50.tif")
-  expect_equal(ReadImageData("50.tif"), img, check.attributes = FALSE)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    # these fail on windows due to an issue with readTIFF(..., as.is = TRUE)
+    expect_equal(ReadImageData("50.tif"), img, check.attributes = FALSE)
+  }
   suppressWarnings(file.remove(list.files()))
 })
 
