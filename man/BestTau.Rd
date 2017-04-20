@@ -4,10 +4,10 @@
 \alias{BestTau}
 \title{Find the best tau for exponential filtering detrend.}
 \usage{
-BestTau(mat3d, mst = NULL, tol = 1)
+BestTau(arr3d, mst = NULL, tol = 1)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}

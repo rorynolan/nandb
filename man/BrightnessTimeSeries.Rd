@@ -4,15 +4,17 @@
 \alias{BrightnessTimeSeries}
 \title{Create a Brightness time-series.}
 \usage{
-BrightnessTimeSeries(arr3d, frames.per.set, tau = NA, mst = NULL,
+BrightnessTimeSeries(arr, frames.per.set, tau = NA, mst = NULL,
   skip.consts = FALSE, filt = NULL, verbose = FALSE,
   mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series. To perform this on a file
-that has not yet been read in, set this argument to the path to that file
-(a string).}
+\item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
+x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+the third slot gives the index of the frame. If it is 4-dimensional, the
+third slot indexes the channel and the fourth indexes the frame in the
+stack. To perform this on a file that has not yet been read in, set this
+argument to the path to that file (a string).}
 
 \item{frames.per.set}{The number of frames with which to calculate the
 successive brightnesses.}
@@ -30,7 +32,8 @@ thresholding \emph{method} here.}
 \item{skip.consts}{An image array with only one value (a 'constant array')
 won't threshold properly. By default the function would give an error, but
 by setting this parameter to \code{TRUE}, the array would instead be
-skipped (the function will return the original array) and give a warning.}
+skipped (the thresholding will return the original array) and give a
+warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
@@ -54,7 +57,7 @@ the user that that file is now being processed (useful for
 An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
 }
 \description{
-Given a stack of images \code{arr3d}, use the first \code{frames.per.set} of
+Given a stack of images \code{arr}, use the first \code{frames.per.set} of
 them to create one brightness image, the next \code{frames.per.set} of them
 to create the next brightness image and so on to get a time-series of
 brightness images. If \code{tau} is specified, bleaching correction is
@@ -67,11 +70,13 @@ correction is selected, it is performed on the whole image stack before the
 sectioning is done for calculation of brightnesses.
 }
 \examples{
+library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
 filt = 'median', mcc = 2)
-
+two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
+bts.2ch <- BrightnessTimeSeries(two.channel.img, 10)
 }
 \seealso{
 \code{\link[=Brightness]{Brightness()}}.

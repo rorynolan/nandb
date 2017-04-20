@@ -13,7 +13,7 @@
 #' this purpose (this has a workaround whereby it does the thresholding in
 #' series and does the rest in parallel).
 #'
-#' @param arr3d A 3-dimensional array (the image stack) where the \eqn{n}th
+#' @param arr A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
@@ -53,14 +53,36 @@
 #' display(normalize(img[, , 1]), method = 'raster')
 #' number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median')
 #' MatrixRasterPlot(number, scale.name = "number")
+#' library(magrittr)
+#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+#' number.2ch <- Number(two.channel.img)
 #' @export
-Number <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, verbose = FALSE) {
-  if (is.character(arr3d)) {
+Number <- function(arr, tau = NA, mst = NULL, skip.consts = FALSE,
+                       filt = NULL, verbose = FALSE) {
+  if (is.character(arr)) {
     if (verbose)
-      message(paste0("Now processing: ", arr3d, "."))
-    arr3d <- ReadImageData(arr3d)
+      message(paste0("Now processing: ", arr, "."))
+    arr <- ReadImageData(arr)
   }
+  d <- dim(arr)
+  if (length(d) == 3) {
+    return(Number_(arr, tau = tau, mst = mst,
+                       skip.consts = skip.consts, filt = filt))
+  }
+  number.args <- list(arr3d = ListChannels(arr), tau = tau, mst = mst,
+                      skip.consts = skip.consts, filt = filt)
+  for (i in seq_along(number.args)) {
+    if (is.null(number.args[[i]])) {
+      number.args[[i]] <- list(NULL)[rep(1, length(number.args$arr3d))]
+    }
+  }
+  number.args %>%
+    purrr::pmap(Number_) %>%
+    ChannelList2Arr
+}
+
+Number_ <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
+  fail = NA, filt = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
@@ -132,17 +154,44 @@ Number <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median', mcc = 2)
-#'
+#' bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median',
+#'                         mcc = 2)
+#' library(magrittr)
+#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+#' nts.2ch <- NumberTimeSeries(two.channel.img, 10)
 #' @export
-NumberTimeSeries <- function(arr3d, frames.per.set, tau = NA,
-  mst = NULL, skip.consts = FALSE, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores(), seed = NULL) {
-  if (is.character(arr3d)) {
+NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
+                                 mst = NULL, skip.consts = FALSE, filt = NULL,
+                                 verbose = FALSE,
+                                 mcc = parallel::detectCores(), seed = NULL) {
+  if (is.character(arr)) {
     if (verbose)
-      message(paste0("Now processing: ", arr3d, "."))
-    arr3d <- ReadImageData(arr3d)
+      message(paste0("Now processing: ", arr, "."))
+    arr <- ReadImageData(arr)
   }
+  d <- dim(arr)
+  if (length(d) == 3) {
+    return(NumberTimeSeries_(arr, frames.per.set = frames.per.set,
+                                 tau = tau, mst = mst,
+                                 skip.consts = skip.consts, filt = filt,
+                                 mcc = mcc, seed = seed))
+  }
+  nts.args <- list(arr3d = ListChannels(arr), frames.per.set = frames.per.set,
+                   tau = tau, mst = mst, skip.consts = skip.consts, filt = filt,
+                   mcc = mcc, seed = seed)
+  for (i in seq_along(nts.args)) {
+    if (is.null(nts.args[[i]])) {
+      nts.args[[i]] <- list(NULL)[rep(1, length(nts.args$arr3d))]
+    }
+  }
+  nts.args %>%
+    purrr::pmap(NumberTimeSeries_) %>%
+    ChannelList2Arr
+}
+
+NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
+  mst = NULL, skip.consts = FALSE, filt = NULL,
+  mcc = parallel::detectCores(), seed = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
@@ -169,10 +218,10 @@ NumberTimeSeries <- function(arr3d, frames.per.set, tau = NA,
 #'
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
-#' @param ext the file extension of the images in the folder that you wish to
-#'   process (can be rooted in regular expression for extra-safety, as in the
-#'   default). You must wish to process all files with this extension; if there
-#'   are files that you don't want to process, take them out of the folder.
+#' @param ext The file extension of the images in the folder that you wish to
+#'   process. You must wish to process all files with this extension; if there
+#'   are files that you don't want to process, take them out of the folder. The
+#'   default is for tiff files. Do not use regular expression in this argument.
 #'
 #' @examples
 #' setwd(tempdir())
@@ -182,11 +231,13 @@ NumberTimeSeries <- function(arr3d, frames.per.set, tau = NA,
 #' file.remove(list.files())  # cleanup
 #' @export
 NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, ext = "\\.tif$",
+  skip.consts = FALSE, filt = NULL, ext = "tif",
   mcc = parallel::detectCores(), seed = NULL, verbose = FALSE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
+  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   numbers <- Numbers(file.names, tau = tau, mst = mst,
                      skip.consts = skip.consts, filt = filt,

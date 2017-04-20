@@ -13,10 +13,12 @@
 #' `Brightnesses` for this purpose (this has a workaround whereby it does
 #' the thresholding in series and does the rest in parallel).
 #'
-#' @param arr3d A 3-dimensional array (the image stack) where the \eqn{n}th
-#'   slice is the \eqn{n}th image in the time series. To perform this on a file
-#'   that has not yet been read in, set this argument to the path to that file
-#'   (a string).
+#' @param arr An array, can be 3- or 4-dimensional. The first two slots give the
+#'   x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+#'   the third slot gives the index of the frame. If it is 4-dimensional, the
+#'   third slot indexes the channel and the fourth indexes the frame in the
+#'   stack. To perform this on a file that has not yet been read in, set this
+#'   argument to the path to that file (a string).
 #' @param tau If this is specified, bleaching correction is performed with
 #'   [CorrectForBleaching()] which uses exponential filtering with
 #'   time constant `tau` (where the unit of time is the time between
@@ -28,9 +30,8 @@
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
 #'   by setting this parameter to `TRUE`, the array would instead be
-#'   skipped (the function will return the original array) and give a warning.
-#' @param fail If thresholding is done, to which value should pixels not
-#'   exceeeding the threshold be set?
+#'   skipped (the thresholding will return the original array) and give a
+#'   warning.
 #' @param filt Do you want to smooth (`filt = 'smooth'`) or median
 #'   (`filt = 'median'`) filter the brightness image using
 #'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
@@ -49,23 +50,45 @@
 #'   same folder as the input images).
 #'
 #' @examples
+#' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 #' brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
 #' MatrixRasterPlot(brightness, log.trans = TRUE)
+#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+#' brightness.2ch <- Brightness(two.channel.img)
 #' @export
-Brightness <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, verbose = FALSE) {
-  if (is.character(arr3d)) {
+Brightness <- function(arr, tau = NA, mst = NULL, skip.consts = FALSE,
+                       filt = NULL, verbose = FALSE) {
+  if (is.character(arr)) {
     if (verbose)
-      message(paste0("Now processing: ", arr3d, "."))
-    arr3d <- ReadImageData(arr3d)
+      message(paste0("Now processing: ", arr, "."))
+    arr <- ReadImageData(arr)
   }
+  d <- dim(arr)
+  if (length(d) == 3) {
+    return(Brightness_(arr, tau = tau, mst = mst,
+                       skip.consts = skip.consts, filt = filt))
+  }
+  brightness.args <- list(arr3d = ListChannels(arr), tau = tau, mst = mst,
+                          skip.consts = skip.consts, filt = filt)
+  for (i in seq_along(brightness.args)) {
+    if (is.null(brightness.args[[i]])) {
+      brightness.args[[i]] <- list(NULL)[rep(1, length(brightness.args$arr3d))]
+    }
+  }
+  brightness.args %>%
+    purrr::pmap(Brightness_) %>%
+    ChannelList2Arr
+}
+
+Brightness_ <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
+                        filt = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
   if (!is.null(mst)) {
-    arr3d <- MeanStackThresh(arr3d, method = mst, fail = fail,
+    arr3d <- MeanStackThresh(arr3d, method = mst, fail = NA,
       skip.consts = skip.consts)
   }
   tau.auto <- FALSE
@@ -109,7 +132,7 @@ Brightness <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
 
 #' Create a Brightness time-series.
 #'
-#' Given a stack of images `arr3d`, use the first `frames.per.set` of
+#' Given a stack of images `arr`, use the first `frames.per.set` of
 #' them to create one brightness image, the next `frames.per.set` of them
 #' to create the next brightness image and so on to get a time-series of
 #' brightness images. If `tau` is specified, bleaching correction is
@@ -131,20 +154,45 @@ Brightness <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #' @seealso [Brightness()].
 #'
 #' @examples
+#' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 #' bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
 #' filt = 'median', mcc = 2)
-#'
+#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+#' bts.2ch <- BrightnessTimeSeries(two.channel.img, 10)
 #' @export
-BrightnessTimeSeries <- function(arr3d, frames.per.set, tau = NA,
+BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
+                                 mst = NULL, skip.consts = FALSE, filt = NULL,
+                                 verbose = FALSE,
+                                 mcc = parallel::detectCores(), seed = NULL) {
+  if (is.character(arr)) {
+    if (verbose)
+      message(paste0("Now processing: ", arr, "."))
+    arr <- ReadImageData(arr)
+  }
+  d <- dim(arr)
+  if (length(d) == 3) {
+    return(BrightnessTimeSeries_(arr, frames.per.set = frames.per.set,
+                                 tau = tau, mst = mst,
+                                 skip.consts = skip.consts, filt = filt,
+                                 verbose = verbose, mcc = mcc, seed = seed))
+  }
+  bts.args <- list(arr3d = ListChannels(arr), frames.per.set = frames.per.set,
+                   tau = tau, mst = mst, skip.consts = skip.consts, filt = filt,
+                   verbose = verbose, mcc = mcc, seed = seed)
+  for (i in seq_along(bts.args)) {
+    if (is.null(bts.args[[i]])) {
+      bts.args[[i]] <- list(NULL)[rep(1, length(bts.args$arr3d))]
+    }
+  }
+  bts.args %>%
+    purrr::pmap(BrightnessTimeSeries_) %>%
+    ChannelList2Arr
+}
+BrightnessTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
   mst = NULL, skip.consts = FALSE, filt = NULL, verbose = FALSE,
   mcc = parallel::detectCores(), seed = NULL) {
-  if (is.character(arr3d)) {
-    if (verbose)
-      message(paste0("Now processing: ", arr3d, "."))
-    arr3d <- ReadImageData(arr3d)
-  }
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
@@ -171,11 +219,10 @@ BrightnessTimeSeries <- function(arr3d, frames.per.set, tau = NA,
 #'
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
-#' @param ext the file extension of the images in the folder that you wish to
-#'   process (can be rooted in regular expression for extra-safety, as in the
-#'   default). You must wish to process all files with this extension; if there
+#' @param ext The file extension of the images in the folder that you wish to
+#'   process. You must wish to process all files with this extension; if there
 #'   are files that you don't want to process, take them out of the folder. The
-#'   default is for tiff files.
+#'   default is for tiff files. Do not use regular expression in this argument.
 #' @param mcc The number of cores to use for the parallel processing.
 #' @param seed A seed for the random number generation for [BestTau]. Don't use
 #'   [set.seed], it won't work.
@@ -189,11 +236,13 @@ BrightnessTimeSeries <- function(arr3d, frames.per.set, tau = NA,
 #' file.remove(list.files())  # cleanup
 #' @export
 BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
-  mst = NULL, skip.consts = FALSE, filt = NULL, ext = "\\.tif$",
+  mst = NULL, skip.consts = FALSE, filt = NULL, ext = "tif",
   mcc = parallel::detectCores(), verbose = FALSE, seed = NULL) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
+  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   brightnesses <- Brightnesses(file.names, tau = tau, mst = mst,
     skip.consts = skip.consts, filt = filt, seed = seed)
@@ -231,14 +280,13 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
 #'
 #' @export
 Brightnesses <- function(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, verbose = FALSE, mcc = parallel::detectCores(),
-  seed = NULL) {
+  filt = NULL, verbose = FALSE, mcc = parallel::detectCores(), seed = NULL) {
   if (is.null(mst)) {
     brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
       filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
   } else if (is.list(arr3d.list)) {
     arr3d.list <- lapply(arr3d.list, MeanStackThresh, method = mst,
-      fail = fail, skip.consts = skip.consts)
+      fail = NA, skip.consts = skip.consts)
     brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
       filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
   } else {
@@ -254,7 +302,7 @@ Brightnesses <- function(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
     for (i in sets) {
       arrays <- lapply(arr3d.list[i], ReadImageData)
       threshed <- lapply(arrays, MeanStackThresh, method = mst,
-        fail = fail, skip.consts = skip.consts)
+        fail = NA, skip.consts = skip.consts)
       brightnesses.i <- BiocParallel::bplapply(threshed,
         Brightness, tau = tau, filt = filt, verbose = verbose,
         BPPARAM = bpp(mcc, seed = seed))

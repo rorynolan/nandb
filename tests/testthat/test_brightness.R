@@ -1,4 +1,5 @@
 test_that("Brightness works", {
+  library(magrittr)
   img <- system.file('extdata', '50.tif', package = 'nandb')
   set.seed(33)
   brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median',
@@ -11,9 +12,15 @@ test_that("Brightness works", {
                "If tau is a string, it must be 'auto'.")
   expect_error(Brightness(img, FALSE),
                "If tau is not numeric, then it must be NA or 'auto'.")
+  img <- ReadImageData(img)
+  brightness <- Brightness(img)
+  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  brightness.2ch <- Brightness(two.channel.img)
+  expect_equal(brightness.2ch, abind::abind(brightness, brightness, along = 3))
 })
 
 test_that("BrightnessTimeSeries works", {
+  library(magrittr)
   img <- system.file('extdata', '50.tif', package = 'nandb')
   set.seed(333)
   bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
@@ -24,6 +31,12 @@ test_that("BrightnessTimeSeries works", {
   expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.016)
   expect_error(BrightnessTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
+  img <- ReadImageData(img)
+  bts <- BrightnessTimeSeries(img, 10)
+  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  bts.2ch <- BrightnessTimeSeries(two.channel.img, 10)
+  expect_equal(bts.2ch,
+               abind::abind(bts, bts, along = 4) %>% aperm(c(1, 2, 4, 3)))
 })
 
 test_that("BrightnessTxtFolder works", {

@@ -96,7 +96,7 @@ KmersFromImage <- function(arr3d, monomer, tau = NA, mst = NULL,
     arr3d <- ReadImageData(arr3d)
   }
   bright <- Brightness(arr3d, tau = tau, mst = mst, skip.consts = skip.consts,
-    fail = NA, filt = filt)
+    filt = filt)
   kmers <- KmersFromBrightnesses(bright, monomer)
   attr(kmers, "mean.intensity") <- mean(arr3d)
   kmers
@@ -123,8 +123,9 @@ KmersFromImages <- function(arrs3d, monomer, tau = NA, mst = NULL,
       print(paste0("Now processing: ", arrs3d, "."))
     arrs3d <- lapply(arrs3d, ReadImageData)
   }
-  brights <- Brightnesses(arrs3d, tau = tau, mst = mst, skip.consts = skip.consts,
-                       fail = NA, filt = filt, mcc = mcc, seed = seed)
+  brights <- Brightnesses(arrs3d, tau = tau, mst = mst,
+                          skip.consts = skip.consts, filt = filt,
+                          mcc = mcc, seed = seed)
   kmerss <- lapply(brights, KmersFromBrightnesses, monomer)
   for (i in seq_along(arrs3d)) {
     attr(kmerss[[i]], "mean.intensity") <- mean(arrs3d[[i]])

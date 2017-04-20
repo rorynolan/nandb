@@ -5,10 +5,12 @@
 #' every image in a folder, writing the results as text files via
 #' [WriteImageTxt()].
 #'
-#' @param arr3d A 3-dimensional array (the image stack) where the \eqn{n}th
-#'   slice is the \eqn{n}th image in the time series. To perform this on a file
-#'   that has not yet been read in, set this argument to the path to that file
-#'   (a string).
+#' @param arr An array, can be 3- or 4-dimensional. The first two slots give the
+#'   x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+#'   the third slot gives the index of the frame. If it is 4-dimensional, the
+#'   third slot indexes the channel and the fourth indexes the frame in the
+#'   stack.. To perform this on a file that has not yet been read in, set this
+#'   argument to the path to that file (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
 #'   mean intensities (via [MeanStackThresh()])? If so, set your thresholding
 #'   \emph{method} here. Pixels failing to exceed the threshold are set to `NA`.
@@ -25,7 +27,7 @@
 #'   smooth/median filter the mean intensity image in a different way, first
 #'   calculate the mean intensities without filtering (`filt = NULL`) using this
 #'   function and then perform your desired filtering routine on the result.
-#' @param verbose If arr3d is specified as a file name, print a message to tell
+#' @param verbose If arr is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
 #'   `MeanIntensityTxtFolder`, does not work with multiple cores) and to tell
 #'   when `MeanIntensityTxtFolder` is done.
@@ -37,25 +39,46 @@
 #'
 #' @examples
 #' library(EBImage)
+#' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
 #' mean.intensity <- MeanIntensity(img, mst = 'Huang', filt = 'median')
 #' display(normalize(mean.intensity), method = 'r')
+#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+#' mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "med")
 #' @export
-MeanIntensity <- function(arr3d, mst = NULL, filt = NULL, skip.consts = FALSE,
-  fail = NA, verbose = FALSE) {
-  if (is.character(arr3d)) {
+MeanIntensity <- function(arr, mst = NULL, filt = NULL, skip.consts = FALSE,
+                          verbose = FALSE) {
+  if (is.character(arr)) {
     if (verbose)
-      message(paste0("Now processing: ", arr3d, "."))
-    arr3d <- ReadImageData(arr3d)
+      message(paste0("Now processing: ", arr, "."))
+    arr <- ReadImageData(arr)
   }
+  d <- dim(arr)
+  if (length(d) == 3) {
+    return(MeanIntensity_(arr, mst = mst, filt = filt,
+                          skip.consts = skip.consts))
+  }
+  mint.args <- list(arr3d = ListChannels(arr), mst = mst, filt = filt,
+                    skip.consts = skip.consts)
+  for (i in seq_along(mint.args)) {
+    if (is.null(mint.args[[i]])) {
+      mint.args[[i]] <- list(NULL)[rep(1, length(mint.args$arr3d))]
+    }
+  }
+  mint.args %>%
+    purrr::pmap(MeanIntensity_) %>%
+    ChannelList2Arr
+}
+
+MeanIntensity_ <- function(arr3d, mst = NULL,
+                           filt = NULL, skip.consts = FALSE) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array ",
          "or the path to an image on disk which can be read in as a 3d array.")
   if (!is.null(mst)) {
-    arr3d <- MeanStackThresh(arr3d, method = mst, fail = fail,
-      skip.consts = skip.consts)
+    arr3d <- MeanStackThresh(arr3d, method = mst, skip.consts = skip.consts)
   }
   mean.intensity <- MeanPillars(arr3d)
   if (!is.null(filt)) {
@@ -81,10 +104,10 @@ MeanIntensity <- function(arr3d, mst = NULL, filt = NULL, skip.consts = FALSE,
 #'
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
-#' @param ext the file extension of the images in the folder that you wish to
-#'   process (can be rooted in regular expression for extra-safety, as in the
-#'   default). You must wish to process all files with this extension; if there
-#'   are files that you don't want to process, take them out of the folder.
+#' @param ext The file extension of the images in the folder that you wish to
+#'   process. You must wish to process all files with this extension; if there
+#'   are files that you don't want to process, take them out of the folder. The
+#'   default is for tiff files. Do not use regular expression in this argument.
 #' @param mcc The number of parallel cores to use for the processing.
 #'
 #' @examples
@@ -96,10 +119,12 @@ MeanIntensity <- function(arr3d, mst = NULL, filt = NULL, skip.consts = FALSE,
 #'
 #' @export
 MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
-  ext = "\\.tif$", mcc = parallel::detectCores(), verbose = TRUE) {
+  ext = "tif", mcc = parallel::detectCores(), verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
+  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   mean.intensities <- MeanIntensities(file.names, MeanIntensity,
     mst = mst, verbose = verbose, mcc = mcc)

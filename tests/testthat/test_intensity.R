@@ -4,12 +4,19 @@ test_that("MeanIntensity works", {
   setwd(tempdir())
   img <- ReadImageData(system.file("extdata", "50.tif",
     package = "nandb"))
+  mean.intensity <- MeanIntensity(img)
   mean.intensity <- MeanIntensity(img, mst = "Huang",
     filt = "median")
   expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 23.571)
+  mean.intensity <- MeanIntensity(img)
+  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 21.112)
   mean.intensity <- MeanIntensity(img, mst = "Huang",
                                   filt = "smooth")
   expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 23.604)
+  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "s")
+  expect_equal(mint.2ch,
+               abind::abind(mean.intensity, mean.intensity, along = 3))
   WriteIntImage(img, "50.tif")
   WriteIntImage(img, "50again.tif")
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {

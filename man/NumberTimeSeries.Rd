@@ -4,12 +4,12 @@
 \alias{NumberTimeSeries}
 \title{Create a number time-series.}
 \usage{
-NumberTimeSeries(arr3d, frames.per.set, tau = NA, mst = NULL,
+NumberTimeSeries(arr, frames.per.set, tau = NA, mst = NULL,
   skip.consts = FALSE, filt = NULL, verbose = FALSE,
   mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
@@ -70,8 +70,11 @@ sectioning is done for calculation of numbers.
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median', mcc = 2)
-
+bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median',
+                        mcc = 2)
+library(magrittr)
+two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
+nts.2ch <- NumberTimeSeries(two.channel.img, 10)
 }
 \seealso{
 \code{\link[=Number]{Number()}}.

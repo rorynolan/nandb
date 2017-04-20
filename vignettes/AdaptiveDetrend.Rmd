@@ -149,7 +149,7 @@ GetDensityDF <- function(mat, detrend) {
   d <- density(mat[!is.na(mat)], range.x = c(0, 5), gridsize = 2^16)
   tibble(detrend = detrend, brightness = d$x, frequency = d$y)
 }
-brightnesses <- lapply(c(NA, 10, tau, tau.again), Brightness, arr3d = eg.img,
+brightnesses <- lapply(c(NA, 10, tau, tau.again), Brightness, arr = eg.img,
                        mst = "tri")
 plot.df <- mapply(GetDensityDF, brightnesses, 
                   c("no detrend", "tau = 10", paste0("tau = ", round(tau)),
@@ -161,7 +161,7 @@ ggplot(plot.df, aes(brightness, frequency, colour = detrend)) +
 ```
 It seems that the brightnesses without detrend and those with detrends of $\tau = `r round(tau)`$ and $\tau = `r round(tau.again)`$ roughly overlap, but the detrend of `tau = 10` has a significant shift.^[Recall that our calculations above show that a detrend with $\tau = 10$ is incorrect.] ^[The closeness of the \emph{correct} detrends to having no detrend at all is due to the fact that there's almost no bleaching in these 50 frames. Try this on more (e.g. 500) with a high laser power and you'll see that then the detrended series is significantly different.] The point is now well-made that by choosing $\tau = 10$ we would have been way off, but using our procedure one can get a sensibly obtained value for tau and, although there is some uncertainty in its value to the randomness involved in simulating the images, this uncertainty is negligible.^[If one wanted to be extra-careful, one could run the procedure for estimating tau several times to get an idea of its distribution and then carry on taking into account the thus quantifiable uncertainty in $\tau$.]
 
-Finally, just in case you don't believe me that "the brightnesses without detrend and those with detrends of $\tau = `r round(tau)`$ and tau = `r round(tau.again)` roughly overlap, but the detrend of `tau = 10` has a significant shift," I'll \emph{prove} it to you by checking their values at 1.5. 
+Finally, just in case you don't believe me that "the brightnesses without detrend and those with detrends of $\tau = `r round(tau)`$ and tau = `r round(tau.again)` roughly overlap, but the detrend of `tau = 10` has a significant shift," I'll *prove* it to you by checking their values at 1.5. 
 ```{r PS}
 Closest(1.5, plot.df$brightness) %>% {filter(plot.df, brightness == .)}
 ```

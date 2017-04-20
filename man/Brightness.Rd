@@ -6,22 +6,24 @@
 \alias{Brightnesses}
 \title{Calculate brightness from image series.}
 \usage{
-Brightness(arr3d, tau = NA, mst = NULL, skip.consts = FALSE, fail = NA,
-  filt = NULL, verbose = FALSE)
+Brightness(arr, tau = NA, mst = NULL, skip.consts = FALSE, filt = NULL,
+  verbose = FALSE)
 
 BrightnessTxtFolder(folder.path = ".", tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, ext = "\\\\.tif$",
+  skip.consts = FALSE, filt = NULL, ext = "tif",
   mcc = parallel::detectCores(), verbose = FALSE, seed = NULL)
 
 Brightnesses(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores(), seed = NULL)
+  filt = NULL, verbose = FALSE, mcc = parallel::detectCores(),
+  seed = NULL)
 }
 \arguments{
-\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series. To perform this on a file
-that has not yet been read in, set this argument to the path to that file
-(a string).}
+\item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
+x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+the third slot gives the index of the frame. If it is 4-dimensional, the
+third slot indexes the channel and the fourth indexes the frame in the
+stack. To perform this on a file that has not yet been read in, set this
+argument to the path to that file (a string).}
 
 \item{tau}{If this is specified, bleaching correction is performed with
 \code{\link[=CorrectForBleaching]{CorrectForBleaching()}} which uses exponential filtering with
@@ -36,10 +38,8 @@ thresholding \emph{method} here.}
 \item{skip.consts}{An image array with only one value (a 'constant array')
 won't threshold properly. By default the function would give an error, but
 by setting this parameter to \code{TRUE}, the array would instead be
-skipped (the function will return the original array) and give a warning.}
-
-\item{fail}{If thresholding is done, to which value should pixels not
-exceeeding the threshold be set?}
+skipped (the thresholding will return the original array) and give a
+warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
@@ -57,11 +57,10 @@ the user that that file is now being processed (useful for
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
 
-\item{ext}{the file extension of the images in the folder that you wish to
-process (can be rooted in regular expression for extra-safety, as in the
-default). You must wish to process all files with this extension; if there
+\item{ext}{The file extension of the images in the folder that you wish to
+process. You must wish to process all files with this extension; if there
 are files that you don't want to process, take them out of the folder. The
-default is for tiff files.}
+default is for tiff files. Do not use regular expression in this argument.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
@@ -94,10 +93,13 @@ anything run using the \code{rJava} package won't)). Always use
 the thresholding in series and does the rest in parallel).
 }
 \examples{
+library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
 brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
 MatrixRasterPlot(brightness, log.trans = TRUE)
+two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
+brightness.2ch <- Brightness(two.channel.img)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')

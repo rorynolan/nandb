@@ -6,20 +6,22 @@
 \alias{MeanIntensities}
 \title{Calculate mean intensity from image series.}
 \usage{
-MeanIntensity(arr3d, mst = NULL, filt = NULL, skip.consts = FALSE,
-  fail = NA, verbose = FALSE)
+MeanIntensity(arr, mst = NULL, filt = NULL, skip.consts = FALSE,
+  verbose = FALSE)
 
-MeanIntensityTxtFolder(folder.path = ".", mst = NULL, ext = "\\\\.tif$",
+MeanIntensityTxtFolder(folder.path = ".", mst = NULL, ext = "tif",
   mcc = parallel::detectCores(), verbose = TRUE)
 
 MeanIntensities(arr3d.list, mst = NULL, skip.consts = FALSE, fail = NA,
   filt = NULL, verbose = FALSE, mcc = parallel::detectCores())
 }
 \arguments{
-\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series. To perform this on a file
-that has not yet been read in, set this argument to the path to that file
-(a string).}
+\item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
+x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+the third slot gives the index of the frame. If it is 4-dimensional, the
+third slot indexes the channel and the fourth indexes the frame in the
+stack.. To perform this on a file that has not yet been read in, set this
+argument to the path to that file (a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
 mean intensities (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
@@ -37,10 +39,7 @@ won't threshold properly. By default the function would give an error, but
 by setting this parameter to \code{TRUE}, the array would instead be skipped
 (the function will return the original array) and give a warning.}
 
-\item{fail}{If thresholding is done, to which value should pixels not
-exceeeding the threshold be set?}
-
-\item{verbose}{If arr3d is specified as a file name, print a message to tell
+\item{verbose}{If arr is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
 \code{MeanIntensityTxtFolder}, does not work with multiple cores) and to tell
 when \code{MeanIntensityTxtFolder} is done.}
@@ -48,16 +47,19 @@ when \code{MeanIntensityTxtFolder} is done.}
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
 
-\item{ext}{the file extension of the images in the folder that you wish to
-process (can be rooted in regular expression for extra-safety, as in the
-default). You must wish to process all files with this extension; if there
-are files that you don't want to process, take them out of the folder.}
+\item{ext}{The file extension of the images in the folder that you wish to
+process. You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder. The
+default is for tiff files. Do not use regular expression in this argument.}
 
 \item{mcc}{The number of parallel cores to use for the processing.}
 
 \item{arr3d.list}{A list of 3-dimensional arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these
 files (a character vector).}
+
+\item{fail}{If thresholding is done, to which value should pixels not
+exceeeding the threshold be set?}
 }
 \value{
 \code{MeanIntensity} returns a matrix, the mean-intensity image.
@@ -73,10 +75,13 @@ every image in a folder, writing the results as text files via
 }
 \examples{
 library(EBImage)
+library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
 mean.intensity <- MeanIntensity(img, mst = 'Huang', filt = 'median')
 display(normalize(mean.intensity), method = 'r')
+two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
+mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "med")
 setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')

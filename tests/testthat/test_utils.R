@@ -130,3 +130,21 @@ test_that("BrightnessVec works", {
   expect_equal(nandb:::BrightnessVec(rep(0, 10)), 0)
 })
 
+test_that("ListChannels errors correctly", {
+  library(magrittr)
+  bad <- array(seq_len(2^3), dim = rep(2, 3)) %>%
+    abind::abind(., ., ., ., ., along = 4) %>%
+    aperm(c(1, 2, 4, 3))
+  expect_error(nandb:::ListChannels(bad), "at most 4")
+})
+
+test_that("ChannelList2Arr errors correctly", {
+  library(magrittr)
+  expect_error(nandb:::ChannelList2Arr(list(matrix(1:4, nrow = 2),
+                                            matrix(1:6, nrow = 2))),
+               "dimensions.*same")
+  expect_error(nandb:::ChannelList2Arr(list(array(seq_len(2^5),
+                                                  dim = rep(2, 5)))[c(1, 1)]),
+               "dimensional")
+
+})

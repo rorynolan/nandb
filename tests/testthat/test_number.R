@@ -11,19 +11,35 @@ test_that("Number works", {
                "If tau is a string, it must be 'auto'.")
   expect_error(Number(img, FALSE),
                "If tau is not numeric, then it must be NA or 'auto'.")
+  library(magrittr)
+  img <- ReadImageData(img)
+  number <- Number(img)
+  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  number.2ch <- Number(two.channel.img)
+  expect_equal(number.2ch, abind::abind(number, number, along = 3))
 })
 
 test_that("NumberTimeSeries works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   set.seed(333)
-  bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri',
-                              filt = 'median', mcc = 2, verbose = TRUE)
-  expect_equal(round(mean(bts, na.rm = TRUE), 3), 23.545)
-  bts <- NumberTimeSeries(img, 30, tau = 'auto', mst = 'tri',
-                              filt = 'median', mcc = 2, verbose = TRUE)
-  expect_equal(round(mean(bts, na.rm = TRUE), 3), 21.043)
+  nts <- NumberTimeSeries(img, 30, tau = 'auto', mst = 'tri', filt = 'median',
+                          mcc = 2, verbose = TRUE, seed = 4)
+  expect_equal(round(mean(nts, na.rm = TRUE), 3), 21.099)
+  nts <- NumberTimeSeries(img, 10, tau = 100, mst = 'tri',
+                          filt = 'median', mcc = 2, verbose = TRUE, seed = 4)
+  expect_equal(round(mean(nts, na.rm = TRUE), 3), 23.594)
   expect_error(NumberTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
+  library(magrittr)
+  img <- ReadImageData(img)
+  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  nts.2ch <- NumberTimeSeries(two.channel.img, 10, tau = 100, mst = 'tri',
+                              filt = 'median', mcc = 2, verbose = TRUE,
+                              seed = 4)
+  expect_equal(nts.2ch,
+               abind::abind(nts, nts, along = 4) %>% aperm(c(1, 2, 4, 3)))
+  nts.2ch <- NumberTimeSeries(two.channel.img, 10)
+  expect_equal(round(mean(nts.2ch, na.rm = TRUE), 3), 27.382)
 })
 
 test_that("NumberTxtFolder works", {

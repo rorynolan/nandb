@@ -9,6 +9,10 @@ test_that("CorrectForBleaching works", {
                "If tau is a string, it must be 'auto'.")
   expect_error(CorrectForBleaching(img, FALSE),
                "If tau is not numeric, then it must be NA or 'auto'.")
+  library(magrittr)
+  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  twoch <- CorrectForBleaching(two.channel.img, 100)
+  expect_equal(mean(twoch), mean(CorrectForBleaching(img, 100)))
 })
 
 test_that("CorrectForBleachingFolder works", {

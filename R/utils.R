@@ -538,5 +538,25 @@ bpp <- function(mcc, seed = NULL) {
 ListChannels <- function(arr4d) {
   d <- dim(arr4d)
   stopifnot(length(d) == 4)
+  if (d[3] > 4) {
+    stop("You have input an image with ", d[3], "channels. ",
+         "This function can deal with images of at most 4 channels.")
+  }
   purrr::map(seq_len(d[3]), ~ arr4d[, , ., ])
+}
+
+ChannelList2Arr <- function(chnl.lst) {
+  stopifnot(is.list(chnl.lst))
+  dims <- purrr::map(chnl.lst, dim)
+  if (!filesstrings::AllEqual(dims)) {
+    stop("The dimensions of the elements of chnl.lst must all be the same.")
+  }
+  if (length(dims[[1]]) == 2) {
+    purrr::reduce(chnl.lst, ~ abind::abind(.x, .y, along = 3))
+  } else if (length(dims[[1]]) == 3) {
+    purrr::reduce(chnl.lst, ~ abind::abind(.x, .y, along = 4)) %>%
+      aperm(c(1, 2, 4, 3))
+  } else {
+    stop("The elements of chnl.lst must be 2- or 3-dimensional.")
+  }
 }

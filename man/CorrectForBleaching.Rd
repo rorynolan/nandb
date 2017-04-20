@@ -5,17 +5,18 @@
 \alias{CorrectForBleachingFolder}
 \title{Detrend an image series}
 \usage{
-CorrectForBleaching(mat3d, tau)
+CorrectForBleaching(arr, tau)
 
 CorrectForBleachingFolder(folder.path = ".", tau = NA, mst = NULL,
-  ext = "\\\\.tif$", na = "error", mcc = parallel::detectCores(),
-  seed = NULL)
+  ext = "tif", na = "error", mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{mat3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
-slice is the \eqn{n}th image in the time series. To perform this on a file
-that has not yet been read in, set this argument to the path to that file
-(a string).}
+\item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
+x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+the third slot gives the index of the frame. If it is 4-dimensional, the
+third slot indexes the channel and the fourth indexes the frame in the
+stack.. To perform this on a file that has not yet been read in, set this
+argument to the path to that file (a string).}
 
 \item{tau}{The time constant for the exponential filtering. If this is set to
 \code{'auto'}, then the value of \code{tau} is calculated automatically via
@@ -28,11 +29,10 @@ process.}
 for bleaching (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
 \emph{method} here.}
 
-\item{ext}{the file extension of the images in the folder that you wish to
-process (can be rooted in regular expression for extra-safety, as in the
-default). You must wish to process all files with this extension; if there
+\item{ext}{The file extension of the images in the folder that you wish to
+process. You must wish to process all files with this extension; if there
 are files that you don't want to process, take them out of the folder. The
-default is for tiff files.}
+default is for tiff files. Do not use regular expression in this argument.}
 
 \item{na}{How do you want to treat \code{NA} values? R can only write integer
 values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'} sets them to
@@ -59,10 +59,12 @@ If you wish to apply thresholding and bleaching correction, aplpluy the
 thresholding first. \code{CorrectforBleachingFolder} takes care of this for you.
 }
 \examples{
+library(magrittr)
 img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 tau10 <- CorrectForBleaching(img, 10)
 autotau <- CorrectForBleaching(img, "auto")
-
+two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
+twoch <- CorrectForBleaching(two.channel.img, 100)
 setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')

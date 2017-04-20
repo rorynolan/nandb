@@ -37,3 +37,7 @@ test_that("MedReflectExtend works", {
   expect_equal(nandb:::MedReflectExtend(8), 8)
   expect_equal(nandb:::ReflectIndexMed(1, 0, ""), NA_real_)
 })
+
+test_that("Smooth works", {
+  expect_equal(Smooth(3), 3)
+})

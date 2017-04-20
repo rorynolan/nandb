@@ -6,11 +6,11 @@
 \alias{Numbers}
 \title{Calculate number from image series.}
 \usage{
-Number(arr3d, tau = NA, mst = NULL, skip.consts = FALSE, fail = NA,
-  filt = NULL, verbose = FALSE)
+Number(arr, tau = NA, mst = NULL, skip.consts = FALSE, filt = NULL,
+  verbose = FALSE)
 
 NumberTxtFolder(folder.path = ".", tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, ext = "\\\\.tif$",
+  skip.consts = FALSE, filt = NULL, ext = "tif",
   mcc = parallel::detectCores(), seed = NULL, verbose = FALSE)
 
 Numbers(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
@@ -18,7 +18,7 @@ Numbers(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
   mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
-\item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
+\item{arr}{A 3-dimensional array (the image stack) where the \eqn{n}th
 slice is the \eqn{n}th image in the time series. To perform this on a file
 that has not yet been read in, set this argument to the path to that file
 (a string).}
@@ -38,9 +38,6 @@ won't threshold properly. By default the function would give an error, but
 by setting this parameter to \code{TRUE}, the array would instead be
 skipped (the function will return the original array) and give a warning.}
 
-\item{fail}{If thresholding is done, to which value should pixels not
-exceeeding the threshold be set?}
-
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the number image using
 \code{\link[=SmoothFilterB]{SmoothFilterB()}} or \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If
@@ -57,10 +54,10 @@ the user that that file is now being processed (useful for
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
 
-\item{ext}{the file extension of the images in the folder that you wish to
-process (can be rooted in regular expression for extra-safety, as in the
-default). You must wish to process all files with this extension; if there
-are files that you don't want to process, take them out of the folder.}
+\item{ext}{The file extension of the images in the folder that you wish to
+process. You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder. The
+default is for tiff files. Do not use regular expression in this argument.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
@@ -70,6 +67,9 @@ are files that you don't want to process, take them out of the folder.}
 \item{arr3d.list}{A list of 3-dimensional arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these
 files (a character vector).}
+
+\item{fail}{If thresholding is done, to which value should pixels not
+exceeeding the threshold be set?}
 }
 \value{
 \code{Number} returns a matrix, the number image; \code{Numbers}
@@ -97,6 +97,9 @@ img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
 number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median')
 MatrixRasterPlot(number, scale.name = "number")
+library(magrittr)
+two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
+number.2ch <- Number(two.channel.img)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')

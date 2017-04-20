@@ -8,10 +8,12 @@
 #' If you wish to apply thresholding and bleaching correction, aplpluy the
 #' thresholding first. `CorrectforBleachingFolder` takes care of this for you.
 #'
-#' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
-#'   slice is the \eqn{n}th image in the time series. To perform this on a file
-#'   that has not yet been read in, set this argument to the path to that file
-#'   (a string).
+#' @param arr An array, can be 3- or 4-dimensional. The first two slots give the
+#'   x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
+#'   the third slot gives the index of the frame. If it is 4-dimensional, the
+#'   third slot indexes the channel and the fourth indexes the frame in the
+#'   stack.. To perform this on a file that has not yet been read in, set this
+#'   argument to the path to that file (a string).
 #' @param tau The time constant for the exponential filtering. If this is set to
 #'   `'auto'`, then the value of `tau` is calculated automatically via
 #'   [BestTau()].
@@ -27,23 +29,35 @@
 #' @return `CorrectForBleaching` returns the detrended image series.
 #'
 #' @examples
+#' library(magrittr)
 #' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' tau10 <- CorrectForBleaching(img, 10)
 #' autotau <- CorrectForBleaching(img, "auto")
-#'
+#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+#' twoch <- CorrectForBleaching(two.channel.img, 100)
 #' @export
-CorrectForBleaching <- function(mat3d, tau) {
-  d <- dim(mat3d)
-  if (length(d) != 3) stop("mat3d must be a three-dimensional array")
+CorrectForBleaching <- function(arr, tau) {
+  if (is.character(arr)) arr <- ReadImageData(arr)
+  d <- dim(arr)
+  if (length(d) == 3) {
+    return(CorrectForBleaching_(arr, tau))
+  }
+  ListChannels(arr) %>%
+    purrr::map2(tau, ~ CorrectForBleaching_(.x, .y)) %>%
+    ChannelList2Arr
+}
+CorrectForBleaching_ <- function(arr3d, tau) {
+  d <- dim(arr3d)
+  if (length(d) != 3) stop("arr3d must be a three-dimensional array")
   auto.tau <- FALSE
   if (is.na(tau)) {
-    attr(mat3d, "tau") <- NA
-    return(mat3d)  # option to do nothing
+    attr(arr3d, "tau") <- NA
+    return(arr3d)  # option to do nothing
   }
   if (is.character(tau)) {
     tau <- tolower(tau)
     if (startsWith("auto", tau)) {
-      tau <- BestTau(mat3d)
+      tau <- BestTau(arr3d)
       auto.tau <- TRUE
     } else {
       stop("If tau is a string, it must be 'auto'.")
@@ -52,11 +66,11 @@ CorrectForBleaching <- function(mat3d, tau) {
     stop("If tau is not numeric, then it must be NA or 'auto'.")
   }
   if (is.na(tau)) {
-    corrected <- mat3d
+    corrected <- arr3d
   } else {
-    smoothed <- ExpSmoothPillars(mat3d, tau)
-    filtered <- mat3d - smoothed
-    means <- MeanPillars(mat3d)
+    smoothed <- ExpSmoothPillars(arr3d, tau)
+    filtered <- arr3d - smoothed
+    means <- MeanPillars(arr3d)
     corrected <- filtered + as.vector(means)
     # as it so happens, this will add the means to the pillars as we desire
     corrected[corrected < 0] <- 0
@@ -73,11 +87,10 @@ CorrectForBleaching <- function(mat3d, tau) {
 #' @param mst Do you want to apply an intensity threshold prior to correcting
 #'   for bleaching (via [MeanStackThresh()])? If so, set your thresholding
 #'   \emph{method} here.
-#' @param ext the file extension of the images in the folder that you wish to
-#'   process (can be rooted in regular expression for extra-safety, as in the
-#'   default). You must wish to process all files with this extension; if there
+#' @param ext The file extension of the images in the folder that you wish to
+#'   process. You must wish to process all files with this extension; if there
 #'   are files that you don't want to process, take them out of the folder. The
-#'   default is for tiff files.
+#'   default is for tiff files. Do not use regular expression in this argument.
 #' @param na How do you want to treat `NA` values? R can only write integer
 #'   values (and hence not `NA`s) to tiff pixels. `na = 'saturate'` sets them to
 #'   saturated value. `na = 'zero'` sets them to zero, while `na = 'error'` will
@@ -100,12 +113,14 @@ CorrectForBleaching <- function(mat3d, tau) {
 #'
 #' @export
 CorrectForBleachingFolder <- function(folder.path = ".", tau = NA, mst = NULL,
-                                      ext = "\\.tif$", na = "error",
+                                      ext = "tif", na = "error",
                                       mcc = parallel::detectCores(),
                                       seed = NULL) {
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(folder.path)
+  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  ext <- ore::ore_escape(ext) %>% paste0("$")
   file.paths <- list.files(pattern = ext)
   BiocParallel::bplapply(file.paths, CorrectForBleachingFile,
                          tau = tau, mst = mst, na = na,
@@ -131,7 +146,7 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
 #' exponential filtering detrend. See \code{vignette('Adaptive Detrending',
 #' package = 'nandb')} for more details.
 #'
-#' @param mat3d A 3-dimensional array (the image stack) where the \eqn{n}th
+#' @param arr3d A 3-dimensional array (the image stack) where the \eqn{n}th
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
@@ -153,19 +168,19 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
 #' BestTau(img, mst = 'tri', tol = 3)
 #'
 #' @export
-BestTau <- function(mat3d, mst = NULL, tol = 1) {
-  if (is.character(mat3d)) {
-    mat3d <- ReadImageData(mat3d[1])
+BestTau <- function(arr3d, mst = NULL, tol = 1) {
+  if (is.character(arr3d)) {
+    arr3d <- ReadImageData(arr3d[1])
   }
   if (!is.null(mst))
-    mat3d <- MeanStackThresh(mat3d, mst, fail = NA)
-  raw.brightness.mean <- Brightness(mat3d) %>% mean(na.rm = TRUE)
+    arr3d <- MeanStackThresh(arr3d, mst, fail = NA)
+  raw.brightness.mean <- Brightness(arr3d) %>% mean(na.rm = TRUE)
   if (raw.brightness.mean < 1) {
     stop("Your raw brightness mean is below 1,",
          "there's probably something wrong with your acquisition.")
   }
-  means <- apply(mat3d, 3, mean, na.rm = TRUE)
-  p <- sum(!is.na(mat3d[, , 1]))
+  means <- apply(arr3d, 3, mean, na.rm = TRUE)
+  p <- sum(!is.na(arr3d[, , 1]))
   sim.img.arr <- vapply(means, stats::rpois, numeric(p), n = p)
   BrightnessMeanSimMatTau <- function(sim.img.arr, tau) {
     if (is.na(tau)) {
