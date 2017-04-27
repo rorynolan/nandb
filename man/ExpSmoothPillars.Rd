@@ -7,7 +7,7 @@
 \usage{
 ExpSmoothPillars(mat3d, tau)
 
-ExpSmoothRows(mat, tau)
+ExpSmoothRows(mat, tau, extended = FALSE)
 }
 \arguments{
 \item{mat3d}{A 3-dimensional array.}
@@ -15,6 +15,11 @@ ExpSmoothRows(mat, tau)
 \item{tau}{The time scale for the exponential smoothing (see Stroud 1999).}
 
 \item{mat}{A matrix.}
+
+\item{extended}{Logical. Has the series (\code{obs}) already been extended via
+via \code{nandb:::MedReflectExtend()}? If not, \code{ExpSmooth} will do this
+prior to smoothing as an edge-correction technique. You will probably
+never set this to \code{TRUE}, but \code{\link[=BestTau]{BestTau()}} needs this feature.}
 }
 \value{
 For \code{ExpSmoothPillars}, a 3-dimensional array where each

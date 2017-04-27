@@ -2,11 +2,16 @@
 % Please edit documentation in R/brightness.R
 \name{BrightnessTimeSeries}
 \alias{BrightnessTimeSeries}
+\alias{BrightnessTimeSeriesTxtFolder}
 \title{Create a Brightness time-series.}
 \usage{
 BrightnessTimeSeries(arr, frames.per.set, tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores(), seed = NULL)
+  filt = NULL, n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(),
+  seed = NULL)
+
+BrightnessTimeSeriesTxtFolder(folder.path = ".", frames.per.set,
+  ext = "tif", tau = NA, mst = NULL, filt = NULL, n.ch = 1,
+  verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
 \item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
@@ -26,14 +31,8 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
+brightness (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
 thresholding \emph{method} here.}
-
-\item{skip.consts}{An image array with only one value (a 'constant array')
-won't threshold properly. By default the function would give an error, but
-by setting this parameter to \code{TRUE}, the array would instead be
-skipped (the thresholding will return the original array) and give a
-warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
@@ -44,6 +43,8 @@ brightness image in a different way, first calculate the brightnesses
 without filtering (\code{filt = NULL}) using this function and then perform
 your desired filtering routine on the result.}
 
+\item{n.ch}{The number of channels in the image (default 1).}
+
 \item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
 \code{BrightnessTxtFolder}, does not work with multiple cores).}
@@ -52,6 +53,13 @@ the user that that file is now being processed (useful for
 
 \item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
 \link{set.seed}, it won't work.}
+
+\item{folder.path}{The path to the folder to process (defaults to current location).}
+
+\item{ext}{The file extension of the images in the folder that you wish to
+process. You must wish to process all files with this extension; if there
+are files that you don't want to process, take them out of the folder. The
+default is for tiff files. Do not use regular expression in this argument.}
 }
 \value{
 An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
@@ -65,9 +73,9 @@ performed via \code{\link[=CorrectForBleaching]{CorrectForBleaching()}}.
 }
 \details{
 This may discard some images, for example if 175 frames are in the input and
-\code{frames.per.set = 50}, then the last 25 are discarded. If bleaching
-correction is selected, it is performed on the whole image stack before the
-sectioning is done for calculation of brightnesses.
+\code{frames.per.set = 50}, then the last 25 are discarded. If bleaching or/and
+thresholding are selected, they are performed on the whole image stack before
+the sectioning is done for calculation of brightnesses.
 }
 \examples{
 library(magrittr)
@@ -77,6 +85,13 @@ bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
 filt = 'median', mcc = 2)
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
 bts.2ch <- BrightnessTimeSeries(two.channel.img, 10)
+setwd(tempdir())
+WriteIntImage(img, '50.tif')
+WriteIntImage(img, '50again.tif')
+BrightnessTimeSeriesTxtFolder(tau = 333, mst = 'tri', mcc = 2,
+                              frames.per.set = 20)
+list.files()
+file.remove(list.files())  # cleanup
 }
 \seealso{
 \code{\link[=Brightness]{Brightness()}}.

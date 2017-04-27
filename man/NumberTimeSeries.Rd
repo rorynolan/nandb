@@ -4,9 +4,8 @@
 \alias{NumberTimeSeries}
 \title{Create a number time-series.}
 \usage{
-NumberTimeSeries(arr, frames.per.set, tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, verbose = FALSE,
-  mcc = parallel::detectCores(), seed = NULL)
+NumberTimeSeries(arr, frames.per.set, tau = NA, mst = NULL, filt = NULL,
+  n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
 \item{arr}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -24,13 +23,8 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-number (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
+number (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your thresholding
 \emph{method} here.}
-
-\item{skip.consts}{An image array with only one value (a 'constant array')
-won't threshold properly. By default the function would give an error, but
-by setting this parameter to \code{TRUE}, the array would instead be
-skipped (the function will return the original array) and give a warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the number image using
@@ -40,6 +34,8 @@ option \code{na_count = TRUE}. If you want to smooth/median filter the
 number image in a different way, first calculate the numbers without
 filtering (\code{filt = NULL}) using this function and then perform your
 desired filtering routine on the result.}
+
+\item{n.ch}{The number of channels in the image (default 1).}
 
 \item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for

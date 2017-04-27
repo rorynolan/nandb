@@ -98,13 +98,17 @@ MedReflectExtend <- function(vec, preserve_mean = FALSE, smooth = FALSE) {
 #'
 #' @param obs A numeric vector of observations (in order).
 #' @param tau The time scale for the exponential smoothing (see Stroud 1999).
+#' @param extended Logical. Has the series (`obs`) already been extended via
+#'   via `nandb:::MedReflectExtend()`? If not, \code{ExpSmooth} will do this
+#'   prior to smoothing as an edge-correction technique. You will probably
+#'   never set this to \code{TRUE}, but [BestTau()] needs this feature.
 #'
 #' @return The smoothed series, a numeric vector of the same length.
 #' @examples
 #' ExpSmooth(1:10, 1)
 #' @export
-ExpSmooth <- function(obs, tau) {
-    .Call('nandb_ExpSmooth', PACKAGE = 'nandb', obs, tau)
+ExpSmooth <- function(obs, tau, extended = FALSE) {
+    .Call('nandb_ExpSmooth', PACKAGE = 'nandb', obs, tau, extended)
 }
 
 #' Exponentially smooth pillars of a 3-dimensional array
@@ -115,7 +119,6 @@ ExpSmooth <- function(obs, tau) {
 #' \link{ExpSmooth} on each row of a matrix.
 #'
 #' @param mat3d A 3-dimensional array.
-#' @param mat A matrix.
 #' @param tau The time scale for the exponential smoothing (see Stroud 1999).
 #'
 #' @return For \code{ExpSmoothPillars}, a 3-dimensional array where each
@@ -131,9 +134,14 @@ ExpSmoothPillars <- function(mat3d, tau) {
 }
 
 #' @rdname ExpSmoothPillars
+#' @param mat A matrix.
+#' @param extended Logical. Has the series (`obs`) already been extended via
+#'   via `nandb:::MedReflectExtend()`? If not, \code{ExpSmooth} will do this
+#'   prior to smoothing as an edge-correction technique. You will probably
+#'   never set this to \code{TRUE}, but [BestTau()] needs this feature.
 #' @export
-ExpSmoothRows <- function(mat, tau) {
-    .Call('nandb_ExpSmoothRows', PACKAGE = 'nandb', mat, tau)
+ExpSmoothRows <- function(mat, tau, extended = FALSE) {
+    .Call('nandb_ExpSmoothRows', PACKAGE = 'nandb', mat, tau, extended)
 }
 
 WhichIntervalC <- function(numbers, ranges) {

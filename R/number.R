@@ -17,18 +17,15 @@
 #'   slice is the \eqn{n}th image in the time series. To perform this on a file
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
+#' @param n.ch The number of channels in the image (default 1).
 #' @param tau If this is specified, bleaching correction is performed with
 #'   [CorrectForBleaching()] which uses exponential filtering with
 #'   time constant `tau` (where the unit of time is the time between
 #'   frames). If this is set to `'auto'`, then the value of `tau` is
 #'   calculated automatically via [BestTau()].
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   number (via [MeanStackThresh()])? If so, set your thresholding
+#'   number (via [autothresholdr::MeanStackThresh()])? If so, set your thresholding
 #'   \emph{method} here.
-#' @param skip.consts An image array with only one value (a 'constant array')
-#'   won't threshold properly. By default the function would give an error, but
-#'   by setting this parameter to `TRUE`, the array would instead be
-#'   skipped (the function will return the original array) and give a warning.
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeeding the threshold be set?
 #' @param filt Do you want to smooth (`filt = 'smooth'`) or median
@@ -57,20 +54,35 @@
 #' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
 #' number.2ch <- Number(two.channel.img)
 #' @export
-Number <- function(arr, tau = NA, mst = NULL, skip.consts = FALSE,
-                       filt = NULL, verbose = FALSE) {
+Number <- function(arr, tau = NA, mst = NULL,
+                   filt = NULL, n.ch = 1, verbose = FALSE) {
   if (is.character(arr)) {
     if (verbose)
       message(paste0("Now processing: ", arr, "."))
     arr <- ReadImageData(arr)
   }
   d <- dim(arr)
+  if (n.ch > 1) {
+    ld <- length(d)
+    if (! ld %in% c(3, 4)) {
+      stop("There is a problem with your image. It was read in as a ", ld,
+           "-dimensional image. If read in as 4-dimensional, it is left alone, ",
+           "or if read in as 3-dimensional, it is coerced to 4-dimansional ",
+           "via nandb::ForceChannels", "but for ", ld, "-dimensional image, ",
+           "there's nothing to be done.")
+    }
+    if (ld == 3) arr <- ForceChannels(arr, n.ch)
+    d <- dim(arr)
+    if (d[3] != n.ch) {
+      stop ("The image does not have ", n.ch, " channels, as you expect. ",
+            "Instead it has ", d[3], ".")
+    }
+  }
   if (length(d) == 3) {
-    return(Number_(arr, tau = tau, mst = mst,
-                       skip.consts = skip.consts, filt = filt))
+    return(Number_(arr, tau = tau, mst = mst, filt = filt))
   }
   number.args <- list(arr3d = ListChannels(arr), tau = tau, mst = mst,
-                      skip.consts = skip.consts, filt = filt)
+                      filt = filt)
   for (i in seq_along(number.args)) {
     if (is.null(number.args[[i]])) {
       number.args[[i]] <- list(NULL)[rep(1, length(number.args$arr3d))]
@@ -81,14 +93,13 @@ Number <- function(arr, tau = NA, mst = NULL, skip.consts = FALSE,
     ChannelList2Arr
 }
 
-Number_ <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
+Number_ <- function(arr3d, tau = NA, mst = NULL,
   fail = NA, filt = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
   if (!is.null(mst)) {
-    arr3d <- MeanStackThresh(arr3d, method = mst, fail = fail,
-      skip.consts = skip.consts)
+    arr3d <- autothresholdr::MeanStackThresh(arr3d, method = mst, fail = fail)
   }
   tau.auto <- FALSE
   if (!is.na(tau)) {
@@ -143,6 +154,7 @@ Number_ <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #' @inheritParams Number
 #' @param frames.per.set The number of frames with which to calculate the
 #'   successive numbers.
+#' @param n.ch The number of channels in the image (default 1).
 #' @param mcc The number of cores to use for the parallel processing.
 #' @param seed A seed for the random number generation for [BestTau]. Don't use
 #'   [set.seed], it won't work.
@@ -161,24 +173,38 @@ Number_ <- function(arr3d, tau = NA, mst = NULL, skip.consts = FALSE,
 #' nts.2ch <- NumberTimeSeries(two.channel.img, 10)
 #' @export
 NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
-                                 mst = NULL, skip.consts = FALSE, filt = NULL,
-                                 verbose = FALSE,
-                                 mcc = parallel::detectCores(), seed = NULL) {
+                             mst = NULL, filt = NULL,
+                             n.ch = 1, verbose = FALSE,
+                             mcc = parallel::detectCores(), seed = NULL) {
   if (is.character(arr)) {
     if (verbose)
       message(paste0("Now processing: ", arr, "."))
     arr <- ReadImageData(arr)
   }
   d <- dim(arr)
+  if (n.ch > 1) {
+    ld <- length(d)
+    if (! ld %in% c(3, 4)) {
+      stop("There is a problem with your image. It was read in as a ", ld,
+           "-dimensional image. If read in as 4-dimensional, it is left alone, ",
+           "or if read in as 3-dimensional, it is coerced to 4-dimansional ",
+           "via nandb::ForceChannels", "but for ", ld, "-dimensional image, ",
+           "there's nothing to be done.")
+    }
+    if (ld == 3) arr <- ForceChannels(arr, n.ch)
+    d <- dim(arr)
+    if (d[3] != n.ch) {
+      stop ("The image does not have ", n.ch, " channels, as you expect. ",
+            "Instead it has ", d[3], ".")
+    }
+  }
   if (length(d) == 3) {
     return(NumberTimeSeries_(arr, frames.per.set = frames.per.set,
                                  tau = tau, mst = mst,
-                                 skip.consts = skip.consts, filt = filt,
-                                 mcc = mcc, seed = seed))
+                                 filt = filt, mcc = mcc, seed = seed))
   }
   nts.args <- list(arr3d = ListChannels(arr), frames.per.set = frames.per.set,
-                   tau = tau, mst = mst, skip.consts = skip.consts, filt = filt,
-                   mcc = mcc, seed = seed)
+                   tau = tau, mst = mst, filt = filt, mcc = mcc, seed = seed)
   for (i in seq_along(nts.args)) {
     if (is.null(nts.args[[i]])) {
       nts.args[[i]] <- list(NULL)[rep(1, length(nts.args$arr3d))]
@@ -190,8 +216,8 @@ NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
 }
 
 NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
-  mst = NULL, skip.consts = FALSE, filt = NULL,
-  mcc = parallel::detectCores(), seed = NULL) {
+                              mst = NULL, filt = NULL,
+                              mcc = parallel::detectCores(), seed = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
@@ -205,8 +231,8 @@ NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
     ((x - 1) * frames.per.set + 1):(x * frames.per.set)
   })
   sets <- lapply(set.indices, Slices, arr3d)
-  numbers <- Numbers(sets, tau = NA, mst = NULL, skip.consts = skip.consts,
-    filt = filt, mcc = mcc, seed = seed) %>%
+  numbers <- Numbers(sets, tau = NA, mst = NULL, filt = filt,
+                     mcc = mcc, seed = seed) %>%
     Reduce(function(x, y) abind::abind(x, y, along = 3), .)
   if (length(dim(numbers)) == 2) {
     numbers <- abind::abind(numbers, along = 3)
@@ -231,8 +257,9 @@ NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
 #' file.remove(list.files())  # cleanup
 #' @export
 NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, ext = "tif",
-  mcc = parallel::detectCores(), seed = NULL, verbose = FALSE) {
+                            filt = NULL, ext = "tif",
+                            mcc = parallel::detectCores(), seed = NULL,
+                            verbose = FALSE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
@@ -240,20 +267,10 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   numbers <- Numbers(file.names, tau = tau, mst = mst,
-                     skip.consts = skip.consts, filt = filt,
-                     mcc = mcc, seed = seed)
+                     filt = filt, mcc = mcc, seed = seed)
   frames <- vapply(numbers, function(x) attr(x, "frames"), integer(1))
-  if (skip.consts) {
-    # this may seem inefficient but it's cost is negligible in
-    # relative to that of the number calculations
-    CheckConst <- function(file.path) {
-      arr <- ReadImageData(file.path)
-      length(unique(as.vector(arr))) == 1
-    }
-    const <- vapply(file.names, CheckConst, TRUE)
-    mst <- ifelse(const, "fail", mst)
-  }
   tau <- vapply(numbers, function(x) attr(x, "tau"), character(1))
+  mst <- purrr::map(numbers, ~ attr(., "mst")) %>% unlist
   names.noext.number <- vapply(file.names, filesstrings::BeforeLastDot,
                                character(1)) %>%
     paste0("_number_frames=", frames, "_tau=", tau, "_mst=",
@@ -277,15 +294,14 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
 #' numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
 #'
 #' @export
-Numbers <- function(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, verbose = FALSE, mcc = parallel::detectCores(),
-  seed = NULL) {
+Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                          verbose = FALSE, mcc = parallel::detectCores(),
+                    seed = NULL) {
   if (is.null(mst)) {
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
                 filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
   } else if (is.list(arr3d.list)) {
-    arr3d.list <- lapply(arr3d.list, MeanStackThresh, method = mst,
-      fail = fail, skip.consts = skip.consts)
+    arr3d.list <- lapply(arr3d.list, autothresholdr::MeanStackThresh,
+                         method = mst, fail = fail)
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
                 filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
   } else {
@@ -300,13 +316,14 @@ Numbers <- function(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
     }
     for (i in sets) {
       arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, MeanStackThresh, method = mst,
-        fail = fail, skip.consts = skip.consts)
+      threshed <- lapply(arrays, autothresholdr::MeanStackThresh, method = mst,
+                         fail = fail)
       numbers.i <- BiocParallel::bplapply(threshed, Number, tau = tau,
         filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
       numbers[i] <- numbers.i
     }
   }
+  if (is.null(mst)) mst <- NA
   numbers <- lapply(numbers, function(x) {
     attr(x, "mst") <- mst
     x

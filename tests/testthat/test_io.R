@@ -83,3 +83,16 @@ test_that("WriteImageTxt works", {
                "The maximum value")
   suppressWarnings(file.remove(list.files()))
 })
+
+test_that("Bin2Tiff works", {
+  setwd(tempdir())
+  dir.create("temp_dir")
+  expect_true(file.copy(system.file("extdata", "b.bin", package = "nandb"),
+                         "temp_dir"))
+  Bin2Tiff("temp_dir/b.bin", height = 2, width = 2, bits = 8)
+  Bin2TiffFolder("temp_dir", height = 2, width = 2, bits = 8)
+  expect_equal(list.files("temp_dir"), c("b.bin", "b.tif"))
+  setwd("temp_dir")
+  expect_equal(readBin("b.bin", "int", size = 1, n = 4),
+               as.vector(ReadImageData("b.tif")))
+})

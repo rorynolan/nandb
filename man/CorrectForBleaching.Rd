@@ -26,8 +26,8 @@ argument to the path to that file (a string).}
 process.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to correcting
-for bleaching (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
-\emph{method} here.}
+for bleaching (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+thresholding \emph{method} here.}
 
 \item{ext}{The file extension of the images in the folder that you wish to
 process. You must wish to process all files with this extension; if there

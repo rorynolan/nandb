@@ -104,14 +104,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // ExpSmooth
-NumericVector ExpSmooth(NumericVector obs, double tau);
-RcppExport SEXP nandb_ExpSmooth(SEXP obsSEXP, SEXP tauSEXP) {
+NumericVector ExpSmooth(NumericVector obs, double tau, bool extended);
+RcppExport SEXP nandb_ExpSmooth(SEXP obsSEXP, SEXP tauSEXP, SEXP extendedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type obs(obsSEXP);
     Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(ExpSmooth(obs, tau));
+    Rcpp::traits::input_parameter< bool >::type extended(extendedSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmooth(obs, tau, extended));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -128,14 +129,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // ExpSmoothRows
-NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau);
-RcppExport SEXP nandb_ExpSmoothRows(SEXP matSEXP, SEXP tauSEXP) {
+NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau, bool extended);
+RcppExport SEXP nandb_ExpSmoothRows(SEXP matSEXP, SEXP tauSEXP, SEXP extendedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
     Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(ExpSmoothRows(mat, tau));
+    Rcpp::traits::input_parameter< bool >::type extended(extendedSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmoothRows(mat, tau, extended));
     return rcpp_result_gen;
 END_RCPP
 }

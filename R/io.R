@@ -77,15 +77,15 @@ ReadImageData <- function(image.name, fix.lut = NULL) {
 WriteImageTxt <- function(img.arr, file.name) {
   d <- dim(img.arr)
   nd <- length(d)
-  if (!nd %in% c(2, 3)) {
-    stop("img.arr must be 2- or 3-dimensional")
+  if (!nd %in% c(2, 3, 4)) {
+    stop("img.arr must be 2-, 3- or 4-dimensional")
   }
   if (nd == 2) {
     img.arr <- t(img.arr)
     as.data.frame(img.arr) %>%
       readr::write_csv(filesstrings::GiveExt(file.name, "csv"),
                        col_names = FALSE)
-  } else {
+  } else if (nd == 3) {
     img.arr <- aperm(img.arr, c(2, 1, 3))
     slices.dfs <- lapply(seq_len(d[3]), Slices, img.arr) %>%
       lapply(as.data.frame)
@@ -93,6 +93,18 @@ WriteImageTxt <- function(img.arr, file.name) {
       vapply(filesstrings::GiveExt, character(1), "csv") %>%
       (filesstrings::NiceNums)
     mapply(readr::write_csv, slices.dfs, file.names, col_names = FALSE,
+           SIMPLIFY = FALSE) %>%
+      invisible
+  } else {
+    img.arr <- aperm(img.arr, c(2, 1, 3, 4))
+    grid <- expand.grid(seq_len(d[3]), seq_len(d[4]))
+    file.names <- paste0(file.name, "_", grid[, 1], "_", grid[, 2]) %>%
+      vapply(filesstrings::GiveExt, character(1), "csv") %>%
+      (filesstrings::NiceNums)
+    dfs <- purrr::map(Mat2RowList(as.matrix(grid)),
+                       ~ img.arr[, , .[1], .[2]]) %>%
+      lapply(as.data.frame)
+    mapply(readr::write_csv, dfs, file.names, col_names = FALSE,
            SIMPLIFY = FALSE) %>%
       invisible
   }
@@ -241,3 +253,62 @@ Stack2DTifs <- function(file.names, out.name, mcc = parallel::detectCores()) {
   EBImage::writeImage(stacked, out.name)
 }
 
+#' Convert a binary image to tiff.
+#'
+#' Read a binary image (pixels must be integers), specifying its dimension and
+#' write it back to disk as a tifff file. The `Bin2TiffFolder` function does
+#' this for an entire folder.
+#'
+#' When using `Bin2TiffFolder`, the images must all have the same dimension.
+#'
+#' @param bin.path The path to the binary file.
+#' @param bits How many bits are there per pixel? This should be a multiple of
+#'   8.
+#' @param height The height of the image (in pixels).
+#' @param width The width of the image (in pixels).
+#' @param frames How many frames are there in the stack (default 1).
+#' @param endian Eigher `"big"` or `"little"` (see [readBin]).
+#' @param signed Logical. Only used for integers of sizes 1 and 2, when it
+#'   determines if the quantity on file should be regarded as a signed or
+#'   unsigned integer.
+#'
+#' @export
+Bin2Tiff <- function(bin.path, bits, height, width, frames = 1,
+                     endian = .Platform$endian, signed = TRUE) {
+  file.name.short <- bin.path
+  if (stringr::str_detect(file.name.short, "/")) {
+    file.dir <- filesstrings::StrBeforeNth(file.name.short, "/", -1)
+    current.wd <- getwd()
+    on.exit(setwd(current.wd))
+    setwd(file.dir)
+    file.name.short <- stringr::str_split(file.name.short, "/") %>%
+      unlist %>%
+      dplyr::last()
+  }
+  bin.vector <- readBin(file.name.short, "int", n = height * width * frames,
+                        signed = signed, size = bits %/% 8)
+  arr <- array(bin.vector, dim = c(height, width, frames))
+  if (dim(arr)[3] == 1) arr <- arr[, , 1]
+  WriteIntImage(arr, filesstrings::BeforeLastDot(file.name.short))
+}
+
+#' @rdname Bin2Tiff
+#'
+#' @param folder.path The path to the folder (defaults to current location).
+#'
+#' @examples
+#' setwd(tempdir())
+#' dir.create("temp_dir")
+#' file.copy(system.file("extdata", "b.bin", package = "nandb"), "temp_dir")
+#' Bin2Tiff("temp_dir/b.bin", height = 2, width = 2, bits = 8)
+#' Bin2TiffFolder("temp_dir", height = 2, width = 2, bits = 8)
+#' list.files("temp_dir")
+#' @export
+Bin2TiffFolder <- function(folder.path = ".", bits, height, width, frames = 1,
+                           endian = .Platform$endian, signed = TRUE) {
+  current.wd <- getwd()
+  on.exit(setwd(current.wd))
+  setwd(folder.path)
+  bin.names <- list.files(pattern = "\\.bin$")
+  lapply(bin.names, Bin2Tiff, bits, height, width, frames, endian, signed)
+}

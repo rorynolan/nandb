@@ -1,8 +1,14 @@
-// [[Rcpp::depends(BH)]]
-
 #include <Rcpp.h>
-#include <boost/math/special_functions/sign.hpp>
 using namespace Rcpp;
+
+
+double sign(double x) {
+  if (x < 0) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
 
 //' Smooth and median filters with options for handling NAs.
 //'
@@ -52,10 +58,10 @@ NumericMatrix MedianFilterB(NumericMatrix mat, int size = 1,
           has been padded with pixels whose values equal the nearest
           border pixel value. */
           while (row < 0 || row >= nr) {
-            row -= boost::math::sign(row);
+            row -= sign(row);
           }
           while (col < 0 || col >= nc) {
-            col -= boost::math::sign(col);
+            col -= sign(col);
           }
           square(k + size, l + size) = mat(row, col);
         }
@@ -104,10 +110,10 @@ NumericMatrix SmoothFilterB(NumericMatrix mat, int size = 1,
            has been padded with pixels whose values equal the nearest
            border pixel value. */
           while (row < 0 || row >= nr) {
-            row -= boost::math::sign(row);
+            row -= sign(row);
           }
           while (col < 0 || col >= nc) {
-            col -= boost::math::sign(col);
+            col -= sign(col);
           }
           square(k + size, l + size) = mat(row, col);
         }

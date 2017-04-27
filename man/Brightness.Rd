@@ -6,16 +6,15 @@
 \alias{Brightnesses}
 \title{Calculate brightness from image series.}
 \usage{
-Brightness(arr, tau = NA, mst = NULL, skip.consts = FALSE, filt = NULL,
+Brightness(arr, tau = NA, mst = NULL, filt = NULL, n.ch = 1,
   verbose = FALSE)
 
 BrightnessTxtFolder(folder.path = ".", tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, ext = "tif",
-  mcc = parallel::detectCores(), verbose = FALSE, seed = NULL)
+  filt = NULL, ext = "tif", n.ch = 1, mcc = parallel::detectCores(),
+  verbose = FALSE, seed = NULL)
 
-Brightnesses(arr3d.list, tau = NA, mst = NULL, skip.consts = FALSE,
-  filt = NULL, verbose = FALSE, mcc = parallel::detectCores(),
-  seed = NULL)
+Brightnesses(arr3d.list, tau = NA, mst = NULL, filt = NULL, n.ch = 1,
+  verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
 }
 \arguments{
 \item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
@@ -32,14 +31,8 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
+brightness (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
 thresholding \emph{method} here.}
-
-\item{skip.consts}{An image array with only one value (a 'constant array')
-won't threshold properly. By default the function would give an error, but
-by setting this parameter to \code{TRUE}, the array would instead be
-skipped (the thresholding will return the original array) and give a
-warning.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
 (\code{filt = 'median'}) filter the brightness image using
@@ -49,6 +42,8 @@ option \code{na_count = TRUE}. If you want to smooth/median filter the
 brightness image in a different way, first calculate the brightnesses
 without filtering (\code{filt = NULL}) using this function and then perform
 your desired filtering routine on the result.}
+
+\item{n.ch}{The number of channels in the image (default 1).}
 
 \item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
@@ -96,10 +91,10 @@ the thresholding in series and does the rest in parallel).
 library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
+brightness <- Brightness(img, tau = "auto", mst = 'Huang', filt = 'median')
 MatrixRasterPlot(brightness, log.trans = TRUE)
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-brightness.2ch <- Brightness(two.channel.img)
+brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')

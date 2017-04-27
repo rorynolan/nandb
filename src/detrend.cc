@@ -115,30 +115,43 @@ NumericVector MedReflectExtend(NumericVector vec, bool preserve_mean = false,
 //'
 //' @param obs A numeric vector of observations (in order).
 //' @param tau The time scale for the exponential smoothing (see Stroud 1999).
+//' @param extended Logical. Has the series (`obs`) already been extended via
+//'   via `nandb:::MedReflectExtend()`? If not, \code{ExpSmooth} will do this
+//'   prior to smoothing as an edge-correction technique. You will probably
+//'   never set this to \code{TRUE}, but [BestTau()] needs this feature.
 //'
 //' @return The smoothed series, a numeric vector of the same length.
 //' @examples
 //' ExpSmooth(1:10, 1)
 //' @export
 // [[Rcpp::export]]
-NumericVector ExpSmooth(NumericVector obs, double tau) {
+NumericVector ExpSmooth(NumericVector obs, double tau, bool extended = false) {
   int n = obs.size();
+  double numerator;
+  double denominator;
+  NumericVector obs_extended;
+  if (extended) {
+    if ((n + 2) % 3 != 0) {
+      return rep(NA_REAL, n);
+    }
+    obs_extended = obs;
+    n = (n + 2) / 3;
+  } else {
+    obs_extended = MedReflectExtend(obs, true, true);
+  }
+  NumericVector smoothed(n);
   NumericVector weights(2 * n - 1);
   for (int i = 0; i < 2 * n - 1; i++) {
     weights[i] = exp(- i / tau);
   }
-  NumericVector extended = MedReflectExtend(obs, true, true);
-  int m = extended.size();
-  NumericVector smoothed(n);
-  double numerator;
-  double denominator;
+  int m = obs_extended.size();
   int i_in_extended;
   for (int i = 0; i < n; i++) {
     numerator = 0;
     denominator = 0;
     for (int j = 0; j < m; j++) {
       i_in_extended = (n - 1) + i;
-      numerator += weights[abs(j - i_in_extended)] * extended[j];
+      numerator += weights[abs(j - i_in_extended)] * obs_extended[j];
       denominator += weights[abs(j - i_in_extended)];
     }
     smoothed[i] = numerator / denominator;
@@ -154,7 +167,6 @@ NumericVector ExpSmooth(NumericVector obs, double tau) {
 //' \link{ExpSmooth} on each row of a matrix.
 //'
 //' @param mat3d A 3-dimensional array.
-//' @param mat A matrix.
 //' @param tau The time scale for the exponential smoothing (see Stroud 1999).
 //'
 //' @return For \code{ExpSmoothPillars}, a 3-dimensional array where each
@@ -187,12 +199,26 @@ NumericVector ExpSmoothPillars(NumericVector mat3d, double tau) {
 }
 
 //' @rdname ExpSmoothPillars
+//' @param mat A matrix.
+//' @param extended Logical. Has the series (`obs`) already been extended via
+//'   via `nandb:::MedReflectExtend()`? If not, \code{ExpSmooth} will do this
+//'   prior to smoothing as an edge-correction technique. You will probably
+//'   never set this to \code{TRUE}, but [BestTau()] needs this feature.
 //' @export
 // [[Rcpp::export]]
-NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau) {
-  NumericMatrix smoothed_rows(clone(mat));
-  for (int i = 0; i < mat.nrow(); i++) {
-    smoothed_rows(i, _) = ExpSmooth(mat(i, _), tau);
+NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau,
+                            bool extended = false) {
+  if (extended) {
+    NumericMatrix smoothed_rows(mat.nrow(), (mat.ncol() + 2) / 3);
+    for (int i = 0; i < mat.nrow(); i++) {
+      smoothed_rows(i, _) = ExpSmooth(mat(i, _), tau, true);
+    }
+    return smoothed_rows;
+  } else {
+    NumericMatrix smoothed_rows(clone(mat));
+    for (int i = 0; i < mat.nrow(); i++) {
+      smoothed_rows(i, _) = ExpSmooth(mat(i, _), tau);
+    }
+    return smoothed_rows;
   }
-  return smoothed_rows;
 }

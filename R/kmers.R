@@ -44,43 +44,37 @@ KmersFromBrightnesses <- function(brightnesses, monomer) {
 #' Calculate numbers of kmers based on an image time-series
 #'
 #' Given an image (as a file path or an array), `KmersFromImage` does the
-#' brightness calculation via [Brightness()] and then counts the
-#' numbers of each kmer via [KmersFromBrightnesses()].
-#' `KmersFromImagesFolder` does this for an entire folder (directory) of
-#' images and outputs a csv file of the results.
+#' brightness calculation via [Brightness()] and then counts the numbers of each
+#' kmer via [KmersFromBrightnesses()]. `KmersFromImagesFolder` does this for an
+#' entire folder (directory) of images and outputs a csv file of the results.
 #'
 #' @param arr3d A 3-dimensional array that one would might input to
 #'   [Brightness()] \emph{or} the path to an image file on disk.
-#' @param monomer The median brightness of a monomer. You must know what
-#'   this is to use this function correctly. This must be greater than 1 (this
-#'   is the 'apparent brightness' of a monomer). If you're reading the Digman et
-#'   al. (2008) paper, this is \eqn{1 + \epsilon}.
+#' @param monomer The median brightness of a monomer. You must know what this is
+#'   to use this function correctly. This must be greater than 1 (this is the
+#'   'apparent brightness' of a monomer). If you're reading the Digman et al.
+#'   (2008) paper, this is \eqn{1 + \epsilon}.
 #' @param tau The time constant for the exponential filtering (see
 #'   [Brightness()]).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via [MeanStackThresh()])? If so, set your thresholding
-#'   \emph{method} here.
-#' @param skip.consts An image array with only one value (a 'constant array')
-#'   won't threshold properly. By default the function would give an error, but
-#'   by setting this parameter to `TRUE`, the array would instead be
-#'   skipped (the function will return the original array) and give a warning.
-#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
-#'   (`filt = 'median'`) filter the brightness image using
-#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
-#'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option `na_count = TRUE`. If you want to smooth/median filter
-#'   the brightness image in a different way, first calculate the brightnesses
-#'   without filtering (`filt = NULL`) using this function and then perform
-#'   your desired filtering routine on the result.
+#'   brightness (via [autothresholdr::MeanStackThresh()])? If so, set your
+#'   thresholding \emph{method} here.
+#' @param filt Do you want to smooth (`filt = 'smooth'`) or median (`filt =
+#'   'median'`) filter the brightness image using [SmoothFilterB()] or
+#'   [MedianFilterB()] respectively? If selected, these are invoked here with a
+#'   filter radius of 1 and with the option `na_count = TRUE`. If you want to
+#'   smooth/median filter the brightness image in a different way, first
+#'   calculate the brightnesses without filtering (`filt = NULL`) using this
+#'   function and then perform your desired filtering routine on the result.
 #' @param verbose If arr3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   `BrightnessFolder`, does not work with multiple cores) and to tell
-#'   when `KmersFromImagesFolder` is done.
+#'   `BrightnessFolder`, does not work with multiple cores) and to tell when
+#'   `KmersFromImagesFolder` is done.
 #'
 #' @return A named vector (named '1mers' '2mers' '3mers' and so on) with each
 #'   element detailing the number of that kmer found, or for
-#'   `KmersFromImagesFolder`, a csv file is written to disk detailing one
-#'   of these vectors for each image. This vector also has an attribute
+#'   `KmersFromImagesFolder`, a csv file is written to disk detailing one of
+#'   these vectors for each image. This vector also has an attribute
 #'   'mean.intensity' giving the mean intensity of the input image.
 #'
 #' @examples
@@ -89,14 +83,13 @@ KmersFromBrightnesses <- function(brightnesses, monomer) {
 #'
 #' @export
 KmersFromImage <- function(arr3d, monomer, tau = NA, mst = NULL,
-  skip.consts = FALSE, filt = NULL, verbose = TRUE) {
+                           filt = NULL, verbose = TRUE) {
   if (is.character(arr3d)) {
     if (verbose)
       print(paste0("Now processing: ", arr3d, "."))
     arr3d <- ReadImageData(arr3d)
   }
-  bright <- Brightness(arr3d, tau = tau, mst = mst, skip.consts = skip.consts,
-    filt = filt)
+  bright <- Brightness(arr3d, tau = tau, mst = mst, filt = filt)
   kmers <- KmersFromBrightnesses(bright, monomer)
   attr(kmers, "mean.intensity") <- mean(arr3d)
   kmers
@@ -116,7 +109,7 @@ KmersFromImage <- function(arr3d, monomer, tau = NA, mst = NULL,
 #'
 #' @export
 KmersFromImages <- function(arrs3d, monomer, tau = NA, mst = NULL,
-                            skip.consts = FALSE, filt = NULL, verbose = TRUE,
+                            filt = NULL, verbose = TRUE,
                             mcc = parallel::detectCores(), seed = NULL) {
   if (is.character(arrs3d)) {
     if (verbose)
@@ -124,8 +117,7 @@ KmersFromImages <- function(arrs3d, monomer, tau = NA, mst = NULL,
     arrs3d <- lapply(arrs3d, ReadImageData)
   }
   brights <- Brightnesses(arrs3d, tau = tau, mst = mst,
-                          skip.consts = skip.consts, filt = filt,
-                          mcc = mcc, seed = seed)
+                          filt = filt, mcc = mcc, seed = seed)
   kmerss <- lapply(brights, KmersFromBrightnesses, monomer)
   for (i in seq_along(arrs3d)) {
     attr(kmerss[[i]], "mean.intensity") <- mean(arrs3d[[i]])
@@ -151,14 +143,14 @@ KmersFromImages <- function(arrs3d, monomer, tau = NA, mst = NULL,
 #'
 #' @export
 KmersFromImagesFolder <- function(folder.path = ".", monomer,
-  tau = NA, mst = NULL, skip.consts = FALSE, filt = NULL, out.name = "results",
-  ext = "\\.tif$", mcc = parallel::detectCores(), seed = NULL, verbose = TRUE) {
+  tau = NA, mst = NULL, filt = NULL, out.name = "results", ext = "\\.tif$",
+  mcc = parallel::detectCores(), seed = NULL, verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
   tif.names <- list.files(pattern = ext)
   kmerss <- KmersFromImages(tif.names, monomer, tau = tau, mst = mst,
-                  filt = filt, skip.consts = skip.consts, verbose = verbose,
+                  filt = filt, verbose = verbose,
                   mcc = mcc, seed = seed)
   means <- vapply(kmerss, function(x) attr(x, "mean.intensity"), numeric(1))
   max.ks <- vapply(kmerss, length, integer(1))

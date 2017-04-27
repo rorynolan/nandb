@@ -24,8 +24,9 @@ stack.. To perform this on a file that has not yet been read in, set this
 argument to the path to that file (a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-mean intensities (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your thresholding
-\emph{method} here. Pixels failing to exceed the threshold are set to \code{NA}.}
+mean intensities (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+thresholding \emph{method} here. Pixels failing to exceed the threshold are
+set to \code{NA}.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the mean intensity image using \code{\link[=SmoothFilterB]{SmoothFilterB()}} or
 \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If selected, these are invoked here with a

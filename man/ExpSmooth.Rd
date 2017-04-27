@@ -4,12 +4,17 @@
 \alias{ExpSmooth}
 \title{Exponentially smooth a series of observations.}
 \usage{
-ExpSmooth(obs, tau)
+ExpSmooth(obs, tau, extended = FALSE)
 }
 \arguments{
 \item{obs}{A numeric vector of observations (in order).}
 
 \item{tau}{The time scale for the exponential smoothing (see Stroud 1999).}
+
+\item{extended}{Logical. Has the series (\code{obs}) already been extended via
+via \code{nandb:::MedReflectExtend()}? If not, \code{ExpSmooth} will do this
+prior to smoothing as an edge-correction technique. You will probably
+never set this to \code{TRUE}, but \code{\link[=BestTau]{BestTau()}} needs this feature.}
 }
 \value{
 The smoothed series, a numeric vector of the same length.

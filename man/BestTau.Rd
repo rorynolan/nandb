@@ -13,7 +13,7 @@ that has not yet been read in, set this argument to the path to that file
 (a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[=MeanStackThresh]{MeanStackThresh()}})? If so, set your
+brightness (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{tol}{What size of error in the estimate of the \emph{ideal} \code{tau}

@@ -40,6 +40,7 @@ CorrectForBleaching <- function(arr, tau) {
   if (is.character(arr)) arr <- ReadImageData(arr)
   d <- dim(arr)
   if (length(d) == 3) {
+    print("precorrectforreturn")
     return(CorrectForBleaching_(arr, tau))
   }
   ListChannels(arr) %>%
@@ -65,19 +66,25 @@ CorrectForBleaching_ <- function(arr3d, tau) {
   } else if (!is.numeric(tau)) {
     stop("If tau is not numeric, then it must be NA or 'auto'.")
   }
-  if (is.na(tau)) {
-    corrected <- arr3d
-  } else {
-    smoothed <- ExpSmoothPillars(arr3d, tau)
-    filtered <- arr3d - smoothed
-    means <- MeanPillars(arr3d)
-    corrected <- filtered + as.vector(means)
-    # as it so happens, this will add the means to the pillars as we desire
-    corrected[corrected < 0] <- 0
-    corrected <- round(corrected)  # return the array back to integer counts
-  }
+  print("prexsm")
+  smoothed <- ExpSmoothPillars(arr3d, tau)
+  print("postxsm")
+  filtered <- arr3d - smoothed
+  print("premeanpils")
+  means <- MeanPillars(arr3d)
+  print("postmeanpils")
+  corrected <- filtered + as.vector(means)
+  # as it so happens, this will add the means to the pillars as we desire
+  print("prezero")
+  corrected[corrected < 0] <- 0
+  print("postzero")
+  print("preround")
+  corrected <- round(corrected)  # return the array back to integer counts
+  print("postround")
+  print("precorrectfor_attr")
   attr(corrected, "tau") <- ifelse(auto.tau, paste0("auto=", round(tau)),
                                    as.character(tau))
+  print("precorrectfor_return")
   corrected
 }
 
@@ -85,8 +92,8 @@ CorrectForBleaching_ <- function(arr3d, tau) {
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
 #' @param mst Do you want to apply an intensity threshold prior to correcting
-#'   for bleaching (via [MeanStackThresh()])? If so, set your thresholding
-#'   \emph{method} here.
+#'   for bleaching (via [autothresholdr::MeanStackThresh()])? If so, set your
+#'   thresholding \emph{method} here.
 #' @param ext The file extension of the images in the folder that you wish to
 #'   process. You must wish to process all files with this extension; if there
 #'   are files that you don't want to process, take them out of the folder. The
@@ -131,7 +138,7 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
                                     na = "error") {
   arr3d <- ReadImageData(file.path)
   stopifnot(length(dim(arr3d)) == 3)
-  if (!is.null(mst)) arr3d <- MeanStackThresh(arr3d, mst)
+  if (!is.null(mst)) arr3d <- autothresholdr::MeanStackThresh(arr3d, mst)
   corrected <- CorrectForBleaching(arr3d, tau)
   out.name <- filesstrings::BeforeLastDot(file.path) %>%
     paste0("_tau=", attr(corrected, "tau"), ".",
@@ -151,7 +158,7 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via [MeanStackThresh()])? If so, set your
+#'   brightness (via [autothresholdr::MeanStackThresh()])? If so, set your
 #'   thresholding \emph{method} here.
 #' @param tol What size of error in the estimate of the \emph{ideal} `tau`
 #'   (aside from the error introduced by the random image simulation, see
@@ -172,8 +179,9 @@ BestTau <- function(arr3d, mst = NULL, tol = 1) {
   if (is.character(arr3d)) {
     arr3d <- ReadImageData(arr3d[1])
   }
-  if (!is.null(mst))
-    arr3d <- MeanStackThresh(arr3d, mst, fail = NA)
+  if (!is.null(mst)) {
+    arr3d <- autothresholdr::MeanStackThresh(arr3d, mst, fail = NA)
+  }
   raw.brightness.mean <- Brightness(arr3d) %>% mean(na.rm = TRUE)
   if (raw.brightness.mean < 1) {
     stop("Your raw brightness mean is below 1,",
@@ -182,17 +190,22 @@ BestTau <- function(arr3d, mst = NULL, tol = 1) {
   means <- apply(arr3d, 3, mean, na.rm = TRUE)
   p <- sum(!is.na(arr3d[, , 1]))
   sim.img.arr <- vapply(means, stats::rpois, numeric(p), n = p)
-  BrightnessMeanSimMatTau <- function(sim.img.arr, tau) {
+  sim.img.arr.extended <- sim.img.arr %>%
+    apply(1, MedReflectExtend, TRUE, TRUE) %>%
+    t
+  BrightnessMeanSimMatTau <- function(sim.img.arr, sim.img.arr.extended, tau) {
     if (is.na(tau)) {
       detrended <- sim.img.arr
     } else {
-      detrended <- (sim.img.arr - ExpSmoothRows(sim.img.arr, tau) +
+      detrended <- (sim.img.arr - ExpSmoothRows(sim.img.arr.extended,
+                                                         tau, extended = TRUE) +
         rowMeans(sim.img.arr)) %>% round
     }
     brightnesses <- matrixStats::rowVars(detrended) / rowMeans(detrended)
     mean(brightnesses)
   }
-  notau.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr, NA)
+  notau.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr,
+                                                       sim.img.arr.extended, NA)
   if (notau.sim.brightness.mean <= 1) {
     # This is when the original image had mean brightness greater than 1 but the
     # simulated image had mean brightness <= 1.
@@ -200,7 +213,7 @@ BestTau <- function(arr3d, mst = NULL, tol = 1) {
     return(NA)
   }
   tau2.sim.brightness.mean <- BrightnessMeanSimMatTau(sim.img.arr,
-    2)
+                                                      sim.img.arr.extended, 2)
   if (tau2.sim.brightness.mean > 1) {
     stop("Even with a savage detrend of tau = 2, ",
          "the brightnesses still have mean greater than 1. ",
@@ -213,15 +226,16 @@ BestTau <- function(arr3d, mst = NULL, tol = 1) {
   }
   lower <- 2
   upper <- length(means)
-  while (BrightnessMeanSimMatTau(sim.img.arr, upper) < 1) {
+  while (BrightnessMeanSimMatTau(sim.img.arr,
+                                 sim.img.arr.extended, upper) < 1) {
     lower <- upper
     upper <- 2 * upper
   }
-  TauFarFromOne <- function(tau, sim.img.arr) {
-    BrightnessMeanSimMatTau(sim.img.arr, tau) - 1
+  TauFarFromOne <- function(tau, sim.img.arr, sim.img.arr.extended) {
+    BrightnessMeanSimMatTau(sim.img.arr, sim.img.arr.extended, tau) - 1
   }
   root <- stats::uniroot(TauFarFromOne, c(lower, upper), sim.img.arr,
-    tol = tol, extendInt = "upX")
+                         sim.img.arr.extended, tol = tol, extendInt = "upX")
   tau <- root$root
   attr(tau, "brightness.immobile") <- 1 + root$f.root
   tau
