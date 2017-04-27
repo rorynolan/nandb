@@ -40,7 +40,6 @@ CorrectForBleaching <- function(arr, tau) {
   if (is.character(arr)) arr <- ReadImageData(arr)
   d <- dim(arr)
   if (length(d) == 3) {
-    print("precorrectforreturn")
     return(CorrectForBleaching_(arr, tau))
   }
   ListChannels(arr) %>%
@@ -66,25 +65,15 @@ CorrectForBleaching_ <- function(arr3d, tau) {
   } else if (!is.numeric(tau)) {
     stop("If tau is not numeric, then it must be NA or 'auto'.")
   }
-  print("prexsm")
   smoothed <- ExpSmoothPillars(arr3d, tau)
-  print("postxsm")
   filtered <- arr3d - smoothed
-  print("premeanpils")
   means <- MeanPillars(arr3d)
-  print("postmeanpils")
   corrected <- filtered + as.vector(means)
   # as it so happens, this will add the means to the pillars as we desire
-  print("prezero")
   corrected[corrected < 0] <- 0
-  print("postzero")
-  print("preround")
   corrected <- round(corrected)  # return the array back to integer counts
-  print("postround")
-  print("precorrectfor_attr")
   attr(corrected, "tau") <- ifelse(auto.tau, paste0("auto=", round(tau)),
                                    as.character(tau))
-  print("precorrectfor_return")
   corrected
 }
 
