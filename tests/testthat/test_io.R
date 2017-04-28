@@ -91,8 +91,11 @@ test_that("Bin2Tiff works", {
                          "temp_dir"))
   Bin2Tiff("temp_dir/b.bin", height = 2, width = 2, bits = 8)
   Bin2TiffFolder("temp_dir", height = 2, width = 2, bits = 8)
-  expect_equal(list.files("temp_dir"), c("b.bin", "b.tif"))
-  setwd("temp_dir")
-  expect_equal(readBin("b.bin", "int", size = 1, n = 4),
-               as.vector(ReadImageData("b.tif")))
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    # these fail on windows due to an issue with readTIFF(..., as.is = TRUE)
+    expect_equal(list.files("temp_dir"), c("b.bin", "b.tif"))
+    setwd("temp_dir")
+    expect_equal(readBin("b.bin", "int", size = 1, n = 4),
+                 as.vector(ReadImageData("b.tif")))
+  }
 })
