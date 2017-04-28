@@ -4,7 +4,7 @@ test_that("CorrectForBleaching works", {
   expect_equal(round(mean(tau10), 4), 21.1542)
   set.seed(9)
   autotau <- CorrectForBleaching(img, "auto")
-  expect_equal(round(mean(autotau), 4), 21.1122)
+  expect_equal(round(mean(autotau), 4), 21.1034)
   expect_error(CorrectForBleaching(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(CorrectForBleaching(img, FALSE),

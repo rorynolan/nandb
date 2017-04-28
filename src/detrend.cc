@@ -181,6 +181,9 @@ NumericVector ExpSmooth(NumericVector obs, double tau, bool extended = false) {
 NumericVector ExpSmoothPillars(NumericVector mat3d, double tau) {
   // mat3d is actually passed in as a 1d vector
   NumericVector smoothed_pillars(clone(mat3d));
+  if (R_IsNA(tau)) {
+    return smoothed_pillars;
+  }
   IntegerVector dim = mat3d.attr("dim");
   int n_pillars = dim[0] * dim[1];
   int pillar_len = dim[2];
