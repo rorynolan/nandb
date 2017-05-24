@@ -23,7 +23,7 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-number (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your thresholding
+number (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your thresholding
 \emph{method} here.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
@@ -66,11 +66,11 @@ sectioning is done for calculation of numbers.
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median',
+bts <- NumberTimeSeries(img, 10, tau = NA, mst = 'tri', filt = 'median',
                         mcc = 2)
 library(magrittr)
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-nts.2ch <- NumberTimeSeries(two.channel.img, 10)
+nts.2ch <- NumberTimeSeries(two.channel.img, 10, n.ch = 2)
 }
 \seealso{
 \code{\link[=Number]{Number()}}.

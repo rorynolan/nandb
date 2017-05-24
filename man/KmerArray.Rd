@@ -21,7 +21,7 @@ for monomer, 2 for dimer and so on).
 }
 \examples{
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
+brightness <- Brightness(img, tau = NA, mst = 'Huang', filt = 'median')
 ka <- KmerArray(brightness, 1.1)
 
 }

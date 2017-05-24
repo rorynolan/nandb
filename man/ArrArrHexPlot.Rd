@@ -5,7 +5,7 @@
 \title{Plot the values in two arrays against each other.}
 \usage{
 ArrArrHexPlot(arr.x, arr.y, bins = 60, log.trans = FALSE, colours = NULL,
-  limits = NULL)
+  limits = NULL, breaks = NULL, include.breaks = NULL)
 }
 \arguments{
 \item{arr.x, arr.y}{The two arrays. The \code{arrx} values will be along the
@@ -23,6 +23,13 @@ this allows the use of \code{\link[grDevices:rainbow]{grDevices::rainbow()}} and
 \code{\link[viridis:viridis]{viridis::viridis()}}.}
 
 \item{limits}{A numeric vector of length two providing limits of the scale.}
+
+\item{breaks}{Where do you want tick marks to appear on the legend colour
+scale?}
+
+\item{include.breaks}{If you don't want to specify all the breaks, but you
+want some specific ones to be included on the legend colour scale, specify
+those specific ones here.}
 }
 \value{
 This is a \code{ggplot2} object and can be manipulated thus.
@@ -35,7 +42,7 @@ a hexagonal heatmap.
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-brightness <- Brightness(img, tau = 10, mst = 'Huang')
+brightness <- Brightness(img, tau = NA, mst = 'Huang')
 mean.intensity <- MeanPillars(img)
 ArrArrHexPlot(mean.intensity, brightness) +
 ggplot2::labs(x = 'intensity', y = 'brightness')

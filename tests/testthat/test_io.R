@@ -36,17 +36,6 @@ test_that("Stack2DTifs works", {
   suppressWarnings(file.remove(list.files()))
 })
 
-test_that("WriteImageTxt works", {
-  cwd <- getwd()
-  on.exit(setwd(cwd))
-  setwd(tempdir())
-  img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-  expect_equal(mean(unlist(WriteImageTxt(img, 'temp'))), mean(img))
-  img_01 <- ReadImageTxt("temp_01.csv")
-  expect_equal(img_01, img[, , 1], check.attributes = FALSE)
-  suppressWarnings(file.remove(list.files()))
-})
-
 test_that("WriteIntImage works", {
   img <- ReadImageData(system.file("extdata", "50.tif",
     package = "nandb"))
@@ -81,10 +70,23 @@ test_that("WriteImageTxt works", {
   WriteIntImage(matrix(2^9), "16bit")
   expect_error(WriteIntImage(matrix(2 ^ 17)),
                "The maximum value")
+  expect_equal(mean(unlist(WriteImageTxt(img, 'temp'))), mean(img))
+  img_01 <- ReadImageTxt("temp_01.csv")
+  expect_equal(img_01, img[, , 1], check.attributes = FALSE)
+  four.d <- array(1:(2^4), dim = rep(2, 4))
+  WriteImageTxt(four.d, "fourD")
+  for (i in 1:2) {
+    for (j in 1:2) {
+      expect_equal(ReadImageTxt(paste0("fourD_", i, "_", j, ".csv")),
+                   four.d[, , i, j], check.attributes = FALSE)
+    }
+  }
   suppressWarnings(file.remove(list.files()))
 })
 
 test_that("Bin2Tiff works", {
+  cwd <- getwd()
+  on.exit(setwd(cwd))
   setwd(tempdir())
   dir.create("temp_dir")
   expect_true(file.copy(system.file("extdata", "b.bin", package = "nandb"),
@@ -98,4 +100,6 @@ test_that("Bin2Tiff works", {
     expect_equal(readBin("b.bin", "int", size = 1, n = 4),
                  as.vector(ReadImageData("b.tif")))
   }
+  setwd("..")
+  filesstrings::RemoveDirs("temp_dir")
 })

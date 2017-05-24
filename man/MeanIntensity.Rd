@@ -24,7 +24,7 @@ stack.. To perform this on a file that has not yet been read in, set this
 argument to the path to that file (a string).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-mean intensities (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+mean intensities (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
 thresholding \emph{method} here. Pixels failing to exceed the threshold are
 set to \code{NA}.}
 

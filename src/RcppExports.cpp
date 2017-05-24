@@ -5,6 +5,94 @@
 
 using namespace Rcpp;
 
+// ReflectIndexMed
+double ReflectIndexMed(NumericVector vec, int ind, std::string side);
+RcppExport SEXP nandb_ReflectIndexMed(SEXP vecSEXP, SEXP indSEXP, SEXP sideSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
+    Rcpp::traits::input_parameter< int >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< std::string >::type side(sideSEXP);
+    rcpp_result_gen = Rcpp::wrap(ReflectIndexMed(vec, ind, side));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Smooth
+NumericVector Smooth(NumericVector vec);
+RcppExport SEXP nandb_Smooth(SEXP vecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
+    rcpp_result_gen = Rcpp::wrap(Smooth(vec));
+    return rcpp_result_gen;
+END_RCPP
+}
+// MedReflectExtend
+NumericVector MedReflectExtend(NumericVector vec, bool preserve_mean, bool smooth);
+RcppExport SEXP nandb_MedReflectExtend(SEXP vecSEXP, SEXP preserve_meanSEXP, SEXP smoothSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
+    Rcpp::traits::input_parameter< bool >::type preserve_mean(preserve_meanSEXP);
+    Rcpp::traits::input_parameter< bool >::type smooth(smoothSEXP);
+    rcpp_result_gen = Rcpp::wrap(MedReflectExtend(vec, preserve_mean, smooth));
+    return rcpp_result_gen;
+END_RCPP
+}
+// MedReflectExtendRows
+NumericMatrix MedReflectExtendRows(NumericMatrix rows, bool preserve_mean, bool smooth);
+RcppExport SEXP nandb_MedReflectExtendRows(SEXP rowsSEXP, SEXP preserve_meanSEXP, SEXP smoothSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type rows(rowsSEXP);
+    Rcpp::traits::input_parameter< bool >::type preserve_mean(preserve_meanSEXP);
+    Rcpp::traits::input_parameter< bool >::type smooth(smoothSEXP);
+    rcpp_result_gen = Rcpp::wrap(MedReflectExtendRows(rows, preserve_mean, smooth));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ExpSmooth
+NumericVector ExpSmooth(NumericVector obs, double tau, bool extended);
+RcppExport SEXP nandb_ExpSmooth(SEXP obsSEXP, SEXP tauSEXP, SEXP extendedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type obs(obsSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< bool >::type extended(extendedSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmooth(obs, tau, extended));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ExpSmoothPillars
+NumericVector ExpSmoothPillars(NumericVector mat3d, double tau);
+RcppExport SEXP nandb_ExpSmoothPillars(SEXP mat3dSEXP, SEXP tauSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type mat3d(mat3dSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmoothPillars(mat3d, tau));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ExpSmoothRows
+NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau, bool extended);
+RcppExport SEXP nandb_ExpSmoothRows(SEXP matSEXP, SEXP tauSEXP, SEXP extendedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< bool >::type extended(extendedSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmoothRows(mat, tau, extended));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MedianFilterB
 NumericMatrix MedianFilterB(NumericMatrix mat, int size, bool na_rm, bool na_count);
 RcppExport SEXP nandb_MedianFilterB(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
@@ -63,81 +151,6 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type mat3d(mat3dSEXP);
     rcpp_result_gen = Rcpp::wrap(MedianPillars(mat3d));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ReflectIndexMed
-double ReflectIndexMed(NumericVector vec, int ind, std::string side);
-RcppExport SEXP nandb_ReflectIndexMed(SEXP vecSEXP, SEXP indSEXP, SEXP sideSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
-    Rcpp::traits::input_parameter< int >::type ind(indSEXP);
-    Rcpp::traits::input_parameter< std::string >::type side(sideSEXP);
-    rcpp_result_gen = Rcpp::wrap(ReflectIndexMed(vec, ind, side));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Smooth
-NumericVector Smooth(NumericVector vec);
-RcppExport SEXP nandb_Smooth(SEXP vecSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
-    rcpp_result_gen = Rcpp::wrap(Smooth(vec));
-    return rcpp_result_gen;
-END_RCPP
-}
-// MedReflectExtend
-NumericVector MedReflectExtend(NumericVector vec, bool preserve_mean, bool smooth);
-RcppExport SEXP nandb_MedReflectExtend(SEXP vecSEXP, SEXP preserve_meanSEXP, SEXP smoothSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
-    Rcpp::traits::input_parameter< bool >::type preserve_mean(preserve_meanSEXP);
-    Rcpp::traits::input_parameter< bool >::type smooth(smoothSEXP);
-    rcpp_result_gen = Rcpp::wrap(MedReflectExtend(vec, preserve_mean, smooth));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ExpSmooth
-NumericVector ExpSmooth(NumericVector obs, double tau, bool extended);
-RcppExport SEXP nandb_ExpSmooth(SEXP obsSEXP, SEXP tauSEXP, SEXP extendedSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type obs(obsSEXP);
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< bool >::type extended(extendedSEXP);
-    rcpp_result_gen = Rcpp::wrap(ExpSmooth(obs, tau, extended));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ExpSmoothPillars
-NumericVector ExpSmoothPillars(NumericVector mat3d, double tau);
-RcppExport SEXP nandb_ExpSmoothPillars(SEXP mat3dSEXP, SEXP tauSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type mat3d(mat3dSEXP);
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(ExpSmoothPillars(mat3d, tau));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ExpSmoothRows
-NumericMatrix ExpSmoothRows(NumericMatrix mat, double tau, bool extended);
-RcppExport SEXP nandb_ExpSmoothRows(SEXP matSEXP, SEXP tauSEXP, SEXP extendedSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< bool >::type extended(extendedSEXP);
-    rcpp_result_gen = Rcpp::wrap(ExpSmoothRows(mat, tau, extended));
     return rcpp_result_gen;
 END_RCPP
 }

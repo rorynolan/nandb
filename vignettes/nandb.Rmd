@@ -84,9 +84,3 @@ Say we know that our monomeric brightness is 1.05. Then we can create a plot of 
 ```{r kmer plot, fig.width=7, fig.height=7}
 KmerPlot(img_brightness, 1.05)
 ```
-
-<!-- Instead, say that you know that you have only monomers (no dimers, trimers, etc) in your images but you don't know what your monomeric brightness is. Then you can use 
-```{r}
-# this
-```
-However, if you don't have an image of monomers only, then I can't help you to determine the brightness of your monomer. --> 

@@ -26,7 +26,7 @@ argument to the path to that file (a string).}
 process.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to correcting
-for bleaching (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+for bleaching (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{ext}{The file extension of the images in the folder that you wish to
@@ -61,16 +61,13 @@ thresholding first. \code{CorrectforBleachingFolder} takes care of this for you.
 \examples{
 library(magrittr)
 img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-tau10 <- CorrectForBleaching(img, 10)
 autotau <- CorrectForBleaching(img, "auto")
-two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-twoch <- CorrectForBleaching(two.channel.img, 100)
 setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
 set.seed(33)
-CorrectForBleachingFolder(tau = 'auto', mst = 'tri', mcc = 2, na = "s")
+CorrectForBleachingFolder(tau = 1000, mst = 'tri', mcc = 2, na = "s")
 list.files()
 file.remove(list.files())
 
@@ -79,8 +76,4 @@ file.remove(list.files())
 Stroud, P. D.: A recursive exponential filter for time-sensitive
 data, Los Alamos national Laboratory, LAUR-99-5573,
 \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
-
-img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-tau10 <- CorrectForBleaching(img, 10) autotau <- CorrectForBleaching(img,
-'auto')
 }

@@ -12,7 +12,7 @@
 #'   stack.. To perform this on a file that has not yet been read in, set this
 #'   argument to the path to that file (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   mean intensities (via [autothresholdr::MeanStackThresh()])? If so, set your
+#'   mean intensities (via [autothresholdr::mean_stack_thresh()])? If so, set your
 #'   thresholding \emph{method} here. Pixels failing to exceed the threshold are
 #'   set to `NA`.
 #' @param skip.consts An image array with only one value (a 'constant array')
@@ -79,7 +79,7 @@ MeanIntensity_ <- function(arr3d, mst = NULL,
     stop("arr3d must be a three-dimensional array ",
          "or the path to an image on disk which can be read in as a 3d array.")
   if (!is.null(mst)) {
-    arr3d <- autothresholdr::MeanStackThresh(arr3d, method = mst)
+    arr3d <- autothresholdr::mean_stack_thresh(arr3d, method = mst)
   }
   mean.intensity <- MeanPillars(arr3d)
   if (!is.null(filt)) {
@@ -159,7 +159,7 @@ MeanIntensities <- function(arr3d.list, mst = NULL, skip.consts = FALSE,
       MeanIntensity, filt = filt, verbose = verbose,
       BPPARAM = bpp(mcc))
   } else if (is.list(arr3d.list)) {
-    arr3d.list <- lapply(arr3d.list, autothresholdr::MeanStackThresh,
+    arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
                          method = mst, fail = fail)
     mean.intensities <- BiocParallel::bplapply(arr3d.list,
       MeanIntensity, filt = filt, verbose = verbose, BPPARAM = bpp(mcc))
@@ -175,7 +175,7 @@ MeanIntensities <- function(arr3d.list, mst = NULL, skip.consts = FALSE,
     }
     for (i in sets) {
       arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::MeanStackThresh, method = mst,
+      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh, method = mst,
                          fail = fail)
       mean.intensities.i <- BiocParallel::bplapply(threshed,
         MeanIntensity, filt = filt, verbose = verbose,

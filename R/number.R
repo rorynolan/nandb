@@ -24,7 +24,7 @@
 #'   frames). If this is set to `'auto'`, then the value of `tau` is
 #'   calculated automatically via [BestTau()].
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   number (via [autothresholdr::MeanStackThresh()])? If so, set your thresholding
+#'   number (via [autothresholdr::mean_stack_thresh()])? If so, set your thresholding
 #'   \emph{method} here.
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeeding the threshold be set?
@@ -48,11 +48,11 @@
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median')
+#' number <- Number(img, tau = NA, mst = 'Huang', filt = 'median')
 #' MatrixRasterPlot(number, scale.name = "number")
 #' library(magrittr)
 #' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' number.2ch <- Number(two.channel.img)
+#' number.2ch <- Number(two.channel.img, n.ch = 2)
 #' @export
 Number <- function(arr, tau = NA, mst = NULL,
                    filt = NULL, n.ch = 1, verbose = FALSE) {
@@ -62,6 +62,12 @@ Number <- function(arr, tau = NA, mst = NULL,
     arr <- ReadImageData(arr)
   }
   d <- dim(arr)
+  if (n.ch == 1) {
+    if (length(d) != 3) {
+      stop("Expected a three-dimensional image array image but got a ",
+           length(d), " dimensional one.")
+    }
+  }
   if (n.ch > 1) {
     ld <- length(d)
     if (! ld %in% c(3, 4)) {
@@ -73,10 +79,6 @@ Number <- function(arr, tau = NA, mst = NULL,
     }
     if (ld == 3) arr <- ForceChannels(arr, n.ch)
     d <- dim(arr)
-    if (d[3] != n.ch) {
-      stop ("The image does not have ", n.ch, " channels, as you expect. ",
-            "Instead it has ", d[3], ".")
-    }
   }
   if (length(d) == 3) {
     return(Number_(arr, tau = tau, mst = mst, filt = filt))
@@ -99,7 +101,7 @@ Number_ <- function(arr3d, tau = NA, mst = NULL,
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
   if (!is.null(mst)) {
-    arr3d <- autothresholdr::MeanStackThresh(arr3d, method = mst, fail = fail)
+    arr3d <- autothresholdr::mean_stack_thresh(arr3d, method = mst, fail = fail)
   }
   tau.auto <- FALSE
   if (!is.na(tau)) {
@@ -166,11 +168,11 @@ Number_ <- function(arr3d, tau = NA, mst = NULL,
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' bts <- NumberTimeSeries(img, 10, tau = 'auto', mst = 'tri', filt = 'median',
+#' bts <- NumberTimeSeries(img, 10, tau = NA, mst = 'tri', filt = 'median',
 #'                         mcc = 2)
 #' library(magrittr)
 #' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' nts.2ch <- NumberTimeSeries(two.channel.img, 10)
+#' nts.2ch <- NumberTimeSeries(two.channel.img, 10, n.ch = 2)
 #' @export
 NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
                              mst = NULL, filt = NULL,
@@ -182,6 +184,12 @@ NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
     arr <- ReadImageData(arr)
   }
   d <- dim(arr)
+  if (n.ch == 1) {
+    if (length(d) != 3) {
+      stop("Expected a three-dimensional image array image but got a ",
+           length(d), " dimensional one.")
+    }
+  }
   if (n.ch > 1) {
     ld <- length(d)
     if (! ld %in% c(3, 4)) {
@@ -193,10 +201,6 @@ NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
     }
     if (ld == 3) arr <- ForceChannels(arr, n.ch)
     d <- dim(arr)
-    if (d[3] != n.ch) {
-      stop ("The image does not have ", n.ch, " channels, as you expect. ",
-            "Instead it has ", d[3], ".")
-    }
   }
   if (length(d) == 3) {
     return(NumberTimeSeries_(arr, frames.per.set = frames.per.set,
@@ -253,7 +257,7 @@ NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
 #' setwd(tempdir())
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
-#' NumberTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+#' NumberTxtFolder(tau = NA, mst = 'tri', mcc = 2)
 #' file.remove(list.files())  # cleanup
 #' @export
 NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
@@ -300,7 +304,7 @@ Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,   
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
                 filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
   } else if (is.list(arr3d.list)) {
-    arr3d.list <- lapply(arr3d.list, autothresholdr::MeanStackThresh,
+    arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
                          method = mst, fail = fail)
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
                 filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
@@ -312,11 +316,11 @@ Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,   
     }
     numbers <- list()
     sets <- seq_along(arr3d.list) %>% {
-      split(., ((. - 1)%/%mcc) + 1)
+      split(., ((. - 1) %/% mcc) + 1)
     }
     for (i in sets) {
       arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::MeanStackThresh, method = mst,
+      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh, method = mst,
                          fail = fail)
       numbers.i <- BiocParallel::bplapply(threshed, Number, tau = tau,
         filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))

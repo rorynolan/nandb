@@ -31,7 +31,7 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+brightness (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
@@ -98,10 +98,10 @@ brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
-BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+BrightnessTxtFolder(tau = NA, mst = 'tri', mcc = 2)
 list.files()
 file.remove(list.files())  # cleanup
 img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
+brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = NA, mcc = 2)
 
 }

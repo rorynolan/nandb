@@ -29,7 +29,7 @@ to use this function correctly. This must be greater than 1 (this is the
 \code{\link[=Brightness]{Brightness()}}).}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+brightness (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the brightness image using \code{\link[=SmoothFilterB]{SmoothFilterB()}} or
@@ -78,9 +78,9 @@ entire folder (directory) of images and outputs a csv file of the results.
 }
 \examples{
 img <- system.file('extdata', '50.tif', package = 'nandb')
-KmersFromImage(img, 1.1, tau = "auto", mst = "huang")
+KmersFromImage(img, 1.1, tau = NA, mst = "huang")
 
-KmersFromImages(c(img, img), 1.1, tau = "auto", mst = "huang")
+KmersFromImages(c(img, img), 1.1, tau = NA, mst = "huang")
 
 setwd(tempdir())
 file.copy(img, ".")

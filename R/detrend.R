@@ -22,19 +22,12 @@
 #'   data, Los Alamos national Laboratory, LAUR-99-5573,
 #'   \url{public.lanl.gov/stroud/ExpFilter/ExpFilter995573.pdf}, 1999.
 #'
-#'   img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#'   tau10 <- CorrectForBleaching(img, 10) autotau <- CorrectForBleaching(img,
-#'   'auto')
-#'
 #' @return `CorrectForBleaching` returns the detrended image series.
 #'
 #' @examples
 #' library(magrittr)
 #' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-#' tau10 <- CorrectForBleaching(img, 10)
 #' autotau <- CorrectForBleaching(img, "auto")
-#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' twoch <- CorrectForBleaching(two.channel.img, 100)
 #' @export
 CorrectForBleaching <- function(arr, tau) {
   if (is.character(arr)) arr <- ReadImageData(arr)
@@ -65,13 +58,17 @@ CorrectForBleaching_ <- function(arr3d, tau) {
   } else if (!is.numeric(tau)) {
     stop("If tau is not numeric, then it must be NA or 'auto'.")
   }
-  smoothed <- ExpSmoothPillars(arr3d, tau)
-  filtered <- arr3d - smoothed
-  means <- MeanPillars(arr3d)
-  corrected <- filtered + as.vector(means)
-  # as it so happens, this will add the means to the pillars as we desire
-  corrected[corrected < 0] <- 0
-  corrected <- round(corrected)  # return the array back to integer counts
+  if (is.na(tau)) {
+    corrected <- arr3d
+  } else {
+    smoothed <- ExpSmoothPillars(arr3d, tau)
+    filtered <- arr3d - smoothed
+    means <- MeanPillars(arr3d)
+    corrected <- filtered + as.vector(means)
+    # as it so happens, this will add the means to the pillars as we desire
+    corrected[corrected < 0] <- 0
+    corrected <- round(corrected)  # return the array back to integer counts
+  }
   attr(corrected, "tau") <- ifelse(auto.tau, paste0("auto=", round(tau)),
                                    as.character(tau))
   corrected
@@ -81,7 +78,7 @@ CorrectForBleaching_ <- function(arr3d, tau) {
 #' @param folder.path The path (relative or absolute) to the folder you wish to
 #'   process.
 #' @param mst Do you want to apply an intensity threshold prior to correcting
-#'   for bleaching (via [autothresholdr::MeanStackThresh()])? If so, set your
+#'   for bleaching (via [autothresholdr::mean_stack_thresh()])? If so, set your
 #'   thresholding \emph{method} here.
 #' @param ext The file extension of the images in the folder that you wish to
 #'   process. You must wish to process all files with this extension; if there
@@ -103,7 +100,7 @@ CorrectForBleaching_ <- function(arr3d, tau) {
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
 #' set.seed(33)
-#' CorrectForBleachingFolder(tau = 'auto', mst = 'tri', mcc = 2, na = "s")
+#' CorrectForBleachingFolder(tau = 1000, mst = 'tri', mcc = 2, na = "s")
 #' list.files()
 #' file.remove(list.files())
 #'
@@ -118,19 +115,24 @@ CorrectForBleachingFolder <- function(folder.path = ".", tau = NA, mst = NULL,
   if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.paths <- list.files(pattern = ext)
-  BiocParallel::bplapply(file.paths, CorrectForBleachingFile,
+  if (is.null(mst)) mst <- list(NULL)[rep(1, length(file.paths))]
+  BiocParallel::bpmapply(CorrectForBleachingFile, file.paths,
                          tau = tau, mst = mst, na = na,
                          BPPARAM = bpp(mcc, seed = seed))
 }
 
 CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
                                     na = "error") {
+  if ((!is.null(mst)) && startsWith("error", tolower(na))) {
+    stop("If you select thresholding, you cannot have na = \"error\".")
+  }
   arr3d <- ReadImageData(file.path)
   stopifnot(length(dim(arr3d)) == 3)
-  if (!is.null(mst)) arr3d <- autothresholdr::MeanStackThresh(arr3d, mst)
+  if (!is.null(mst)) arr3d <- autothresholdr::mean_stack_thresh(arr3d, mst)
   corrected <- CorrectForBleaching(arr3d, tau)
+  if (is.null(mst)) mst <- "NA"
   out.name <- filesstrings::BeforeLastDot(file.path) %>%
-    paste0("_tau=", attr(corrected, "tau"), ".",
+    paste0("_tau=", attr(corrected, "tau"), "_mst=", mst, ".",
            filesstrings::StrAfterNth(file.path, stringr::coll("."), -1))
   WriteIntImage(corrected, out.name, na = na)
 }
@@ -147,7 +149,7 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
 #'   that has not yet been read in, set this argument to the path to that file
 #'   (a string).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via [autothresholdr::MeanStackThresh()])? If so, set your
+#'   brightness (via [autothresholdr::mean_stack_thresh()])? If so, set your
 #'   thresholding \emph{method} here.
 #' @param tol What size of error in the estimate of the \emph{ideal} `tau`
 #'   (aside from the error introduced by the random image simulation, see
@@ -161,7 +163,7 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' BestTau(img, mst = 'tri', tol = 3)
+#' BestTau(img, tol = 3)
 #'
 #' @export
 BestTau <- function(arr3d, mst = NULL, tol = 1) {
@@ -169,7 +171,7 @@ BestTau <- function(arr3d, mst = NULL, tol = 1) {
     arr3d <- ReadImageData(arr3d[1])
   }
   if (!is.null(mst)) {
-    arr3d <- autothresholdr::MeanStackThresh(arr3d, mst, fail = NA)
+    arr3d <- autothresholdr::mean_stack_thresh(arr3d, mst, fail = NA)
   }
   raw.brightness.mean <- Brightness(arr3d) %>% mean(na.rm = TRUE)
   if (raw.brightness.mean < 1) {
@@ -179,9 +181,7 @@ BestTau <- function(arr3d, mst = NULL, tol = 1) {
   means <- apply(arr3d, 3, mean, na.rm = TRUE)
   p <- sum(!is.na(arr3d[, , 1]))
   sim.img.arr <- vapply(means, stats::rpois, numeric(p), n = p)
-  sim.img.arr.extended <- sim.img.arr %>%
-    apply(1, MedReflectExtend, TRUE, TRUE) %>%
-    t
+  sim.img.arr.extended <- MedReflectExtendRows(sim.img.arr, TRUE, TRUE)
   BrightnessMeanSimMatTau <- function(sim.img.arr, sim.img.arr.extended, tau) {
     if (is.na(tau)) {
       detrended <- sim.img.arr

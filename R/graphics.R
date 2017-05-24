@@ -326,6 +326,11 @@ BrightnessPlotFolder <- function(folder.path = ".",
 #'   this allows the use of [grDevices::rainbow()] and friends. The default uses
 #'   [viridis::viridis()].
 #' @param limits A numeric vector of length two providing limits of the scale.
+#' @param breaks Where do you want tick marks to appear on the legend colour
+#'   scale?
+#' @param include.breaks If you don't want to specify all the breaks, but you
+#'   want some specific ones to be included on the legend colour scale, specify
+#'   those specific ones here.
 #'
 #' @return This is a `ggplot2` object and can be manipulated thus.
 #'
@@ -333,21 +338,22 @@ BrightnessPlotFolder <- function(folder.path = ".",
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = 10, mst = 'Huang')
+#' brightness <- Brightness(img, tau = NA, mst = 'Huang')
 #' mean.intensity <- MeanPillars(img)
 #' ArrArrHexPlot(mean.intensity, brightness) +
 #' ggplot2::labs(x = 'intensity', y = 'brightness')
 #'
 #' @export
 ArrArrHexPlot <- function(arr.x, arr.y, bins = 60, log.trans = FALSE,
-  colours = NULL, limits = NULL) {
+  colours = NULL, limits = NULL, breaks = NULL, include.breaks = NULL) {
   stopifnot(all.equal(dim(arr.x), dim(arr.y)))
   df <- data.frame(x = as.vector(arr.x), y = as.vector(arr.y))
   if (is.null(colours))
     colours <- viridis::viridis(9)
   if (is.null(limits))
     limits <- NULL
+  if (is.null(breaks)) breaks <- ScaleBreaksFun(include.breaks, log.trans)
   ggplot(df, aes(x, y)) + geom_hex(bins = bins) +
-    scale_fill_gradientn(colours = colours,
+    scale_fill_gradientn(colours = colours, breaks = breaks,
     limits = limits, trans = ifelse(log.trans, "log", "identity"))
 }

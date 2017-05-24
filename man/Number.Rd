@@ -29,7 +29,7 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-number (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your thresholding
+number (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your thresholding
 \emph{method} here.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
@@ -91,15 +91,15 @@ series and does the rest in parallel).
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median')
+number <- Number(img, tau = NA, mst = 'Huang', filt = 'median')
 MatrixRasterPlot(number, scale.name = "number")
 library(magrittr)
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-number.2ch <- Number(two.channel.img)
+number.2ch <- Number(two.channel.img, n.ch = 2)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
-NumberTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+NumberTxtFolder(tau = NA, mst = 'tri', mcc = 2)
 file.remove(list.files())  # cleanup
 img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
 numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)

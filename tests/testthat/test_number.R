@@ -15,8 +15,12 @@ test_that("Number works", {
   img <- ReadImageData(img)
   number <- Number(img)
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  number.2ch <- Number(two.channel.img)
+  number.2ch <- Number(two.channel.img, n.ch = 2)
   expect_equal(number.2ch, abind::abind(number, number, along = 3))
+  expect_error(Number(two.channel.img), "dimensional one")
+  expect_error(Number(matrix(1:4, nrow = 2)), "dimensional one")
+  expect_error(Number(matrix(1:4, nrow = 2), n.ch = 2),
+               "nothing to be done")
 })
 
 test_that("NumberTimeSeries works", {
@@ -35,11 +39,15 @@ test_that("NumberTimeSeries works", {
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
   nts.2ch <- NumberTimeSeries(two.channel.img, 10, tau = 100, mst = 'tri',
                               filt = 'median', mcc = 2, verbose = TRUE,
-                              seed = 4)
+                              seed = 4, n.ch = 2)
   expect_equal(nts.2ch,
                abind::abind(nts, nts, along = 4) %>% aperm(c(1, 2, 4, 3)))
-  nts.2ch <- NumberTimeSeries(two.channel.img, 10)
+  nts.2ch <- NumberTimeSeries(two.channel.img, 10, n.ch = 2)
   expect_equal(round(mean(nts.2ch, na.rm = TRUE), 3), 27.382)
+  expect_error(NumberTimeSeries(two.channel.img), "dimensional one")
+  expect_error(NumberTimeSeries(matrix(1:4, nrow = 2)), "dimensional one")
+  expect_error(NumberTimeSeries(matrix(1:4, nrow = 2), n.ch = 2),
+               "nothing to be done")
 })
 
 test_that("NumberTxtFolder works", {

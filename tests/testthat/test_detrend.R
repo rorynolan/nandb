@@ -4,7 +4,7 @@ test_that("CorrectForBleaching works", {
   expect_equal(round(mean(tau10), 4), 21.1542)
   set.seed(9)
   autotau <- CorrectForBleaching(img, "auto")
-  expect_equal(round(mean(autotau), 4), 21.1034)
+  expect_equal(round(mean(autotau), 4), 21.1122)
   expect_error(CorrectForBleaching(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(CorrectForBleaching(img, FALSE),
@@ -23,11 +23,15 @@ test_that("CorrectForBleachingFolder works", {
   WriteIntImage(img, '50.tif')
   WriteIntImage(img, '50again.tif')
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    CorrectForBleachingFolder(tau = 'auto', mst = 'tri', mcc = 2, na = "s",
+    set.seed(19)
+    CorrectForBleachingFolder(tau = "auto", mst = 'tri', mcc = 1, na = "s",
                               seed = 8)
-    expect_true(all(c("50_tau=auto=201.tif", "50again_tau=auto=NA.tif") %in%
+    expect_true(all(c("50_tau=auto=219_mst=tri.tif",
+                      "50again_tau=auto=213_mst=tri.tif") %in%
                       list.files()))
   }
+  expect_error(nandb:::CorrectForBleachingFile("50.tif", mst = "h"),
+               "If you select thresholding")
   suppressWarnings(file.remove(list.files()))
 })
 

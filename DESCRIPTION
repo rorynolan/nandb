@@ -6,17 +6,14 @@ Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com",
                     role = c("aut", "cre", "cph")),
              person("Luis", "Alvarez", email = "lalvarez@well.ox.ac.uk",
                     role = "ctb"),
-             person("Maro", "Iliopoulou", email = "maroilio@well.ox.ac.uk",
-                    role = "ctb"),
              person("Sergi", "Padilla-Parra", email = "spadilla@well.ox.ac.uk",
                     role = c("ctb", "ths", "cph")))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
 URL: https://github.com/rorynolan/filesstrings
 BugReports: https://github.com/rorynolan/filesstrings/issues
-Description: This package is gives functions for calculation of molecular 
-    number and brightness from images, as detailed in Digman et al. 2008. This
-    is the first free, open-source software available for this purpose and comes
-    with an implementation of the novel "automatic detrending" technique.
+Description: Functions for calculation of molecular number and brightness from 
+    images, as detailed in Digman et al. 2008 <doi:10.1529/biophysj.107.114645>. 
+    Includes the implementation of the novel "automatic detrending" technique.
 License: BSD_3_clause + file LICENSE
 LazyData: TRUE
 LinkingTo: Rcpp,
@@ -44,7 +41,8 @@ Imports:
     tibble,
     purrr,
     hexbin,
-    ore
+    ore,
+    tiff
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,

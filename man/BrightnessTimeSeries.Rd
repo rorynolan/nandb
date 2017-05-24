@@ -31,7 +31,7 @@ frames). If this is set to \code{'auto'}, then the value of \code{tau} is
 calculated automatically via \code{\link[=BestTau]{BestTau()}}.}
 
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-brightness (via \code{\link[autothresholdr:MeanStackThresh]{autothresholdr::MeanStackThresh()}})? If so, set your
+brightness (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
 thresholding \emph{method} here.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median
@@ -81,14 +81,14 @@ the sectioning is done for calculation of brightnesses.
 library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-bts <- BrightnessTimeSeries(img, 10, tau = 'auto', mst = 'tri',
+bts <- BrightnessTimeSeries(img, 10, tau = NA, mst = 'tri',
 filt = 'median', mcc = 2)
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-bts.2ch <- BrightnessTimeSeries(two.channel.img, 10)
+bts.2ch <- BrightnessTimeSeries(two.channel.img, 10, n.ch = 2)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
-BrightnessTimeSeriesTxtFolder(tau = 333, mst = 'tri', mcc = 2,
+BrightnessTimeSeriesTxtFolder(tau = NA, mst = 'tri', mcc = 2,
                               frames.per.set = 20)
 list.files()
 file.remove(list.files())  # cleanup

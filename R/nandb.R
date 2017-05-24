@@ -1,4 +1,4 @@
-#' @useDynLib nandb
+#' @useDynLib nandb, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom magrittr '%>%' '%T>%'
 #' @import ggplot2
@@ -12,8 +12,7 @@ if (getRversion() >= "2.15.1") {
 }
 
 .onLoad <- function(libname, pkgname) {
-  ## Workaround needed for BiocParallel MulticoreParam to work
-  ## on mac
+  ## Workaround needed for BiocParallel MulticoreParam to work on mac
   options(bphost = "localhost")
 }
 
@@ -23,7 +22,7 @@ if (getRversion() >= "2.15.1") {
 
 #' nandb: Number and brightness in R.
 #'
-#' The `nandb` package is gives functions for calculation of molecular
+#' The `nandb` package gives functions for calculation of molecular
 #' number and brightness from images, as detailed in Digman et al. 2008. This is
 #' (to the best of my knowledge) the first free, open-source software available
 #' for this purpose and comes with an implementation of the novel 'automatic
@@ -33,5 +32,5 @@ if (getRversion() >= "2.15.1") {
 #' @name nandb
 #' @references Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of
 #'   Molecules and Brightness in the Laser Scanning Microscope. Biophysical
-#'   Journal. 2008;94(6):2320-2332. <doi:10.1529/biophysj.107.114645>.
+#'   Journal. 2008;94(6):2320-2332. \doi{10.1529/biophysj.107.114645}.
 NULL

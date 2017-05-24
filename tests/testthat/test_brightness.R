@@ -15,8 +15,12 @@ test_that("Brightness works", {
   img <- ReadImageData(img)
   brightness <- Brightness(img)
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  brightness.2ch <- Brightness(two.channel.img)
+  brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
   expect_equal(brightness.2ch, abind::abind(brightness, brightness, along = 3))
+  expect_error(Brightness(two.channel.img), "dimensional one")
+  expect_error(Brightness(matrix(1:4, nrow = 2)), "dimensional one")
+  expect_error(Brightness(matrix(1:4, nrow = 2), n.ch = 2),
+               "nothing to be done")
 })
 
 test_that("BrightnessTimeSeries works", {
@@ -26,19 +30,40 @@ test_that("BrightnessTimeSeries works", {
   bts <- BrightnessTimeSeries(img, 10, tau = 100, mst = 'tri',
                               filt = 'median', mcc = 2, seed = 9,
                               verbose = TRUE)
-  expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.957)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.957)
+  }
   bts <- BrightnessTimeSeries(img, 30, tau = 100, mst = 'tri',
                               filt = 'median', mcc = 2, seed = 99,
                               verbose = TRUE)
-  expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.006)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.006)
+  }
   expect_error(BrightnessTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
   img <- ReadImageData(img)
   bts <- BrightnessTimeSeries(img, 10)
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  bts.2ch <- BrightnessTimeSeries(two.channel.img, 10)
+  bts.2ch <- BrightnessTimeSeries(two.channel.img, 10, n.ch = 2)
   expect_equal(bts.2ch,
                abind::abind(bts, bts, along = 4) %>% aperm(c(1, 2, 4, 3)))
+  expect_error(BrightnessTimeSeries(two.channel.img), "dimensional one")
+  expect_error(BrightnessTimeSeries(matrix(1:4, nrow = 2)), "dimensional one")
+  expect_error(BrightnessTimeSeries(matrix(1:4, nrow = 2), n.ch = 2),
+               "nothing to be done")
+
+  setwd(tempdir())
+  WriteIntImage(img, '50.tif')
+  WriteIntImage(img, '50again.tif')
+  BrightnessTimeSeriesTxtFolder(tau = 333, mst = 'tri', mcc = 2,
+                                frames.per.set = 20, seed = 0)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_true(all(
+      c("50_brightness_frames=20_tau=333_mst=tri_filter=NA_1.csv",
+        "50_brightness_frames=20_tau=333_mst=tri_filter=NA_2.csv") %in%
+        list.files()))
+  }
+  suppressWarnings(file.remove(list.files()))  # cleanup
 })
 
 test_that("BrightnessTxtFolder works", {
@@ -75,4 +100,17 @@ test_that("Brightnesses works", {
     expect_error(Brightnesses(1:2, mst = "tri"),
                  "must either be a list of 3d arrays")
   }
+})
+
+test_that("BrightnessTimeSeriess works", {
+  img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+  arr3d.list <- list(img, img)
+  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10)
+  expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
+               rep(1.0207, 2))
+  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10, mst = "otsu")
+  expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
+               rep(1.0247, 2))
+  expect_error(nandb:::BrightnessTimeSeriess(1:2, 10, mst = "tri"),
+               "either.*vector of path")
 })

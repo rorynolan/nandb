@@ -108,6 +108,17 @@ NumericVector MedReflectExtend(NumericVector vec, bool preserve_mean = false,
   }
 }
 
+// [[Rcpp::export]]
+NumericMatrix MedReflectExtendRows(NumericMatrix rows,
+                                   bool preserve_mean = false,
+                                   bool smooth = false) {
+  NumericMatrix extended_rows(rows.nrow(), 3 * rows.ncol() - 2);
+  for (int i = 0; i < rows.nrow(); i++) {
+    extended_rows(i, _) = MedReflectExtend(rows(i, _), preserve_mean, smooth);
+  }
+  return extended_rows;
+}
+
 //' Exponentially smooth a series of observations.
 //'
 //' This function assumes that the observations are evenly spaced and separated

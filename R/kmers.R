@@ -57,7 +57,7 @@ KmersFromBrightnesses <- function(brightnesses, monomer) {
 #' @param tau The time constant for the exponential filtering (see
 #'   [Brightness()]).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via [autothresholdr::MeanStackThresh()])? If so, set your
+#'   brightness (via [autothresholdr::mean_stack_thresh()])? If so, set your
 #'   thresholding \emph{method} here.
 #' @param filt Do you want to smooth (`filt = 'smooth'`) or median (`filt =
 #'   'median'`) filter the brightness image using [SmoothFilterB()] or
@@ -79,7 +79,7 @@ KmersFromBrightnesses <- function(brightnesses, monomer) {
 #'
 #' @examples
 #' img <- system.file('extdata', '50.tif', package = 'nandb')
-#' KmersFromImage(img, 1.1, tau = "auto", mst = "huang")
+#' KmersFromImage(img, 1.1, tau = NA, mst = "huang")
 #'
 #' @export
 KmersFromImage <- function(arr3d, monomer, tau = NA, mst = NULL,
@@ -105,7 +105,7 @@ KmersFromImage <- function(arr3d, monomer, tau = NA, mst = NULL,
 #'   [set.seed], it won't work.
 #'
 #' @examples
-#' KmersFromImages(c(img, img), 1.1, tau = "auto", mst = "huang")
+#' KmersFromImages(c(img, img), 1.1, tau = NA, mst = "huang")
 #'
 #' @export
 KmersFromImages <- function(arrs3d, monomer, tau = NA, mst = NULL,
@@ -183,7 +183,7 @@ KmersFromImagesFolder <- function(folder.path = ".", monomer,
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median')
+#' brightness <- Brightness(img, tau = NA, mst = 'Huang', filt = 'median')
 #' ka <- KmerArray(brightness, 1.1)
 #'
 #' @export
