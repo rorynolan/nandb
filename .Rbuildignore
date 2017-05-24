@@ -7,3 +7,4 @@
 ^appveyor\.yml$
 ^codecov\.yml$
 ^paper_data$
+^cran-comments\.md$
