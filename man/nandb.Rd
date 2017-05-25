@@ -6,11 +6,9 @@
 \alias{nandb-package}
 \title{nandb: Number and brightness in R.}
 \description{
-The \code{nandb} package gives functions for calculation of molecular
-number and brightness from images, as detailed in Digman et al. 2008. This is
-(to the best of my knowledge) the first free, open-source software available
-for this purpose and comes with an implementation of the novel 'automatic
-detrending' technique.
+The \code{nandb} package gives functions for calculation of molecular number and
+brightness from images, as detailed in Digman et al. 2008. It comes with an
+implementation of the novel 'automatic detrending' technique.
 }
 \references{
 Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of
