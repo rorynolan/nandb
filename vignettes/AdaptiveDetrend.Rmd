@@ -26,8 +26,7 @@ invisible(sapply(required.pkgs, library, character.only = TRUE))
 Let's start with an example.
 
 ```{r Read and display image, fig.width=5, fig.height=5}
-eg.img <- system.file("extdata", "50.tif", package = "nandb") %>% 
-  ReadImageData
+eg.img <- system.file("extdata", "50.tif", package = "nandb") %>% ReadImageData
 display(normalize(eg.img[, , 1]), method = "raster")
 ```
 

@@ -1,22 +1,23 @@
 ---
-title: "Number and Brightness Image Analysis in R"
+title: "Number and Brightness Image Analysis"
 author: "Rory Nolan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Number and Brightness analysis in R}
+  %\VignetteIndexEntry{Number and Brightness Image Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+set.seed(1)
 ```
 
 ### Loading the libraries
 
 ```{r load library, results='hide', message=FALSE}
-required <- c("nandb", "EBImage", "magrittr", "dplyr", "ggplot2")
+required <- c("nandb", "EBImage", "dplyr", "ggplot2", "matrixStats")
 sapply(required, library, character.only = TRUE)
 ```
 
@@ -70,7 +71,8 @@ ggplot(db, aes(x, y)) + geom_line() +
 
 and we can compare it to the distribution of brightnesses from immobile particles:
 ```{r immobile plot, fig.width=7, fig.height=7}
-immobile_brightnesses <- replicate(10^6, rpois(50, 50) %>% {var(.) / mean(.)})
+immobile_brightnesses <- matrix(rpois(50 * 10^6, 50), nrow = 10^6) %>% 
+  {rowVars(.) / rowMeans(.)}
 di <- density(immobile_brightnesses) %>% {data.frame(x = .$x, y = .$y)}
 rbind(mutate(db, mobility = "mobile"), mutate(di, mobility = "immobile")) %>%      mutate(mobility = factor(mobility)) %>% 
   ggplot(aes(x, y)) + geom_line(aes(colour = mobility)) + 

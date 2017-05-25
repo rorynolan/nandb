@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README.*$
-^R_junk$
+^junk$
 ^Icon.*$
 ^\.travis\.yml$
 ^appveyor\.yml$
