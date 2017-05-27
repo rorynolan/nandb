@@ -68,6 +68,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ExpSmoothNaive
+NumericVector ExpSmoothNaive(NumericVector obs, double tau);
+RcppExport SEXP nandb_ExpSmoothNaive(SEXP obsSEXP, SEXP tauSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type obs(obsSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExpSmoothNaive(obs, tau));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ExpSmoothPillars
 NumericVector ExpSmoothPillars(NumericVector mat3d, double tau);
 RcppExport SEXP nandb_ExpSmoothPillars(SEXP mat3dSEXP, SEXP tauSEXP) {

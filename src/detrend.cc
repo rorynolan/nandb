@@ -170,6 +170,41 @@ NumericVector ExpSmooth(NumericVector obs, double tau, bool extended = false) {
   return smoothed;
 }
 
+// Exponentially smooth a series of observations without edge correction.
+//
+// This function assumes that the observations are evenly spaced and separated
+// by 1 time unit (so choose your \code{tau} based on that).
+//
+// The function `ExpSmooth()` performs edge correction. This one does not.
+//
+// @param obs A numeric vector of observations (in order).
+// @param tau The time scale for the exponential smoothing (see Stroud 1999).
+//
+// @return The smoothed series, a numeric vector of the same length.
+// @examples
+// ExpSmoothNaive(1:10, 1)
+// [[Rcpp::export]]
+NumericVector ExpSmoothNaive(NumericVector obs, double tau) {
+  int n = obs.size();
+  double numerator;
+  double denominator;
+  NumericVector smoothed(n);
+  NumericVector weights(n);
+  for (int i = 0; i < n; i++) {
+    weights[i] = exp(- i / tau);
+  }
+  for (int i = 0; i < n; i++) {
+    numerator = 0;
+    denominator = 0;
+    for (int j = 0; j < n; j++) {
+      numerator += weights[abs(j - i)] * obs[j];
+      denominator += weights[abs(j - i)];
+    }
+    smoothed[i] = numerator / denominator;
+  }
+  return smoothed;
+}
+
 //' Exponentially smooth pillars of a 3-dimensional array
 //'
 //' For a 3-dimensional array \code{mat3d}, pillar \code{i,j} is defined as

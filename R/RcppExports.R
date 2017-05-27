@@ -37,6 +37,10 @@ ExpSmooth <- function(obs, tau, extended = FALSE) {
     .Call('nandb_ExpSmooth', PACKAGE = 'nandb', obs, tau, extended)
 }
 
+ExpSmoothNaive <- function(obs, tau) {
+    .Call('nandb_ExpSmoothNaive', PACKAGE = 'nandb', obs, tau)
+}
+
 #' Exponentially smooth pillars of a 3-dimensional array
 #'
 #' For a 3-dimensional array \code{mat3d}, pillar \code{i,j} is defined as

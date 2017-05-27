@@ -1,0 +1,7 @@
+oligomer,tau,n,Median,Conf.level,Bca.lower,Bca.upper
+fivemers,10,96,17.6,0.95,15.9,21.5
+fivemers,auto,144,4.41,0.95,4.08,4.72
+fivemers,"NA",144,5.04,0.95,5.01,5.24
+tenmers,10,96,22.5,0.95,15.2,31.1
+tenmers,auto,144,8.19,0.95,7.77,8.5
+tenmers,"NA",144,9.33,0.95,9.18,9.58

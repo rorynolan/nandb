@@ -49,3 +49,7 @@ test_that("BestTau works", {
                          matrix(0, nrow = 2, ncol = 2), along = 3)
   expect_error(BestTau(savage), "savage")
 })
+
+test_that("ExpSmoothNaive works", {
+  expect_equal(round(nandb:::ExpSmoothNaive(1:3, 2), 2), c(1.68, 2, 2.32))
+})

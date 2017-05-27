@@ -1,14 +1,20 @@
-img <- ReadImageData("bleachvis.tif")
-means <- autothresholdr::mean_stack_thresh(before, "MinError") %>%
+required <- c("nandb", "gridExtra", "tidyverse", "EBImage")
+for (r in required) if (!require(r, character.only = TRUE)) install.packages(r)
+invisible(sapply(required, library, character.only = TRUE))
+
+img <- ReadImageData("main_before.tif")
+means <- autothresholdr::mean_stack_thresh(img, "MinError") %>%
   apply(3, mean, na.rm = TRUE)
-means.tau10 <- autothresholdr::mean_stack_thresh(before, "MinError") %>%
+means.tau10 <- autothresholdr::mean_stack_thresh(img, "MinError") %>%
   CorrectForBleaching(10) %>%
   apply(3, mean, na.rm = TRUE)
-means.before.tauauto <- autothresholdr::mean_stack_thresh(before, "MinError") %>%
-  CorrectForBleaching(160) %>%
+set.seed(2)
+best.tau <- autothresholdr::mean_stack_thresh(img, "MinError") %>% BestTau
+means.tauauto <- autothresholdr::mean_stack_thresh(img, "MinError") %>%
+  CorrectForBleaching(best.tau) %>%
   apply(3, mean, na.rm = TRUE)
-bleach.vis <- tibble(frame = seq_along(means.before), `no detrend` = means.before,
-                     `10` = means.before.tau10, auto = means.before.tauauto) %>%
+bleach.vis <- tibble(frame = seq_along(means), `no detrend` = means,
+                     `10` = means.tau10, auto = means.tauauto) %>%
   gather(tau, mean_intensity, -1)
 ggplot(bleach.vis, aes(frame, mean_intensity, colour = tau)) + geom_line()
 ggsave(filename = "bleachvis1.pdf", width = 6, height = 4)
