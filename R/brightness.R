@@ -49,7 +49,7 @@
 #' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = "auto", mst = 'tri', filt = 'median')
+#' brightness <- Brightness(img, tau = "auto", mst = 'Huang', filt = 'median')
 #' MatrixRasterPlot(brightness, log.trans = TRUE)
 #' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
 #' brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
@@ -174,7 +174,7 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
 #' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-#' bts <- BrightnessTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
+#' bts <- BrightnessTimeSeries(img, 20, tau = NA, mst = "Huang", mcc = 2)
 #' @export
 BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
                                  mst = NULL, filt = NULL,

@@ -65,7 +65,7 @@ sectioning is done for calculation of numbers.
 \examples{
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-bts <- NumberTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
+bts <- NumberTimeSeries(img, 20, tau = NA, mst = "Huang", mcc = 2)
 }
 \seealso{
 \code{\link[=Number]{Number()}}.

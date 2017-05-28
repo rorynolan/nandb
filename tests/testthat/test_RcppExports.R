@@ -41,7 +41,7 @@ test_that("MedReflectExtend works", {
 })
 
 test_that("Smooth works", {
-  expect_equal(Smooth(3), 3)
+  expect_equal(nandb:::Smooth(3), 3)
 })
 
 test_that("ExpSmoothRows works with extended = FALSE", {
@@ -52,3 +52,4 @@ test_that("ExpSmoothRows works with extended = FALSE", {
   expect_equal(smoothed.rounded, rbind(c(2.55, 2.67, 2.78),
                                        c(6.92, 7, 7.08)))
 })
+

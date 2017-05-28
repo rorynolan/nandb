@@ -48,7 +48,7 @@
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' number <- Number(img, tau = NA, mst = 'tri')
+#' number <- Number(img, tau = NA, mst = "Huang")
 #' @export
 Number <- function(arr, tau = NA, mst = NULL,
                    filt = NULL, n.ch = 1, verbose = FALSE) {
@@ -163,7 +163,7 @@ Number_ <- function(arr3d, tau = NA, mst = NULL,
 #' @examples
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' bts <- NumberTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
+#' bts <- NumberTimeSeries(img, 20, tau = NA, mst = "Huang", mcc = 2)
 #' @export
 NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
                              mst = NULL, filt = NULL,
@@ -248,7 +248,7 @@ NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
 #' setwd(tempdir())
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
-#' NumberTxtFolder(tau = NA, mst = 'tri', mcc = 2)
+#' NumberTxtFolder(tau = NA, mst = "Huang", mcc = 2)
 #' file.remove(list.files())  # cleanup
 #' @export
 NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,

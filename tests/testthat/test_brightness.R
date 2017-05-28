@@ -4,10 +4,10 @@ test_that("Brightness works", {
   set.seed(33)
   brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median',
                            verbose = TRUE)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0313)
+  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 0.9815)
   brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'smooth',
                            verbose = TRUE)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0466)
+  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0139)
   expect_error(Brightness(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(Brightness(img, FALSE),
@@ -27,17 +27,17 @@ test_that("BrightnessTimeSeries works", {
   library(magrittr)
   img <- system.file('extdata', '50.tif', package = 'nandb')
   set.seed(333)
-  bts <- BrightnessTimeSeries(img, 10, tau = 100, mst = 'tri',
+  bts <- BrightnessTimeSeries(img, 20, tau = 100, mst = 'Huang',
                               filt = 'median', mcc = 2, seed = 9,
                               verbose = TRUE)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.94)
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.964)
   }
-  bts <- BrightnessTimeSeries(img, 30, tau = 100, mst = 'tri',
+  bts <- BrightnessTimeSeries(img, 30, tau = NA, mst = 'Huang',
                               filt = 'median', mcc = 2, seed = 99,
                               verbose = TRUE)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.995)
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.977)
   }
   expect_error(BrightnessTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
@@ -73,8 +73,8 @@ test_that("BrightnessTxtFolder works", {
   WriteIntImage(img, '50.tif')
   WriteIntImage(img, '50again.tif')
   WriteIntImage(array(4, dim = rep(3, 3)), "const.tif")
+  BrightnessTxtFolder(tau = NA, mst = NULL, mcc = 2, seed = 3)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    BrightnessTxtFolder(tau = NA, mst = NULL, mcc = 2, seed = 3)
     expect_true(
       all(c("50_brightness_frames=50_tau=NA_mst=NA_filter=NA.csv",
             "50again_brightness_frames=50_tau=NA_mst=NA_filter=NA.csv") %in%
@@ -92,13 +92,13 @@ test_that("BrightnessTxtFolder works", {
 
 test_that("Brightnesses works", {
   img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
+  brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 250, mcc = 2,
+                               seed = 7)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 250, mcc = 2,
-                                 seed = 7)
-    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.039)
-    expect_error(Brightnesses(1:2, mst = "tri"),
-                 "must either be a list of 3d arrays")
+    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.012)
   }
+  expect_error(Brightnesses(1:2, mst = "tri"),
+               "must either be a list of 3d arrays")
 })
 
 test_that("BrightnessTimeSeriess works", {
@@ -106,10 +106,10 @@ test_that("BrightnessTimeSeriess works", {
   arr3d.list <- list(img, img)
   btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10)
   expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-               rep(1.0094, 2))
+               rep(0.9904, 2))
   btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10, mst = "otsu")
   expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-               rep(1.0085, 2))
+               rep(0.9901, 2))
   expect_error(nandb:::BrightnessTimeSeriess(1:2, 10, mst = "tri"),
                "either.*vector of path")
 })

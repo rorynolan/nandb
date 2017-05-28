@@ -13,28 +13,28 @@ test_that("KmersFromImage works", {
   on.exit(setwd(cwd))
   img <- system.file("extdata", "50.tif", package = "nandb")
   library(magrittr)
-  expected <- c(50, 1) %>%
+  expected <- c(66, 2) %>%
     set_names(c("1mers", "2mers")) %T>% {
-      attr(., "mean.intensity") <- 15.0075
+      attr(., "mean.intensity") <- 15.8987
     }
   set.seed(3)
-  expect_equal(KmersFromImage(img, 2.1, tau = NA, mst = "tri"),
+  expect_equal(KmersFromImage(img, 1.3, tau = NA, mst = "Huang"),
                expected, tolerance = 1e-4, check.attributes = TRUE)
   expected <- list(expected %T>% {
-                     .[1] <- 50
-                     .[2] <- 1})[c(1, 1)]
+                     .[1] <- 66
+                     .[2] <- 2})[c(1, 1)]
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(KmersFromImages(c(img, img), 2.1, tau = NA, mst = "tri",
+    expect_equal(KmersFromImages(c(img, img), 1.3, tau = NA, mst = "Huang",
                                  seed = 8), expected, tolerance = 1e-4,
                  check.attributes = FALSE)
   }
   setwd(tempdir())
   file.copy(img, ".")
-  KmersFromImagesFolder(monomer = 2.1, seed = 3)
+  KmersFromImagesFolder(monomer = 1.3, seed = 3)
   expect_equal(as.matrix(readr::read_csv("results.csv")),
                as.matrix(tibble::tibble(ImageName = "50.tif",
-                                        MeanIntensity = 15.0075,
-                                        `1mers` = 71L, `2mers` = 2L)))
+                                        MeanIntensity = 15.8987,
+                                        `1mers` = 92L, `2mers` = 2L)))
   suppressWarnings(file.remove(list.files()))
 })
 
@@ -45,11 +45,11 @@ test_that("KmerTIFFsFromBrightnessCSVs works", {
   setwd(tempdir())
   file.copy(img, ".")
   set.seed(6)
+  BrightnessTxtFolder(tau = NA, mst = "Huang", seed = 8)
+  KmerTIFFsFromBrightnessCSVs(1.111)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    BrightnessTxtFolder(tau = NA, mst = "tri", seed = 8)
-    KmerTIFFsFromBrightnessCSVs(1.111)
     expect_equal(round(mean(ReadImageData(list.files(pattern = "tau.*tif"))), 2),
-               0.8, tolerance = 0.01)
+               0.57, tolerance = 0.01)
     expect_error(KmerTIFFsFromBrightnessCSVs(1.111, csv.paths = "a",
                                            out.names = c("a", "b")))
   }
@@ -60,9 +60,9 @@ test_that("KmerArray works", {
   set.seed(0)
   img <- ReadImageData(system.file("extdata", "50.tif",
                                    package = "nandb"))
-  brightness <- Brightness(img, tau = NA, mst = "tri")
+  brightness <- Brightness(img, tau = NA, mst = "Huang")
   ka <- KmerArray(brightness, 1.1)
-  expect_equal(round(mean(ka), 3), 0.892)
+  expect_equal(round(mean(ka), 3), 0.625)
   ka0 <- KmerArray(brightness, max(brightness + 1, na.rm = TRUE))
   expect_true(all(unique(ka0) %in% c(NA, 0)))
 })

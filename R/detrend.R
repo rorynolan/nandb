@@ -95,7 +95,7 @@ CorrectForBleaching_ <- function(arr3d, tau) {
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
 #' set.seed(33)
-#' CorrectForBleachingFolder(tau = 1000, mst = 'tri', mcc = 2, na = "s")
+#' CorrectForBleachingFolder(tau = 1000, mst = "Huang", mcc = 2, na = "s")
 #' list.files()
 #' file.remove(list.files())
 #'

@@ -24,7 +24,7 @@ should be greater than 1).
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-brightness <- Brightness(img, tau = NA, mst = 'tri')
+brightness <- Brightness(img, tau = NA, mst = "Huang")
 KmerPlot(brightness, 1.02)
 KmerPlot(brightness, 1.12)
 KmerPlot(brightness, 100)

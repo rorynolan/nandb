@@ -67,7 +67,7 @@ img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
 set.seed(33)
-CorrectForBleachingFolder(tau = 1000, mst = 'tri', mcc = 2, na = "s")
+CorrectForBleachingFolder(tau = 1000, mst = "Huang", mcc = 2, na = "s")
 list.files()
 file.remove(list.files())
 

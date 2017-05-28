@@ -10,13 +10,10 @@ test_that("MeanIntensity works", {
   expect_equal(mint.2ch,
                abind::abind(mean.intensity, mean.intensity, along = 3))
   mean.intensity <- MeanIntensity(img, mst = "Huang", filt = "median")
-  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 18.317)
-  mean.intensity <- MeanIntensity(img)
-  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 15.008)
+  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 18.897)
   mean.intensity <- MeanIntensity(img, filt = "smooth")
-  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 15.008)
+  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 15.899)
   mean.intensity <- MeanIntensity(img, mst = "Huang", filt = "smooth")
-  expect_equal(round(mean(mean.intensity, na.rm = TRUE), 3), 18.333)
   mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "s")
   expect_equal(mint.2ch,
                abind::abind(mean.intensity, mean.intensity, along = 3))
@@ -30,10 +27,10 @@ test_that("MeanIntensity works", {
                  mean(unlist(MeanIntensities(list(img)[rep(1, 2)], mcc = 2))))
     expect_error(MeanIntensities(1:2, mst = "tri"))
     mean.intensities <- MeanIntensities(list(img, 2 * img), mst = "otsu")
-    expect_equal(round(mean(unlist(mean.intensities), na.rm = TRUE), 3), 28.815)
+    expect_equal(round(mean(unlist(mean.intensities), na.rm = TRUE), 3), 29.028)
     img <- system.file("extdata", "50.tif", package = "nandb")
     mean.intensities <- MeanIntensities(rep(img, 2), mst = "otsu")
-    expect_equal(round(mean(unlist(mean.intensities), na.rm = TRUE), 3), 19.201)
+    expect_equal(round(mean(unlist(mean.intensities), na.rm = TRUE), 3), 19.365)
   }
   suppressWarnings(file.remove(list.files()))
 })

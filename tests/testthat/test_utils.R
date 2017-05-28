@@ -31,6 +31,7 @@ test_that("CollapseRanges works", {
                "One cannot try to preserve more ranges than one wants overall")
   expect_error(CollapseRanges(0:11, 5, c(3, 6, 9)),
                "The way in which you've chosen n.out and preserve")
+  expect_error(CollapseRanges(1:2, 2), "must reduce")
 })
 
 test_that("GroupClose works", {
@@ -148,3 +149,4 @@ test_that("ChannelList2Arr errors correctly", {
                "dimensional")
 
 })
+

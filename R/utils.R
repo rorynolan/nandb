@@ -268,8 +268,11 @@ CollapseRanges <- function(ranges, n.out, preserve = NULL, prefer.low = FALSE,
   if (prefer.high && prefer.low) {
     stop("One cannot select both prefer.high and prefer.low.")
   }
-  if (!all(diff(ranges) > 0))
-    stop("ranges must be strictly increasing.")
+  if (!all(diff(ranges) > 0)) stop("ranges must be strictly increasing.")
+  if (n.out >= length(ranges)) {
+    stop("Cannot collapse ", length(ranges) - 1, " ranges into ", n.out,
+         " ranges. Collapsing must reduce the number of ranges.")
+  }
   lp <- length(preserve)
   if (lp > n.out) {
     stop("One cannot try to preserve more ranges than one wants overall. ",

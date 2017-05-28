@@ -81,7 +81,7 @@ the sectioning is done for calculation of brightnesses.
 library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-bts <- BrightnessTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
+bts <- BrightnessTimeSeries(img, 20, tau = NA, mst = "Huang", mcc = 2)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
