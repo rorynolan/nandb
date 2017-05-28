@@ -16,7 +16,7 @@ test_that("KmerPlot is ggplot", {
   expect_is(KmerPlot(brightness, 1.02), "ggplot")
   expect_is(KmerPlot(brightness, 100), "ggplot")
   expect_is(KmerPlot(brightness, 1.02, log.trans = TRUE), "ggplot")
-  expect_is(KmerPlot(brightness, 1.12), "ggplot")
+  expect_is(KmerPlot(brightness, 1.52), "ggplot")
 })
 
 test_that("MatrixRasterPlot is ggplot", {

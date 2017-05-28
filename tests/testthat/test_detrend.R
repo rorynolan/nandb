@@ -1,6 +1,7 @@
 test_that("CorrectForBleaching works", {
   img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
   set.seed(9)
+  expect_equal(CorrectForBleaching(img, NA), img, check.attributes = FALSE)
   autotau <- CorrectForBleaching(img, "auto")
   expect_equal(round(mean(autotau), 4), 15.0092)
   expect_error(CorrectForBleaching(img, "abc"),

@@ -43,10 +43,6 @@ CorrectForBleaching_ <- function(arr3d, tau) {
   d <- dim(arr3d)
   if (length(d) != 3) stop("arr3d must be a three-dimensional array")
   auto.tau <- FALSE
-  if (is.na(tau)) {
-    attr(arr3d, "tau") <- NA
-    return(arr3d)  # option to do nothing
-  }
   if (is.character(tau)) {
     tau <- tolower(tau)
     if (startsWith("auto", tau)) {
@@ -55,7 +51,7 @@ CorrectForBleaching_ <- function(arr3d, tau) {
     } else {
       stop("If tau is a string, it must be 'auto'.")
     }
-  } else if (!is.numeric(tau)) {
+  } else if ((!is.numeric(tau)) && (!is.na(tau))) {
     stop("If tau is not numeric, then it must be NA or 'auto'.")
   }
   if (is.na(tau)) {

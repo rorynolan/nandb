@@ -13,9 +13,9 @@ test_that("Brightness works", {
   expect_error(Brightness(img, FALSE),
                "If tau is not numeric, then it must be NA or 'auto'.")
   img <- ReadImageData(img)
-  brightness <- Brightness(img)
+  brightness <- Brightness(img, filt = "smooth")
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
+  brightness.2ch <- Brightness(two.channel.img, n.ch = 2, filt = "smooth")
   expect_equal(brightness.2ch, abind::abind(brightness, brightness, along = 3))
   expect_error(Brightness(two.channel.img), "dimensional one")
   expect_error(Brightness(matrix(1:4, nrow = 2)), "dimensional one")

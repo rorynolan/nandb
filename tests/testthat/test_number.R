@@ -10,9 +10,9 @@ test_that("Number works", {
                "If tau is not numeric, then it must be NA or 'auto'.")
   library(magrittr)
   img <- ReadImageData(img)
-  number <- Number(img)
+  number <- Number(img, filt = "smooth")
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  number.2ch <- Number(two.channel.img, n.ch = 2)
+  number.2ch <- Number(two.channel.img, n.ch = 2, filt = "smooth")
   expect_equal(number.2ch, abind::abind(number, number, along = 3))
   expect_error(Number(two.channel.img), "dimensional one")
   expect_error(Number(matrix(1:4, nrow = 2)), "dimensional one")
@@ -23,9 +23,9 @@ test_that("Number works", {
 test_that("NumberTimeSeries works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   set.seed(333)
-  nts <- NumberTimeSeries(img, 30, tau = 10, mst = 'tri', filt = 'median',
+  nts <- NumberTimeSeries(img, 30, tau = 10, mst = 'tri', filt = 'smooth',
                           mcc = 2, verbose = TRUE, seed = 4)
-  expect_equal(round(mean(nts, na.rm = TRUE), 3), 16.199)
+  expect_equal(round(mean(nts, na.rm = TRUE), 3), 16.974)
   nts <- NumberTimeSeries(img, 10, tau = NA, mst = 'tri',
                           mcc = 2, verbose = TRUE, seed = 4)
   expect_equal(round(mean(nts, na.rm = TRUE), 3), 19.93)
