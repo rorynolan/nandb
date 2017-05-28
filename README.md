@@ -67,20 +67,12 @@ On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools
 Then, everyone, open R and run:
 
 ``` r
-install.packages(c("devtools", "knitr", "rmarkdown", "locfit", "tiff", "jpeg", 
-                   "png", "fftwtools", "XML", "xml2", "gstat", "gridExtra"))
 source("https://bioconductor.org/biocLite.R")
-biocLite(c("BiocGenerics", "EBImage", "BiocParallel"))
+biocLite(c("EBImage", "BiocParallel"))
+install.packages("nandb")
 ```
 
-If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. If you get the chance to install some packages from source, it's safest to decline. Then run
-
-``` r
-options(unzip = "internal")
-devtools::install_github("rorynolan/nandb", build_vignettes = TRUE)
-```
-
-Done.
+If you get a message saying `Update all/some/none? [a/s/n]:`, type `a`. If you get the chance to install some packages from source, it's safest to decline.
 
 #### Problems
 
@@ -91,15 +83,12 @@ If you run into problems during your installation, it's most likely that your in
 To update the package, you just need to do the same thing:
 
 ``` r
-options(unzip = "internal")
-devtools::install_github("rorynolan/nandb", build_vignettes = TRUE)
+source("https://bioconductor.org/biocLite.R")
+biocLite(c("EBImage", "BiocParallel"))
+install.packages("nandb")
 ```
-
-To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page <https://github.com/rorynolan/nandb> (you're probably there right now) and look for the version in the DESCRIPTION file.
-
-If you don't want to bother checking and you just want to make sure you have the latest version, just run those two lines of code.
 
 Use
 ---
 
-For the lowdown on how to use this package, you should read the package vignettes (browse them using `vignette(package = "nandb")`).
+For the lowdown on how to use this package, you should read the package vignettes. Once you've installed the package, you can browse them using `vignette(package = "nandb")`.
