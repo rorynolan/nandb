@@ -107,9 +107,7 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
     if (is.character(tau)) {
       tau <- tolower(tau)
       if (startsWith("auto", tau)) {
-        Sys.sleep(1)
         tau <- BestTau(arr3d)
-        Sys.sleep(1)
         tau.auto <- TRUE
       } else {
         stop("If tau is a string, it must be 'auto'.")
@@ -119,9 +117,7 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
     }
     arr3d <- CorrectForBleaching(arr3d, tau)
   }
-  Sys.sleep(1)
   brightness <- VarPillars(arr3d)/MeanPillars(arr3d)
-  Sys.sleep(1)
   if (!is.null(filt)) {
     allowed <- c("median", "smooth")
     filt <- tolower(filt)
@@ -134,7 +130,6 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
     } else {
       brightness <- SmoothFilterB(brightness, na_count = TRUE)
     }
-    Sys.sleep(1)
   }
   tau <- ifelse(tau.auto, ifelse(is.na(tau), "auto=NA", stringr::str_c("auto=",
     round(tau))), tau)
@@ -143,7 +138,6 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
   new.brightness.attrs <- list(frames = d[3], tau = tau, filter = filter,
     mst = mst)
   attributes(brightness) <- c(attributes(brightness), new.brightness.attrs)
-  Sys.sleep(1)
   brightness
 }
 

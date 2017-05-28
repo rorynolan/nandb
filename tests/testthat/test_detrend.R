@@ -3,7 +3,7 @@ test_that("CorrectForBleaching works", {
   set.seed(9)
   expect_equal(CorrectForBleaching(img, NA), img, check.attributes = FALSE)
   autotau <- CorrectForBleaching(img, "auto")
-  expect_equal(round(mean(autotau), 4), 15.8991)
+  expect_equal(round(mean(autotau), 4), 13.9142)
   expect_error(CorrectForBleaching(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(CorrectForBleaching(img, FALSE),
@@ -25,8 +25,8 @@ test_that("CorrectForBleachingFolder works", {
   CorrectForBleachingFolder(tau = "auto", mst = 'Huang', mcc = 1, na = "s",
                             seed = 8)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_true(all(c("50_tau=auto=NA_mst=Huang.tif",
-                      "50again_tau=auto=98_mst=Huang.tif") %in%
+    expect_true(all(c("50_tau=auto=102_mst=Huang.tif",
+                      "50again_tau=auto=49_mst=Huang.tif") %in%
                       list.files()))
   }
   expect_error(nandb:::CorrectForBleachingFile("50.tif", mst = "h"),
@@ -37,12 +37,18 @@ test_that("CorrectForBleachingFolder works", {
 test_that("BestTau works", {
   set.seed(5)
   img <- system.file('extdata', '50.tif', package = 'nandb')
+  expect_equal(round(BestTau(img, mst = "H")), 32, check.attributes = FALSE)
   expect_error(BestTau(array(1, dim = rep(3, 3))),
                "Your raw brightness mean is below 1,")
   savage <- abind::abind(matrix(0, nrow = 2, ncol = 2),
                          matrix(100, nrow = 2, ncol = 2),
                          matrix(0, nrow = 2, ncol = 2), along = 3)
   expect_error(BestTau(savage), "savage")
+  set.seed(0)
+  a <- abind::abind(matrix(rpois(4, 100), nrow = 2),
+                    matrix(rpois(4, 100), nrow = 2),
+                    along = 3)
+  expect_true(is.na(BestTau(a)))
 })
 
 test_that("ExpSmoothNaive works", {
