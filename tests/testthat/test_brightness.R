@@ -4,10 +4,10 @@ test_that("Brightness works", {
   set.seed(33)
   brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median',
                            verbose = TRUE)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0314)
+  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0313)
   brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'smooth',
                            verbose = TRUE)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0448)
+  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0466)
   expect_error(Brightness(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(Brightness(img, FALSE),
@@ -31,13 +31,13 @@ test_that("BrightnessTimeSeries works", {
                               filt = 'median', mcc = 2, seed = 9,
                               verbose = TRUE)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.957)
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.94)
   }
   bts <- BrightnessTimeSeries(img, 30, tau = 100, mst = 'tri',
                               filt = 'median', mcc = 2, seed = 99,
                               verbose = TRUE)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.006)
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.995)
   }
   expect_error(BrightnessTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
@@ -51,7 +51,6 @@ test_that("BrightnessTimeSeries works", {
   expect_error(BrightnessTimeSeries(matrix(1:4, nrow = 2)), "dimensional one")
   expect_error(BrightnessTimeSeries(matrix(1:4, nrow = 2), n.ch = 2),
                "nothing to be done")
-
   setwd(tempdir())
   WriteIntImage(img, '50.tif')
   WriteIntImage(img, '50again.tif')
@@ -96,7 +95,7 @@ test_that("Brightnesses works", {
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
     brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 250, mcc = 2,
                                  seed = 7)
-    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.041)
+    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.039)
     expect_error(Brightnesses(1:2, mst = "tri"),
                  "must either be a list of 3d arrays")
   }
@@ -107,10 +106,10 @@ test_that("BrightnessTimeSeriess works", {
   arr3d.list <- list(img, img)
   btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10)
   expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-               rep(1.0207, 2))
+               rep(1.0094, 2))
   btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10, mst = "otsu")
   expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-               rep(1.0247, 2))
+               rep(1.0085, 2))
   expect_error(nandb:::BrightnessTimeSeriess(1:2, 10, mst = "tri"),
                "either.*vector of path")
 })

@@ -3,10 +3,7 @@ test_that("Number works", {
   set.seed(33)
   number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median',
                            verbose = TRUE)
-  expect_equal(round(mean(number, na.rm = TRUE), 4), 22.9993)
-  number <- Number(img, tau = 1000, mst = 'Huang', filt = 'smooth',
-                   verbose = TRUE)
-  expect_equal(round(mean(number, na.rm = TRUE), 4), 23.5807)
+  expect_equal(round(mean(number, na.rm = TRUE), 4), 18.1342)
   expect_error(Number(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(Number(img, FALSE),
@@ -28,22 +25,22 @@ test_that("NumberTimeSeries works", {
   set.seed(333)
   nts <- NumberTimeSeries(img, 30, tau = 10, mst = 'tri', filt = 'median',
                           mcc = 2, verbose = TRUE, seed = 4)
-  expect_equal(round(mean(nts, na.rm = TRUE), 3), 22.551)
-  nts <- NumberTimeSeries(img, 10, tau = 100, mst = 'tri',
-                          filt = 'median', mcc = 2, verbose = TRUE, seed = 4)
-  expect_equal(round(mean(nts, na.rm = TRUE), 3), 23.594)
+  expect_equal(round(mean(nts, na.rm = TRUE), 3), 16.199)
+  nts <- NumberTimeSeries(img, 10, tau = NA, mst = 'tri',
+                          mcc = 2, verbose = TRUE, seed = 4)
+  expect_equal(round(mean(nts, na.rm = TRUE), 3), 19.93)
   expect_error(NumberTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
   library(magrittr)
   img <- ReadImageData(img)
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  nts.2ch <- NumberTimeSeries(two.channel.img, 10, tau = 100, mst = 'tri',
-                              filt = 'median', mcc = 2, verbose = TRUE,
+  nts.2ch <- NumberTimeSeries(two.channel.img, 10, tau = NA, mst = 'tri',
+                              mcc = 2, verbose = TRUE,
                               seed = 4, n.ch = 2)
   expect_equal(nts.2ch,
                abind::abind(nts, nts, along = 4) %>% aperm(c(1, 2, 4, 3)))
   nts.2ch <- NumberTimeSeries(two.channel.img, 10, n.ch = 2)
-  expect_equal(round(mean(nts.2ch, na.rm = TRUE), 3), 27.382)
+  expect_equal(round(mean(nts.2ch, na.rm = TRUE), 3), 19.93)
   expect_error(NumberTimeSeries(two.channel.img), "dimensional one")
   expect_error(NumberTimeSeries(matrix(1:4, nrow = 2)), "dimensional one")
   expect_error(NumberTimeSeries(matrix(1:4, nrow = 2), n.ch = 2),
@@ -74,10 +71,10 @@ test_that("Numbers works", {
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
     numbers <- Numbers(img.paths, mst = 'Huang', tau = 7, mcc = 2,
                        seed = 7)
-    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 26.634)
+    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 21.008)
     imgs <- lapply(img.paths, ReadImageData)
     numbers <- Numbers(imgs, mst = 'Huang', tau = 8, mcc = 2, seed = 7)
-    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 26.227)
+    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 20.702)
   }
   expect_error(Numbers(1:2, mst = "tri"),
                "must either be a list of 3d arrays")

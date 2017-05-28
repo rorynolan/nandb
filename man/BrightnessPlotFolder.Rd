@@ -32,7 +32,7 @@ setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
-BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+BrightnessTxtFolder(tau = NA, mst = 'tri', mcc = 2)
 BrightnessPlotFolder()
 list.files()
 file.remove(list.files())  # cleanup

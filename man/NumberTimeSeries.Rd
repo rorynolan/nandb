@@ -65,12 +65,7 @@ sectioning is done for calculation of numbers.
 \examples{
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-display(normalize(img[, , 1]), method = 'raster')
-bts <- NumberTimeSeries(img, 10, tau = NA, mst = 'tri', filt = 'median',
-                        mcc = 2)
-library(magrittr)
-two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-nts.2ch <- NumberTimeSeries(two.channel.img, 10, n.ch = 2)
+bts <- NumberTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
 }
 \seealso{
 \code{\link[=Number]{Number()}}.

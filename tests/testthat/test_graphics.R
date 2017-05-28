@@ -4,7 +4,7 @@
 test_that("ArrArrHexPlot is ggplot", {
   img <- ReadImageData(system.file("extdata", "50.tif",
     package = "nandb"))
-  brightness <- Brightness(img, tau = 10, mst = "Huang")
+  brightness <- Brightness(img)
   mean.intensity <- MeanPillars(img)
   expect_is(ArrArrHexPlot(mean.intensity, brightness), "ggplot")
 })
@@ -12,7 +12,7 @@ test_that("ArrArrHexPlot is ggplot", {
 test_that("KmerPlot is ggplot", {
   img <- ReadImageData(system.file("extdata", "50.tif",
     package = "nandb"))
-  brightness <- Brightness(img, tau = 10, mst = "Huang")
+  brightness <- Brightness(img)
   expect_is(KmerPlot(brightness, 1.02), "ggplot")
   expect_is(KmerPlot(brightness, 100), "ggplot")
   expect_is(KmerPlot(brightness, 1.02, log.trans = TRUE), "ggplot")
@@ -22,7 +22,7 @@ test_that("KmerPlot is ggplot", {
 test_that("MatrixRasterPlot is ggplot", {
   img <- ReadImageData(system.file("extdata", "50.tif",
     package = "nandb"))
-  brightness <- Brightness(img, tau = 10, mst = "Huang")
+  brightness <- Brightness(img)
   expect_is(MatrixRasterPlot(brightness, scale.name = "brightness"), "ggplot")
   expect_is(MatrixRasterPlot(brightness, scale.name = "brightness",
     log.trans = TRUE), "ggplot")

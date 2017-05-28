@@ -91,17 +91,17 @@ the thresholding in series and does the rest in parallel).
 library(magrittr)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-brightness <- Brightness(img, tau = "auto", mst = 'Huang', filt = 'median')
+brightness <- Brightness(img, tau = "auto", mst = 'tri', filt = 'median')
 MatrixRasterPlot(brightness, log.trans = TRUE)
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
 brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
 setwd(tempdir())
 WriteIntImage(img, '50.tif')
 WriteIntImage(img, '50again.tif')
-BrightnessTxtFolder(tau = NA, mst = 'tri', mcc = 2)
+BrightnessTxtFolder(tau = NA, mcc = 2)
 list.files()
 file.remove(list.files())  # cleanup
 img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = NA, mcc = 2)
+brightnesses <- Brightnesses(img.paths, tau = NA, mcc = 2)
 
 }

@@ -82,7 +82,7 @@ rbind(mutate(db, mobility = "mobile"), mutate(di, mobility = "immobile")) %>%   
 
 ### Calculating the Brightness of a Monomer
 
-Say we know that our monomeric brightness is 1.05. Then we can create a plot of all kmers present:
+Say we know that our monomeric brightness is 1.02. Then we can create a plot of all kmers present:
 ```{r kmer plot, fig.width=7, fig.height=7}
-KmerPlot(img_brightness, 1.05)
+KmerPlot(img_brightness, 1.04)
 ```

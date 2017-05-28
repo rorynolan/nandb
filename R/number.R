@@ -48,11 +48,7 @@
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' number <- Number(img, tau = NA, mst = 'Huang', filt = 'median')
-#' MatrixRasterPlot(number, scale.name = "number")
-#' library(magrittr)
-#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' number.2ch <- Number(two.channel.img, n.ch = 2)
+#' number <- Number(img, tau = NA, mst = 'tri')
 #' @export
 Number <- function(arr, tau = NA, mst = NULL,
                    filt = NULL, n.ch = 1, verbose = FALSE) {
@@ -167,12 +163,7 @@ Number_ <- function(arr3d, tau = NA, mst = NULL,
 #' @examples
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' display(normalize(img[, , 1]), method = 'raster')
-#' bts <- NumberTimeSeries(img, 10, tau = NA, mst = 'tri', filt = 'median',
-#'                         mcc = 2)
-#' library(magrittr)
-#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' nts.2ch <- NumberTimeSeries(two.channel.img, 10, n.ch = 2)
+#' bts <- NumberTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
 #' @export
 NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
                              mst = NULL, filt = NULL,
@@ -295,7 +286,7 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
 #'
 #' @examples
 #' img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-#' numbers <- Numbers(img.paths, mst = 'Huang', tau = 'auto', mcc = 2)
+#' numbers <- Numbers(img.paths, mst = 'otsu', mcc = 2)
 #'
 #' @export
 Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                          verbose = FALSE, mcc = parallel::detectCores(),

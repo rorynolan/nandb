@@ -49,7 +49,7 @@
 #' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = "auto", mst = 'Huang', filt = 'median')
+#' brightness <- Brightness(img, tau = "auto", mst = 'tri', filt = 'median')
 #' MatrixRasterPlot(brightness, log.trans = TRUE)
 #' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
 #' brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
@@ -174,10 +174,7 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
 #' library(magrittr)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-#' bts <- BrightnessTimeSeries(img, 10, tau = NA, mst = 'tri',
-#' filt = 'median', mcc = 2)
-#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' bts.2ch <- BrightnessTimeSeries(two.channel.img, 10, n.ch = 2)
+#' bts <- BrightnessTimeSeries(img, 20, tau = NA, mst = 'tri', mcc = 2)
 #' @export
 BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
                                  mst = NULL, filt = NULL,
@@ -269,8 +266,7 @@ BrightnessTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
 #' setwd(tempdir())
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
-#' BrightnessTimeSeriesTxtFolder(tau = NA, mst = 'tri', mcc = 2,
-#'                               frames.per.set = 20)
+#' BrightnessTimeSeriesTxtFolder(tau = NA, mcc = 2, frames.per.set = 20)
 #' list.files()
 #' file.remove(list.files())  # cleanup
 #' @export
@@ -355,7 +351,7 @@ BrightnessTimeSeriess <- function(arr3d.list, frames.per.set, tau = NA,
 #' setwd(tempdir())
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
-#' BrightnessTxtFolder(tau = NA, mst = 'tri', mcc = 2)
+#' BrightnessTxtFolder(tau = NA, mcc = 2)
 #' list.files()
 #' file.remove(list.files())  # cleanup
 #' @export
@@ -391,7 +387,7 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
 #'
 #' @examples
 #' img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-#' brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = NA, mcc = 2)
+#' brightnesses <- Brightnesses(img.paths, tau = NA, mcc = 2)
 #'
 #' @export
 Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,

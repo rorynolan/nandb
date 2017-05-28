@@ -1,10 +1,8 @@
 test_that("CorrectForBleaching works", {
   img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-  tau10 <- CorrectForBleaching(img, 10)
-  expect_equal(round(mean(tau10), 4), 21.1542)
   set.seed(9)
   autotau <- CorrectForBleaching(img, "auto")
-  expect_equal(round(mean(autotau), 4), 21.1122)
+  expect_equal(round(mean(autotau), 4), 15.0092)
   expect_error(CorrectForBleaching(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(CorrectForBleaching(img, FALSE),
@@ -26,8 +24,8 @@ test_that("CorrectForBleachingFolder works", {
     set.seed(19)
     CorrectForBleachingFolder(tau = "auto", mst = 'tri', mcc = 1, na = "s",
                               seed = 8)
-    expect_true(all(c("50_tau=auto=219_mst=tri.tif",
-                      "50again_tau=auto=213_mst=tri.tif") %in%
+    expect_true(all(c("50_tau=auto=155_mst=tri.tif",
+                      "50again_tau=auto=144_mst=tri.tif") %in%
                       list.files()))
   }
   expect_error(nandb:::CorrectForBleachingFile("50.tif", mst = "h"),
@@ -36,12 +34,9 @@ test_that("CorrectForBleachingFolder works", {
 })
 
 test_that("BestTau works", {
-  set.seed(3)
-  img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-  expect_true(round(BestTau(img, mst = 'tri', tol = 3)) == 357)
-  set.seed(3)
+  set.seed(5)
   img <- system.file('extdata', '50.tif', package = 'nandb')
-  expect_true(round(BestTau(img, mst = 'tri', tol = 3)) == 357)
+  expect_true(round(BestTau(img, mst = 'tri', tol = 3)) == 100)
   expect_error(BestTau(array(1, dim = rep(3, 3))),
                "Your raw brightness mean is below 1,")
   savage <- abind::abind(matrix(0, nrow = 2, ncol = 2),

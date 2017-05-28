@@ -76,60 +76,24 @@ On **Windows**, you need to go to https://cran.r-project.org/bin/windows/Rtools/
 Then, everyone, open R and run:
 
 ```{r, eval=FALSE}
-install.packages(c("devtools", "knitr", "rmarkdown", "locfit", "tiff", "jpeg", 
-                   "png", "fftwtools", "XML", "xml2", "gstat", "gridExtra"))
 source("https://bioconductor.org/biocLite.R")
-biocLite(c("BiocGenerics", "EBImage", "BiocParallel"))
+biocLite(c("EBImage", "BiocParallel"))
+install.packages("nandb")
 ```
 If you get a message saying `Update all/some/none? [a/s/n]: `, type `a`. If you get the chance to install some packages from source, it's safest to decline.
-Then run
-```{r, eval=FALSE}
-options(unzip = "internal")
-devtools::install_github("rorynolan/nandb", build_vignettes = TRUE)
-```
-Done.
 
 #### Problems
-If you run into problems during your installation, it's most likely that your installation of ```rJava``` didn't work. Try running ```install.packages("rJava")``` and try to work through the errors there. If that still doesn't work, try googling "install rJava" for your operating system e.g. "install rJava Ubuntu". The second most likely culprit is ```EBImage``` so similarly have a google of "install EBImage". If you get these to work, then try the installation instructions again. If you still can't get it to work, feel free to contact me via the issues page associated with this repo.
+If you run into problems during your installation, it's most likely that your installation of `rJava` didn't work. Try running ```install.packages("rJava")``` and try to work through the errors there. If that still doesn't work, try googling "install rJava" for your operating system e.g. "install rJava Ubuntu". The second most likely culprit is `EBImage` so similarly have a google of "install EBImage". If you get these to work, then try the installation instructions again. If you still can't get it to work, feel free to contact me via the issues page associated with this repo.
 
 
 ### Updates
-
 To update the package, you just need to do the same thing:
 ```{r, eval=FALSE}
-options(unzip = "internal")
-devtools::install_github("rorynolan/nandb", build_vignettes = TRUE)
+source("https://bioconductor.org/biocLite.R")
+biocLite(c("EBImage", "BiocParallel"))
+install.packages("nandb")
 ```
-To check if you need an update, check if the package has been updated since you installed it. To check your current version, use `packageVersion("nandb")`. To check if there's a newer version, go to the github page https://github.com/rorynolan/nandb (you're probably there right now) and look for the version in the DESCRIPTION file.
-
-If you don't want to bother checking and you just want to make sure you have the latest version, just run those two lines of code.
-
 
 ## Use
 
-For the lowdown on how to use this package, you should read the package vignettes (browse them using `vignette(package = "nandb")`); however, here's a quick example. First load the library:
-```{r}
-library("nandb")
-```
-Then load the .tif file included with the package:
-```{r}
-tif_file_location <- system.file("extdata", "50.tif", package = "nandb")
-img <- ReadImageData(tif_file_location)
-```
-This `img` is a 3-dimensional array of image slices, where each element corresponds to a pixel with a value of integer counts. Looking at the dimensions of this object:
-```{r}
-dim(img)
-```
-we can see that it is 50 slices each of which is a $`r nrow(img)` \times `r ncol(img)`$ image. We can view the first slice:
-```{r}
-EBImage::display(EBImage::normalize(img[, , 1]), method = "raster")
-```
-
-Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames via 
-```{r}
-img.brightness <- Brightness(img, tau = "auto", mst = "Huang", filt = "median")
-```
-Now we can see the (median filtered) version of the output. 
-```{r Brightness plot}
-MatrixRasterPlot(img.brightness, scale.name = "brightness", log.trans = TRUE)
-```
+For the lowdown on how to use this package, you should read the package vignettes. Once you've installed the package, you can browse them using `vignette(package = "nandb")`.

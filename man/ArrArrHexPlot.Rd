@@ -42,7 +42,7 @@ a hexagonal heatmap.
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-brightness <- Brightness(img, tau = NA, mst = 'Huang')
+brightness <- Brightness(img, tau = NA, mst = 'tri')
 mean.intensity <- MeanPillars(img)
 ArrArrHexPlot(mean.intensity, brightness) +
 ggplot2::labs(x = 'intensity', y = 'brightness')

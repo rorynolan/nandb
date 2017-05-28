@@ -77,7 +77,7 @@
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = 10, mst = 'Huang')
+#' brightness <- Brightness(img, tau = NA, mst = 'tri')
 #' MatrixRasterPlot(brightness, scale.name = 'brightness')
 #' MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE)
 #' MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,
@@ -213,7 +213,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = 10, mst = 'Huang')
+#' brightness <- Brightness(img, tau = NA, mst = 'tri')
 #' KmerPlot(brightness, 1.02)
 #' KmerPlot(brightness, 1.12)
 #' KmerPlot(brightness, 100)
@@ -278,7 +278,7 @@ KmerPlot <- function(brightness.mat, monomer.brightness, log.trans = FALSE) {
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' WriteIntImage(img, '50.tif')
 #' WriteIntImage(img, '50again.tif')
-#' BrightnessTxtFolder(tau = 'auto', mst = 'tri', mcc = 2)
+#' BrightnessTxtFolder(tau = NA, mst = 'tri', mcc = 2)
 #' BrightnessPlotFolder()
 #' list.files()
 #' file.remove(list.files())  # cleanup
@@ -338,7 +338,7 @@ BrightnessPlotFolder <- function(folder.path = ".",
 #' library(EBImage)
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 #' display(normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = NA, mst = 'Huang')
+#' brightness <- Brightness(img, tau = NA, mst = 'tri')
 #' mean.intensity <- MeanPillars(img)
 #' ArrArrHexPlot(mean.intensity, brightness) +
 #' ggplot2::labs(x = 'intensity', y = 'brightness')

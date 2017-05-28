@@ -102,7 +102,7 @@ if you're confused about a transposed plot, this is why.
 library(EBImage)
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 display(normalize(img[, , 1]), method = 'raster')
-brightness <- Brightness(img, tau = 10, mst = 'Huang')
+brightness <- Brightness(img, tau = NA, mst = 'tri')
 MatrixRasterPlot(brightness, scale.name = 'brightness')
 MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE)
 MatrixRasterPlot(brightness, scale.name = 'brightness', log.trans = TRUE,

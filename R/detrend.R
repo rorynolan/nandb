@@ -93,7 +93,6 @@ CorrectForBleaching_ <- function(arr3d, tau) {
 #' @param seed A seed for the random number generation for [BestTau]. Don't use
 #'   [set.seed], it won't work.
 #'
-#'
 #' @examples
 #' setwd(tempdir())
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
