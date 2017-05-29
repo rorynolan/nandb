@@ -13,5 +13,4 @@
 
 ## Resubmission
 This is a resubmission. In this version I have
-* Considerably shortened the time needed to check the package (examples and tests)
 * Fixed the LICENSE to be of the CRAN template
