@@ -8,3 +8,4 @@
 ^paper_data$
 ^cran-comments\.md$
 ^README\.Rmd$
+^LICENSE\.md$
