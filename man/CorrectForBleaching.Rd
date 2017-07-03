@@ -5,7 +5,7 @@
 \alias{CorrectForBleachingFolder}
 \title{Detrend an image series}
 \usage{
-CorrectForBleaching(arr, tau)
+CorrectForBleaching(arr, tau, n.ch = 1)
 
 CorrectForBleachingFolder(folder.path = ".", tau = NA, mst = NULL,
   ext = "tif", na = "error", mcc = parallel::detectCores(), seed = NULL)
@@ -21,6 +21,8 @@ argument to the path to that file (a string).}
 \item{tau}{The time constant for the exponential filtering. If this is set to
 \code{'auto'}, then the value of \code{tau} is calculated automatically via
 \code{\link[=BestTau]{BestTau()}}.}
+
+\item{n.ch}{The number of channels in the image (default 1).}
 
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}

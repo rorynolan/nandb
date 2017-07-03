@@ -83,7 +83,7 @@ Brightness <- function(arr, tau = NA, mst = NULL,
   if (length(d) == 3) {
     return(Brightness_(arr, tau = tau, mst = mst, filt = filt))
   }
-  brightness.args <- list(arr3d = ListChannels(arr), tau = tau, mst = mst,
+  brightness.args <- list(arr3d = ListChannels(arr, n.ch), tau = tau, mst = mst,
                           filt = filt)
   for (i in seq_along(brightness.args)) {
     if (is.null(brightness.args[[i]])) {
@@ -158,8 +158,8 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
 #' @param frames.per.set The number of frames with which to calculate the
 #'   successive brightnesses.
 #' @param mcc The number of cores to use for the parallel processing.
-#' @param seed A seed for the random number generation for [BestTau]. Don't use
-#'   [set.seed], it won't work.
+#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
+#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
 #' @seealso [Brightness()].
@@ -203,7 +203,7 @@ BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
                                  tau = tau, mst = mst, filt = filt,
                                  verbose = verbose, mcc = mcc, seed = seed))
   }
-  bts.args <- list(arr3d = ListChannels(arr), frames.per.set = frames.per.set,
+  bts.args <- list(arr3d = ListChannels(arr, n.ch), frames.per.set = frames.per.set,
                    tau = tau, mst = mst, filt = filt,
                    verbose = verbose, mcc = mcc, seed = seed)
   for (i in seq_along(bts.args)) {
@@ -270,7 +270,7 @@ BrightnessTimeSeriesTxtFolder <- function(folder.path = ".", frames.per.set,
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
-  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   btss <- BrightnessTimeSeriess(file.names, tau = tau, mst = mst,
@@ -278,7 +278,7 @@ BrightnessTimeSeriesTxtFolder <- function(folder.path = ".", frames.per.set,
                                 frames.per.set = frames.per.set)
   frames <- vapply(btss, function(x) attr(x, "frames"), integer(1))
   tau <- simplify2array(lapply(btss, function(x) attr(x, "tau")))
-  names.noext.btss <- vapply(file.names, filesstrings::BeforeLastDot,
+  names.noext.btss <- vapply(file.names, filesstrings::before_last_dot,
                                    character(1)) %>%
     paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
            mst, "_filter=", ifelse(is.null(filt), NA, filt))
@@ -338,8 +338,8 @@ BrightnessTimeSeriess <- function(arr3d.list, frames.per.set, tau = NA,
 #'   are files that you don't want to process, take them out of the folder. The
 #'   default is for tiff files. Do not use regular expression in this argument.
 #' @param mcc The number of cores to use for the parallel processing.
-#' @param seed A seed for the random number generation for [BestTau]. Don't use
-#'   [set.seed], it won't work.
+#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
+#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
 #'
 #' @examples
 #' setwd(tempdir())
@@ -355,7 +355,7 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
-  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   brightnesses <- Brightnesses(file.names, tau = tau, mst = mst,
@@ -363,7 +363,7 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
   frames <- vapply(brightnesses, function(x) attr(x, "frames"), integer(1))
   tau <- simplify2array(lapply(brightnesses, function(x) attr(x, "tau")))
   mst <- purrr::map(brightnesses, ~ attr(., "mst")) %>% unlist
-  names.noext.brightness <- vapply(file.names, filesstrings::BeforeLastDot,
+  names.noext.brightness <- vapply(file.names, filesstrings::before_last_dot,
                                    character(1)) %>%
     paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
       mst, "_filter=", ifelse(is.null(filt), NA, filt))
@@ -389,12 +389,16 @@ Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,
                          mcc = parallel::detectCores(), seed = NULL) {
   if (is.null(mst)) {
     brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
-      filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
+                                           filt = filt, verbose = verbose,
+                                           n.ch = n.ch,
+                                           BPPARAM = bpp(mcc, seed = seed))
   } else if (is.list(arr3d.list)) {
     arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
                          method = mst, fail = NA)
     brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
-      filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
+                                           filt = filt, verbose = verbose,
+                                           n.ch = n.ch,
+                                           BPPARAM = bpp(mcc, seed = seed))
   } else {
     if (!is.character(arr3d.list)) {
       stop("arr3d.list must either be a list of 3d arrays, ",
@@ -409,9 +413,10 @@ Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,
       arrays <- lapply(arr3d.list[i], ReadImageData)
       threshed <- lapply(arrays, autothresholdr::mean_stack_thresh, method = mst,
                          fail = NA)
-      brightnesses.i <- BiocParallel::bplapply(threshed,
-        Brightness, tau = tau, filt = filt, verbose = verbose,
-        BPPARAM = bpp(mcc, seed = seed))
+      brightnesses.i <- BiocParallel::bplapply(threshed, Brightness, tau = tau,
+                                               filt = filt, verbose = verbose,
+                                               n.ch = n.ch,
+                                               BPPARAM = bpp(mcc, seed = seed))
       brightnesses[i] <- brightnesses.i
     }
   }

@@ -103,7 +103,7 @@ test_that("Mat2ColList works", {
 
 test_that("ListChannels works", {
   arr4d <- array(1:(3 ^ 4), dim = rep(3, 4))
-  expect_equal(nandb:::ListChannels(arr4d), list(arr4d[, , 1, ],
+  expect_equal(nandb:::ListChannels(arr4d, 3), list(arr4d[, , 1, ],
                                                  arr4d[, , 2, ],
                                                  arr4d[, , 3, ]))
 })
@@ -133,10 +133,10 @@ test_that("BrightnessVec works", {
 
 test_that("ListChannels errors correctly", {
   library(magrittr)
-  bad <- array(seq_len(2^3), dim = rep(2, 3)) %>%
+  arr <- array(seq_len(2^3), dim = rep(2, 3)) %>%
     abind::abind(., ., ., ., ., along = 4) %>%
     aperm(c(1, 2, 4, 3))
-  expect_error(nandb:::ListChannels(bad), "at most 4")
+  expect_error(nandb:::ListChannels(arr, 2), "but you have indicated")
 })
 
 test_that("ChannelList2Arr errors correctly", {

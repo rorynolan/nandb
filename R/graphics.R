@@ -103,6 +103,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
   ranges = NULL, range.names = NULL, colours = NULL, na.colour = "black",
   clip = FALSE, clip.low = FALSE, clip.high = FALSE, log.trans = FALSE,
   breaks = NULL, include.breaks = NULL) {
+  stopifnot(is.matrix(mat))
   plain.theme <- theme(axis.ticks = element_blank(),
     axis.text = element_blank(), axis.title = element_blank(),
     panel.background = element_rect(fill = "white"),
@@ -117,7 +118,7 @@ MatrixRasterPlot <- function(mat, scale.name = "scale", limits = NULL,
     if (is.null(colours)) {
       if (log.trans) {
         min.log.sep <- log(nr) - log(nr - 1)
-        nums <- round((1 + log(seq_along(ranges)))/min.log.sep) %>%
+        nums <- round((1 + log(seq_along(ranges))) / min.log.sep) %>%
           {
           .[-length(.)]
           }
@@ -298,11 +299,11 @@ BrightnessPlotFolder <- function(folder.path = ".",
   if (is.null(dots$scale.name))
     dots$scale.name <- "brightness"
   for (i in seq_along(file.names)) {
-    bld <- filesstrings::BeforeLastDot(file.names[i])
+    bld <- filesstrings::before_last_dot(file.names[i])
     if (verbose) {
       paste0("Now processing ", bld, ".") %>% message
     }
-    pdf.file.name <- filesstrings::GiveExt(bld, "pdf")
+    pdf.file.name <- filesstrings::give_ext(bld, "pdf")
     grDevices::pdf(pdf.file.name)
     c(list(mat = brightness.matrices[[i]]), dots) %>% do.call(MatrixRasterPlot,
       .) %>% print

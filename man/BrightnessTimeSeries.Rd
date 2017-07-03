@@ -51,8 +51,8 @@ the user that that file is now being processed (useful for
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
-\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
-\link{set.seed}, it won't work.}
+\item{seed}{If using parallel processing (\code{mcc} > 1), a seed for the random
+number generation for \link{BestTau}. Don't use \link{set.seed}, it won't work.}
 
 \item{folder.path}{The path to the folder to process (defaults to current location).}
 

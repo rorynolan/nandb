@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Number and Brightness Image Analysis
-Version: 0.2.0
+Version: 0.2.0.9001
 Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
                     role = c("aut", "cre", "cph")),
              person("Luis", "Alvarez", email = "lalvarez@well.ox.ac.uk",
@@ -20,7 +20,7 @@ LinkingTo: Rcpp,
     BH
 Imports:
     Rcpp,
-    filesstrings,
+    filesstrings (>= 1.1.0),
     magrittr,
     readr,
     reshape2,
@@ -31,7 +31,6 @@ Imports:
     dplyr,
     matrixStats,
     BiocParallel,
-    parallel,
     stringr,
     EBImage,
     RSAGA,
@@ -42,7 +41,7 @@ Imports:
     purrr,
     hexbin,
     ore,
-    tiff
+    DescTools
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,

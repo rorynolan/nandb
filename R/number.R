@@ -79,7 +79,7 @@ Number <- function(arr, tau = NA, mst = NULL,
   if (length(d) == 3) {
     return(Number_(arr, tau = tau, mst = mst, filt = filt))
   }
-  number.args <- list(arr3d = ListChannels(arr), tau = tau, mst = mst,
+  number.args <- list(arr3d = ListChannels(arr, n.ch), tau = tau, mst = mst,
                       filt = filt)
   for (i in seq_along(number.args)) {
     if (is.null(number.args[[i]])) {
@@ -154,8 +154,8 @@ Number_ <- function(arr3d, tau = NA, mst = NULL,
 #'   successive numbers.
 #' @param n.ch The number of channels in the image (default 1).
 #' @param mcc The number of cores to use for the parallel processing.
-#' @param seed A seed for the random number generation for [BestTau]. Don't use
-#'   [set.seed], it won't work.
+#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
+#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th number image.
 #' @seealso [Number()].
@@ -198,7 +198,7 @@ NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
                                  tau = tau, mst = mst,
                                  filt = filt, mcc = mcc, seed = seed))
   }
-  nts.args <- list(arr3d = ListChannels(arr), frames.per.set = frames.per.set,
+  nts.args <- list(arr3d = ListChannels(arr, n.ch), frames.per.set = frames.per.set,
                    tau = tau, mst = mst, filt = filt, mcc = mcc, seed = seed)
   for (i in seq_along(nts.args)) {
     if (is.null(nts.args[[i]])) {
@@ -258,7 +258,7 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
-  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   numbers <- Numbers(file.names, tau = tau, mst = mst,
@@ -266,7 +266,7 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
   frames <- vapply(numbers, function(x) attr(x, "frames"), integer(1))
   tau <- vapply(numbers, function(x) attr(x, "tau"), character(1))
   mst <- purrr::map(numbers, ~ attr(., "mst")) %>% unlist
-  names.noext.number <- vapply(file.names, filesstrings::BeforeLastDot,
+  names.noext.number <- vapply(file.names, filesstrings::before_last_dot,
                                character(1)) %>%
     paste0("_number_frames=", frames, "_tau=", tau, "_mst=",
       mst, "_filter=", ifelse(is.null(filt), NA, filt))
@@ -281,24 +281,28 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
 #'   that have not yet been read in, set this argument to the path to these
 #'   files (a character vector).
 #' @param mcc The number of cores to use for the parallel processing.
-#' @param seed A seed for the random number generation for [BestTau]. Don't use
-#'   [set.seed], it won't work.
+#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
+#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
 #'
 #' @examples
 #' img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
 #' numbers <- Numbers(img.paths, mst = 'otsu', mcc = 2)
 #'
 #' @export
-Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                          verbose = FALSE, mcc = parallel::detectCores(),
+Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                                        n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(),
                     seed = NULL) {
   if (is.null(mst)) {
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
-                filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
+                                      n.ch = n.ch, filt = filt,
+                                      verbose = verbose,
+                                      BPPARAM = bpp(mcc, seed = seed))
   } else if (is.list(arr3d.list)) {
     arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
                          method = mst, fail = fail)
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
-                filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
+                                      n.ch = n.ch, filt = filt,
+                                      verbose = verbose,
+                                      BPPARAM = bpp(mcc, seed = seed))
   } else {
     if (!is.character(arr3d.list)) {
       stop("arr3d.list must either be a list of 3d arrays, ",
@@ -311,10 +315,12 @@ Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,   
     }
     for (i in sets) {
       arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh, method = mst,
-                         fail = fail)
+      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh,
+                         method = mst, fail = fail)
       numbers.i <- BiocParallel::bplapply(threshed, Number, tau = tau,
-        filt = filt, verbose = verbose, BPPARAM = bpp(mcc, seed = seed))
+                                          n.ch = n.ch, filt = filt,
+                                          verbose = verbose,
+                                          BPPARAM = bpp(mcc, seed = seed))
       numbers[i] <- numbers.i
     }
   }

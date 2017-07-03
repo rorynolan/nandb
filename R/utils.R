@@ -135,7 +135,7 @@ PillarsDF <- function(arr3d) {
 }
 
 BrightnessVec <- function(vec) {
-  if (filesstrings::AllEqual(vec, 0)) return(0)
+  if (filesstrings::all_equal(vec, 0)) return(0)
   stats::var(vec)/mean(vec)
 }
 
@@ -194,7 +194,7 @@ FixLUTError <- function(arr, ndim.out) {
     R.utils::extract(arr, seq_len(d[1]), seq_len(d[2]), x,
       drop = TRUE)
   })
-  nonzero <- !vapply(lapply(third.solos, as.vector), filesstrings::AllEqual,
+  nonzero <- !vapply(lapply(third.solos, as.vector), filesstrings::all_equal,
                      logical(1), 0)
   if (sum(nonzero) != 1) {
     err.msg <- paste0("This function expects that in the read image, ",
@@ -538,12 +538,12 @@ bpp <- function(mcc, seed = NULL) {
   suppressWarnings(BiocParallel::MulticoreParam(workers = mcc, RNGseed = seed))
 }
 
-ListChannels <- function(arr4d) {
+ListChannels <- function(arr4d, n.ch) {
   d <- dim(arr4d)
   stopifnot(length(d) == 4)
-  if (d[3] > 4) {
-    stop("You have input an image with ", d[3], "channels. ",
-         "This function can deal with images of at most 4 channels.")
+  if (d[3] != n.ch) {
+    stop("You have input an image with ", d[3], " channels, ",
+         "but you have indicated that it has ", n.ch, " channels.")
   }
   purrr::map(seq_len(d[3]), ~ arr4d[, , ., ])
 }
@@ -551,7 +551,7 @@ ListChannels <- function(arr4d) {
 ChannelList2Arr <- function(chnl.lst) {
   stopifnot(is.list(chnl.lst))
   dims <- purrr::map(chnl.lst, dim)
-  if (!filesstrings::AllEqual(dims)) {
+  if (!filesstrings::all_equal(dims)) {
     stop("The dimensions of the elements of chnl.lst must all be the same.")
   }
   if (length(dims[[1]]) == 2) {

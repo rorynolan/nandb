@@ -14,6 +14,7 @@
 #'   third slot indexes the channel and the fourth indexes the frame in the
 #'   stack.. To perform this on a file that has not yet been read in, set this
 #'   argument to the path to that file (a string).
+#' @param n.ch The number of channels in the image (default 1).
 #' @param tau The time constant for the exponential filtering. If this is set to
 #'   `'auto'`, then the value of `tau` is calculated automatically via
 #'   [BestTau()].
@@ -29,13 +30,13 @@
 #' img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
 #' autotau <- CorrectForBleaching(img, "auto")
 #' @export
-CorrectForBleaching <- function(arr, tau) {
+CorrectForBleaching <- function(arr, tau, n.ch = 1) {
   if (is.character(arr)) arr <- ReadImageData(arr)
   d <- dim(arr)
   if (length(d) == 3) {
     return(CorrectForBleaching_(arr, tau))
   }
-  ListChannels(arr) %>%
+  ListChannels(arr, n.ch = n.ch) %>%
     purrr::map2(tau, ~ CorrectForBleaching_(.x, .y)) %>%
     ChannelList2Arr
 }
@@ -107,7 +108,7 @@ CorrectForBleachingFolder <- function(folder.path = ".", tau = NA, mst = NULL,
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(folder.path)
-  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.paths <- list.files(pattern = ext)
   if (is.null(mst)) mst <- list(NULL)[rep(1, length(file.paths))]
@@ -126,9 +127,9 @@ CorrectForBleachingFile <- function(file.path, tau = NA, mst = NULL,
   if (!is.null(mst)) arr3d <- autothresholdr::mean_stack_thresh(arr3d, mst)
   corrected <- CorrectForBleaching(arr3d, tau)
   if (is.null(mst)) mst <- "NA"
-  out.name <- filesstrings::BeforeLastDot(file.path) %>%
+  out.name <- filesstrings::before_last_dot(file.path) %>%
     paste0("_tau=", attr(corrected, "tau"), "_mst=", mst, ".",
-           filesstrings::StrAfterNth(file.path, stringr::coll("."), -1))
+           filesstrings::str_after_nth(file.path, stringr::coll("."), -1))
   WriteIntImage(corrected, out.name, na = na)
 }
 

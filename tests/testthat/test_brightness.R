@@ -4,10 +4,14 @@ test_that("Brightness works", {
   set.seed(33)
   brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median',
                            verbose = TRUE)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0263)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0239)
+  }
   brightness <- Brightness(img, tau = 1000, mst = 'Huang', filt = 'smooth',
                            verbose = TRUE)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.2823)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0442)
+  }
   expect_error(Brightness(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(Brightness(img, FALSE),
@@ -23,7 +27,7 @@ test_that("Brightness works", {
                "nothing to be done")
 })
 
-test_that("BrightnessTimeSeries works", {
+ test_that("BrightnessTimeSeries works", {
   library(magrittr)
   img <- system.file('extdata', '50.tif', package = 'nandb')
   set.seed(333)
@@ -31,13 +35,13 @@ test_that("BrightnessTimeSeries works", {
                               filt = 'median', mcc = 2, seed = 9,
                               verbose = TRUE)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.988)
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.977)
   }
-  bts <- BrightnessTimeSeries(img, 30, tau = NA, mst = 'Huang',
+  bts <- BrightnessTimeSeries(img, 30, tau = NA, mst = 'tri',
                               filt = 'median', mcc = 2, seed = 99,
                               verbose = TRUE)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.181)
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.008)
   }
   expect_error(BrightnessTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
@@ -95,7 +99,7 @@ test_that("Brightnesses works", {
   brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 250, mcc = 2,
                                seed = 7)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.222)
+    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.039)
   }
   expect_error(Brightnesses(1:2, mst = "tri"),
                "must either be a list of 3d arrays")
@@ -104,12 +108,16 @@ test_that("Brightnesses works", {
 test_that("BrightnessTimeSeriess works", {
   img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
   arr3d.list <- list(img, img)
-  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10)
-  expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-               rep(1.025, 2))
-  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 10, mst = "otsu")
-  expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-               rep(1.0079, 2))
+  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 20)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
+                 rep(1.0124, 2))
+  }
+  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 20, mst = "otsu")
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
+                 rep(1.0105, 2))
+  }
   expect_error(nandb:::BrightnessTimeSeriess(1:2, 10, mst = "tri"),
                "either.*vector of path")
 })

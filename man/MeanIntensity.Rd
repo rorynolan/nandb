@@ -6,8 +6,8 @@
 \alias{MeanIntensities}
 \title{Calculate mean intensity from image series.}
 \usage{
-MeanIntensity(arr, mst = NULL, filt = NULL, skip.consts = FALSE,
-  verbose = FALSE)
+MeanIntensity(arr, n.ch = 1, mst = NULL, filt = NULL,
+  skip.consts = FALSE, verbose = FALSE)
 
 MeanIntensityTxtFolder(folder.path = ".", mst = NULL, ext = "tif",
   mcc = parallel::detectCores(), verbose = TRUE)
@@ -23,10 +23,12 @@ third slot indexes the channel and the fourth indexes the frame in the
 stack.. To perform this on a file that has not yet been read in, set this
 argument to the path to that file (a string).}
 
+\item{n.ch}{The number of channels in the image (default 1).}
+
 \item{mst}{Do you want to apply an intensity threshold prior to calculating
-mean intensities (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
-thresholding \emph{method} here. Pixels failing to exceed the threshold are
-set to \code{NA}.}
+mean intensities (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set
+your thresholding \emph{method} here. Pixels failing to exceed the
+threshold are set to \code{NA}.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the mean intensity image using \code{\link[=SmoothFilterB]{SmoothFilterB()}} or
 \code{\link[=MedianFilterB]{MedianFilterB()}} respectively? If selected, these are invoked here with a
@@ -82,7 +84,7 @@ display(normalize(img[, , 1]), method = 'raster')
 mean.intensity <- MeanIntensity(img, mst = 'Huang', filt = 'median')
 display(normalize(mean.intensity), method = 'r')
 two.channel.img <- abind::abind(img, img, along = 4) \%>\% aperm(c(1, 2, 4, 3))
-mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "med")
+mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "med", n.ch = 2)
 setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')

@@ -39,6 +39,13 @@ function wraps). However, when one prints a matrix in a console (or views it
 in a program such as excel), the value in position \eqn{x = }\code{i}, \eqn{y =
 }\code{j} is from \code{mat[j, i]}, so if you're confused about a phantom
 transposition, this is why.
+
+Sometimes (for whatever reason) the reading of image values as integers with
+\code{readTIFF(..., as.is = TRUE)} fails such that the values which should be 1,
+2, 3 etc. end up as 256, 512, 778 etc. This function corrects for this as
+follows: if the greatest common divisor of the elements in the array are one
+of 2^8, 2^12, 2^16 or 2^32, then divide each element of the array by this
+greatest common divisor. This will return 256, 512, 778 etc. to 1, 2, 3 etc.
 }
 \examples{
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))

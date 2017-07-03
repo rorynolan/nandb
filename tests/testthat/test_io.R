@@ -55,7 +55,9 @@ test_that("ReadImageData works", {
   expect_equal(EBImage::imageData(EBImage::readImage(file.path, as.is = TRUE)),
                ReadImageData(file.path, 3))
   expect_error(ReadImageData(file.path, TRUE), "integer")
-
+  expect_equal(max(ReadImageData(system.file("extdata", "needs_rescaling.tif",
+                                             package = "nandb"))),
+               6)
 })
 
 test_that("WriteImageTxt works", {
@@ -101,5 +103,5 @@ test_that("Bin2Tiff works", {
                  as.vector(ReadImageData("b.tif")))
   }
   setwd("..")
-  filesstrings::RemoveDirs("temp_dir")
+  filesstrings::dir.remove("temp_dir")
 })

@@ -11,10 +11,11 @@
 #'   third slot indexes the channel and the fourth indexes the frame in the
 #'   stack.. To perform this on a file that has not yet been read in, set this
 #'   argument to the path to that file (a string).
+#' @param n.ch The number of channels in the image (default 1).
 #' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   mean intensities (via [autothresholdr::mean_stack_thresh()])? If so, set your
-#'   thresholding \emph{method} here. Pixels failing to exceed the threshold are
-#'   set to `NA`.
+#'   mean intensities (via [autothresholdr::mean_stack_thresh()])? If so, set
+#'   your thresholding \emph{method} here. Pixels failing to exceed the
+#'   threshold are set to `NA`.
 #' @param skip.consts An image array with only one value (a 'constant array')
 #'   won't threshold properly. By default the function would give an error, but
 #'   by setting this parameter to `TRUE`, the array would instead be skipped
@@ -46,9 +47,10 @@
 #' mean.intensity <- MeanIntensity(img, mst = 'Huang', filt = 'median')
 #' display(normalize(mean.intensity), method = 'r')
 #' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "med")
+#' mint.2ch <- MeanIntensity(two.channel.img, mst = "h", filt = "med", n.ch = 2)
 #' @export
-MeanIntensity <- function(arr, mst = NULL, filt = NULL, skip.consts = FALSE,
+MeanIntensity <- function(arr, n.ch = 1, mst = NULL,
+                          filt = NULL, skip.consts = FALSE,
                           verbose = FALSE) {
   if (is.character(arr)) {
     if (verbose)
@@ -60,7 +62,7 @@ MeanIntensity <- function(arr, mst = NULL, filt = NULL, skip.consts = FALSE,
     return(MeanIntensity_(arr, mst = mst, filt = filt,
                           skip.consts = skip.consts))
   }
-  mint.args <- list(arr3d = ListChannels(arr), mst = mst, filt = filt,
+  mint.args <- list(arr3d = ListChannels(arr, n.ch), mst = mst, filt = filt,
                     skip.consts = skip.consts)
   for (i in seq_along(mint.args)) {
     if (is.null(mint.args[[i]])) {
@@ -124,7 +126,7 @@ MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
-  if (filesstrings::StrElem(ext, 1) != ".") ext <- paste0(".", ext)
+  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
   mean.intensities <- MeanIntensities(file.names, MeanIntensity,
@@ -134,7 +136,7 @@ MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
   filters <- vapply(mean.intensities, function(x) attr(x, "filter"),
                     character(1))
   names.noext.mean.intensity <- vapply(file.names,
-                                  filesstrings::BeforeLastDot, character(1)) %>%
+                                  filesstrings::before_last_dot, character(1)) %>%
     paste0("_MeanIntensity_frames=", frames, "_mst=", msts, "_filter=", filters)
   written <- mapply(WriteImageTxt, mean.intensities, names.noext.mean.intensity)
   if (verbose) ("Done. Please check folder.")

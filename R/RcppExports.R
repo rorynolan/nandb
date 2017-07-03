@@ -2,19 +2,19 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 ReflectIndexMed <- function(vec, ind, side) {
-    .Call('nandb_ReflectIndexMed', PACKAGE = 'nandb', vec, ind, side)
+    .Call(nandb_ReflectIndexMed, vec, ind, side)
 }
 
 Smooth <- function(vec) {
-    .Call('nandb_Smooth', PACKAGE = 'nandb', vec)
+    .Call(nandb_Smooth, vec)
 }
 
 MedReflectExtend <- function(vec, preserve_mean = FALSE, smooth = FALSE) {
-    .Call('nandb_MedReflectExtend', PACKAGE = 'nandb', vec, preserve_mean, smooth)
+    .Call(nandb_MedReflectExtend, vec, preserve_mean, smooth)
 }
 
 MedReflectExtendRows <- function(rows, preserve_mean = FALSE, smooth = FALSE) {
-    .Call('nandb_MedReflectExtendRows', PACKAGE = 'nandb', rows, preserve_mean, smooth)
+    .Call(nandb_MedReflectExtendRows, rows, preserve_mean, smooth)
 }
 
 #' Exponentially smooth a series of observations.
@@ -34,11 +34,11 @@ MedReflectExtendRows <- function(rows, preserve_mean = FALSE, smooth = FALSE) {
 #' ExpSmooth(1:10, 1)
 #' @export
 ExpSmooth <- function(obs, tau, extended = FALSE) {
-    .Call('nandb_ExpSmooth', PACKAGE = 'nandb', obs, tau, extended)
+    .Call(nandb_ExpSmooth, obs, tau, extended)
 }
 
 ExpSmoothNaive <- function(obs, tau) {
-    .Call('nandb_ExpSmoothNaive', PACKAGE = 'nandb', obs, tau)
+    .Call(nandb_ExpSmoothNaive, obs, tau)
 }
 
 #' Exponentially smooth pillars of a 3-dimensional array
@@ -60,7 +60,7 @@ ExpSmoothNaive <- function(obs, tau) {
 #' ExpSmoothPillars(m3, 7)
 #' @export
 ExpSmoothPillars <- function(mat3d, tau) {
-    .Call('nandb_ExpSmoothPillars', PACKAGE = 'nandb', mat3d, tau)
+    .Call(nandb_ExpSmoothPillars, mat3d, tau)
 }
 
 #' @rdname ExpSmoothPillars
@@ -71,7 +71,7 @@ ExpSmoothPillars <- function(mat3d, tau) {
 #'   never set this to \code{TRUE}, but [BestTau()] needs this feature.
 #' @export
 ExpSmoothRows <- function(mat, tau, extended = FALSE) {
-    .Call('nandb_ExpSmoothRows', PACKAGE = 'nandb', mat, tau, extended)
+    .Call(nandb_ExpSmoothRows, mat, tau, extended)
 }
 
 #' Smooth and median filters with options for handling NAs.
@@ -103,7 +103,7 @@ ExpSmoothRows <- function(mat, tau, extended = FALSE) {
 #'
 #' @export
 MedianFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
-    .Call('nandb_MedianFilterB', PACKAGE = 'nandb', mat, size, na_rm, na_count)
+    .Call(nandb_MedianFilterB, mat, size, na_rm, na_count)
 }
 
 #' @rdname MedianFilterB
@@ -115,7 +115,7 @@ MedianFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
 #'
 #' @export
 SmoothFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
-    .Call('nandb_SmoothFilterB', PACKAGE = 'nandb', mat, size, na_rm, na_count)
+    .Call(nandb_SmoothFilterB, mat, size, na_rm, na_count)
 }
 
 #' Get the means/medians/variances of pillars of a 3d array
@@ -137,26 +137,26 @@ SmoothFilterB <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
 #'
 #' @export
 MeanPillars <- function(mat3d) {
-    .Call('nandb_MeanPillars', PACKAGE = 'nandb', mat3d)
+    .Call(nandb_MeanPillars, mat3d)
 }
 
 #' @rdname MeanPillars
 #' @export
 VarPillars <- function(mat3d) {
-    .Call('nandb_VarPillars', PACKAGE = 'nandb', mat3d)
+    .Call(nandb_VarPillars, mat3d)
 }
 
 #' @rdname MeanPillars
 #' @export
 MedianPillars <- function(mat3d) {
-    .Call('nandb_MedianPillars', PACKAGE = 'nandb', mat3d)
+    .Call(nandb_MedianPillars, mat3d)
 }
 
 WhichIntervalC <- function(numbers, ranges) {
-    .Call('nandb_WhichIntervalC', PACKAGE = 'nandb', numbers, ranges)
+    .Call(nandb_WhichIntervalC, numbers, ranges)
 }
 
 SpreadSpecificHelper <- function(interval_lengths, interval_pops, m) {
-    .Call('nandb_SpreadSpecificHelper', PACKAGE = 'nandb', interval_lengths, interval_pops, m)
+    .Call(nandb_SpreadSpecificHelper, interval_lengths, interval_pops, m)
 }
 

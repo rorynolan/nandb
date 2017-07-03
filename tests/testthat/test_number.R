@@ -3,7 +3,9 @@ test_that("Number works", {
   set.seed(33)
   number <- Number(img, tau = 'auto', mst = 'Huang', filt = 'median',
                            verbose = TRUE)
-  expect_equal(round(mean(number, na.rm = TRUE), 4), 17.4385)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(number, na.rm = TRUE), 4), 17.1119)
+  }
   expect_error(Number(img, "abc"),
                "If tau is a string, it must be 'auto'.")
   expect_error(Number(img, FALSE),
@@ -25,10 +27,14 @@ test_that("NumberTimeSeries works", {
   set.seed(333)
   nts <- NumberTimeSeries(img, 30, tau = 10, mst = 'Huang', filt = 'smooth',
                           mcc = 2, verbose = TRUE, seed = 4)
-  expect_equal(round(mean(nts, na.rm = TRUE), 3), 16.293)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(nts, na.rm = TRUE), 3), 11.98)
+  }
   nts <- NumberTimeSeries(img, 20, tau = NA, mst = 'Huang',
                           mcc = 2, verbose = TRUE, seed = 4)
-  expect_equal(round(mean(nts, na.rm = TRUE), 3), 15.053)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(nts, na.rm = TRUE), 3), 12.504)
+  }
   expect_error(NumberTimeSeries(img, 51),
                "frames.per.set must not be greater than the depth of arr3d")
   library(magrittr)
@@ -40,7 +46,9 @@ test_that("NumberTimeSeries works", {
   expect_equal(nts.2ch,
                abind::abind(nts, nts, along = 4) %>% aperm(c(1, 2, 4, 3)))
   nts.2ch <- NumberTimeSeries(two.channel.img, 20, n.ch = 2)
-  expect_equal(round(mean(nts.2ch, na.rm = TRUE), 3), 15.053)
+  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+    expect_equal(round(mean(nts.2ch, na.rm = TRUE), 3), 12.504)
+  }
   expect_error(NumberTimeSeries(two.channel.img), "dimensional one")
   expect_error(NumberTimeSeries(matrix(1:4, nrow = 2)), "dimensional one")
   expect_error(NumberTimeSeries(matrix(1:4, nrow = 2), n.ch = 2),
@@ -68,15 +76,15 @@ test_that("NumberTxtFolder works", {
 
 test_that("Numbers works", {
   img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-  numbers <- Numbers(img.paths, mst = 'Huang', tau = 7, mcc = 2,
+  numbers <- Numbers(img.paths, mst = 'Huang', tau = NA, mcc = 2,
                      seed = 7)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 19.916)
+    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 17.457)
   }
   imgs <- lapply(img.paths, ReadImageData)
   numbers <- Numbers(imgs, mst = 'Huang', tau = NA, mcc = 2, seed = 7)
   if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 15.987)
+    expect_equal(round(mean(unlist(numbers), na.rm = TRUE), 3), 17.457)
   }
   expect_error(Numbers(1:2, mst = "tri"),
                "must either be a list of 3d arrays")

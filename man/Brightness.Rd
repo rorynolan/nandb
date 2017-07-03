@@ -59,8 +59,8 @@ default is for tiff files. Do not use regular expression in this argument.}
 
 \item{mcc}{The number of cores to use for the parallel processing.}
 
-\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
-\link{set.seed}, it won't work.}
+\item{seed}{If using parallel processing (\code{mcc} > 1), a seed for the random
+number generation for \link{BestTau}. Don't use \link{set.seed}, it won't work.}
 
 \item{arr3d.list}{A list of 3-dimensional arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these

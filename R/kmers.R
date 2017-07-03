@@ -165,7 +165,7 @@ KmersFromImagesFolder <- function(folder.path = ".", monomer,
   }
   results <- data.frame(ImageName = tif.names, MeanIntensity = means) %>%
     cbind(kmers.table)
-  out.name <- filesstrings::GiveExt(out.name, "csv")
+  out.name <- filesstrings::give_ext(out.name, "csv")
   readr::write_csv(results, out.name)
   invisible(results)
 }
@@ -244,7 +244,7 @@ KmerTIFFsFromBrightnessCSVs <- function(monomer, csv.paths = NULL,
       stop("The number of input files and output names is not equal.")
     }
   }
-  out.names <- vapply(out.names, filesstrings::GiveExt, character(1),
+  out.names <- vapply(out.names, filesstrings::give_ext, character(1),
     "tif", replace = TRUE)
   brightnesses <- BiocParallel::bplapply(csv.paths, ReadImageTxt,
     BPPARAM = bpp(mcc))
