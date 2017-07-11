@@ -157,7 +157,9 @@ ReadImageTxt <- function(file.name) {
 #' @param na How do you want to treat `NA` values? R can only write integer
 #'   values (and hence not `NA`s) to tiff pixels. `na = 'saturate'` sets them to
 #'   saturated value. `na = 'zero'` sets them to zero, while `na = 'error'` will
-#'   give an error if the image contains `NA`s.
+#'   give an error if the image contains `NA`s. You can also specify directly
+#'   here a natural number (must be between 0 and 2 ^ 16 - 1) to use in place of
+#'   `NA`s.
 #'
 #' @examples
 #' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
@@ -167,33 +169,41 @@ ReadImageTxt <- function(file.name) {
 #'
 #' @export
 WriteIntImage <- function(img.arr, file.name, na = "error") {
+  to.invisibly.return <- img.arr
   if (!all(CanBeInteger(img.arr), na.rm = TRUE)) {
     stop("img.arr must contain only integers")
   }
   if (!all(img.arr >= 0, na.rm = TRUE)) {
     stop("img.arr must not contain negative values")
   }
-  na <- RSAGA::match.arg.ext(na, c("saturate", "zero", "error"),
-    ignore.case = TRUE)
+  stopifnot(length(na) == 1)
+  if (is.numeric(na)) {
+    stopifnot(na >= 0, na < 2 ^ 16)
+    na <- floor(na)
+  } else {
+    na <- RSAGA::match.arg.ext(na, c("saturate", "zero", "error"),
+                               ignore.case = TRUE)
+  }
   any.nas <- anyNA(img.arr)
   if (na == "error" && any.nas) stop("img.arr contains NA values.")
+  if (is.numeric(na)) img.arr[is.na(img.arr)] <- na
   mx <- max(img.arr, na.rm = TRUE)
-  if (mx >= 2^16) {
+  if (mx >= 2 ^ 16) {
     stop("The maximum value in img.arr must be less than 2^16")
-  } else if (mx >= 2^8) {
+  } else if (mx >= 2 ^ 8) {
     bits.per.sample <- 16
   } else {
     bits.per.sample <- 8
   }
   img.arr <- img.arr / (2 ^ bits.per.sample - 1)
   if (any.nas) {
-    if (na == "saturate")
-      img.arr[is.na(img.arr)] <- 1
-    if (na == "zero")
-      img.arr[is.na(img.arr)] <- 0
+    if (na == "saturate") img.arr[is.na(img.arr)] <- 1
+    if (na == "zero") img.arr[is.na(img.arr)] <- 0
   }
   file.name <- filesstrings::give_ext(file.name, "tif")
+  message("Now writing ", file.name, ".")
   EBImage::writeImage(img.arr, file.name, bits.per.sample = bits.per.sample)
+  invisible(to.invisibly.return)
 }
 
 #' Fix an image that didn't recognise channels while reading

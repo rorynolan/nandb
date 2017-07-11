@@ -15,7 +15,9 @@ wish to write.}
 \item{na}{How do you want to treat \code{NA} values? R can only write integer
 values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'} sets them to
 saturated value. \code{na = 'zero'} sets them to zero, while \code{na = 'error'} will
-give an error if the image contains \code{NA}s.}
+give an error if the image contains \code{NA}s. You can also specify directly
+here a natural number (must be between 0 and 2 ^ 16 - 1) to use in place of
+\code{NA}s.}
 }
 \description{
 \link[EBImage:writeImage]{EBImage::writeImage} truncates all values above 1 to 1 and all below 0 to 0

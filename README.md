@@ -10,13 +10,7 @@ Installation
 
 ### Platform Dependencies
 
-#### Java Stuff
-
-##### Everyone except Mac OS X
-
-Install the latest [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
-
-##### Mac OS X
+#### Mac OS X
 
 Mac OS X comes with a legacy Apple Java 6. Update your Java installation to a newer version provided by Oracle.
 
@@ -32,11 +26,11 @@ Mac OS X comes with a legacy Apple Java 6. Update your Java installation to a ne
     install.packages("rJava", type="source")
     ```
 
-Then, to make everything work with Rstudio, run
+4.  Then, to make everything work with Rstudio, run
 
-    sudo ln -f -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
+        sudo ln -f -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
 
-(taken from <http://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite>).
+    (taken from <http://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite>).
 
 You can verify your configuration by running the following commands. This should return the Java version string corresponding to the one downloaded and installed in step 1.
 
@@ -49,18 +43,22 @@ library(rJava)
 
 Thanks to @aoles for these instructions. Check out his great work on image analysis in R at <https://github.com/aoles>.
 
-##### Other stuff
+#### Linux
 
-This is slightly painful but you'll only have to do it once. First of all, if you're on **Ubuntu** (similarly for other debian **linux**), you need to do:
+1.  Install the latest [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html). Be sure to install **both** 32-bit and 64-bit.
 
-    sudo apt-get update
-    sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev 
-    sudo apt-get install libcurl4-openssl-dev libxml2-dev 
-    sudo apt-get install default-jre default-jdk libboost-all-dev
+2.  On **Ubuntu** (similarly for other debian **linux**), you need to do:
 
-On **mac**, you need to go to <https://support.apple.com/kb/dl1572?locale=en_US> and download and install Java 6 (don't ask me why this is necessary). Then you need to install `Xcode` from the app store. Finally, you need to open a terminal and type `brew install boost`. If `brew install boost` doesn't work then google "install boost c++ library mac"; you need to have this done in order to use `nandb`.
+        sudo apt-get update
+        sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev 
+        sudo apt-get install libcurl4-openssl-dev libxml2-dev 
+        sudo apt-get install default-jre default-jdk libboost-all-dev
 
-On **Windows**, you need to go to <https://cran.r-project.org/bin/windows/Rtools/> and install the latest version of Rtools.
+#### Windows
+
+1.  Install the latest [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html). Be sure to install **both** 32-bit and 64-bit.
+
+2.  Go to <https://cran.r-project.org/bin/windows/Rtools/> and install the latest version of Rtools.
 
 ### All Platforms
 

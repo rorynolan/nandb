@@ -2,9 +2,10 @@ test_that("MeanIntensity works", {
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
+  img <- system.file("extdata", "50.tif", package = "nandb")
+  expect_message(mean.intensity <- MeanIntensity(img, verbose = TRUE), "proces")
   img <- ReadImageData(system.file("extdata", "50.tif",
-    package = "nandb"))
-  mean.intensity <- MeanIntensity(img)
+                                   package = "nandb"))
   two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
   mint.2ch <- MeanIntensity(two.channel.img, n.ch = 2)
   expect_equal(mint.2ch,

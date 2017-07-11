@@ -117,7 +117,7 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
     }
     arr3d <- CorrectForBleaching(arr3d, tau)
   }
-  brightness <- VarPillars(arr3d)/MeanPillars(arr3d)
+  brightness <- VarPillars(arr3d) / MeanPillars(arr3d)
   if (!is.null(filt)) {
     allowed <- c("median", "smooth")
     filt <- tolower(filt)
