@@ -122,7 +122,7 @@ MeanIntensity_ <- function(arr3d, mst = NULL,
 #'
 #' @export
 MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
-  ext = "tif", mcc = parallel::detectCores(), verbose = TRUE) {
+  ext = "tif", mcc = 1, verbose = TRUE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
@@ -155,7 +155,7 @@ MeanIntensityTxtFolder <- function(folder.path = ".", mst = NULL,
 #'
 #' @export
 MeanIntensities <- function(arr3d.list, mst = NULL, skip.consts = FALSE,
-  fail = NA, filt = NULL, verbose = FALSE, mcc = parallel::detectCores()) {
+  fail = NA, filt = NULL, verbose = FALSE, mcc = 1) {
   if (is.null(mst)) {
     mean.intensities <- BiocParallel::bplapply(arr3d.list,
       MeanIntensity, filt = filt, verbose = verbose,

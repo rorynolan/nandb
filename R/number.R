@@ -168,7 +168,7 @@ Number_ <- function(arr3d, tau = NA, mst = NULL,
 NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
                              mst = NULL, filt = NULL,
                              n.ch = 1, verbose = FALSE,
-                             mcc = parallel::detectCores(), seed = NULL) {
+                             mcc = 1, seed = NULL) {
   if (is.character(arr)) {
     if (verbose)
       message(paste0("Now processing: ", arr, "."))
@@ -212,7 +212,7 @@ NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
 
 NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
                               mst = NULL, filt = NULL,
-                              mcc = parallel::detectCores(), seed = NULL) {
+                              mcc = 1, seed = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3)
     stop("arr3d must be a three-dimensional array")
@@ -253,7 +253,7 @@ NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
 #' @export
 NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
                             filt = NULL, ext = "tif",
-                            mcc = parallel::detectCores(), seed = NULL,
+                            mcc = 1, seed = NULL,
                             verbose = FALSE) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
@@ -289,7 +289,7 @@ NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
 #' numbers <- Numbers(img.paths, mst = 'otsu', mcc = 2)
 #'
 #' @export
-Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                                        n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(),
+Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                                        n.ch = 1, verbose = FALSE, mcc = 1,
                     seed = NULL) {
   if (is.null(mst)) {
     numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,

@@ -25,7 +25,7 @@ Imports:
     readr,
     reshape2,
     R.utils,
-    autothresholdr,
+    autothresholdr (>= 1.0.0),
     abind,
     viridis,
     dplyr,
@@ -41,7 +41,9 @@ Imports:
     purrr,
     hexbin,
     ore,
-    DescTools
+    DescTools,
+    checkmate,
+    radiant.data
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,

@@ -173,7 +173,7 @@ Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
 BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
                                  mst = NULL, filt = NULL,
                                  n.ch = 1, verbose = FALSE,
-                                 mcc = parallel::detectCores(), seed = NULL) {
+                                 mcc = 1, seed = NULL) {
   if (is.character(arr)) {
     if (verbose)
       message(paste0("Now processing: ", arr, "."))
@@ -217,7 +217,7 @@ BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
 }
 BrightnessTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
                                   mst = NULL, filt = NULL, verbose = FALSE,
-                                  mcc = parallel::detectCores(), seed = NULL) {
+                                  mcc = 1, seed = NULL) {
   d <- dim(arr3d)
   if (length(d) != 3) stop("arr3d must be a three-dimensional array")
   if (frames.per.set > d[3]) {
@@ -266,7 +266,7 @@ BrightnessTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
 #' @export
 BrightnessTimeSeriesTxtFolder <- function(folder.path = ".", frames.per.set,
   ext = "tif", tau = NA, mst = NULL, filt = NULL, n.ch = 1, verbose = FALSE,
-  mcc = parallel::detectCores(), seed = NULL) {
+  mcc = 1, seed = NULL) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
@@ -276,12 +276,13 @@ BrightnessTimeSeriesTxtFolder <- function(folder.path = ".", frames.per.set,
   btss <- BrightnessTimeSeriess(file.names, tau = tau, mst = mst,
                                 filt = filt, seed = seed, n.ch = n.ch,
                                 frames.per.set = frames.per.set)
-  frames <- vapply(btss, function(x) attr(x, "frames"), integer(1))
-  tau <- simplify2array(lapply(btss, function(x) attr(x, "tau")))
+  frames <- purrr::map_chr(btss, ~ paste(attr(., "frames"), collapse = ","))
+  tau <- purrr::map_chr(btss, ~ paste(attr(., "tau"), collapse = ","))
   names.noext.btss <- vapply(file.names, filesstrings::before_last_dot,
                                    character(1)) %>%
     paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
-           mst, "_filter=", ifelse(is.null(filt), NA, filt))
+           paste(unlist(mst), collapse = ","),
+           "_filter=", ifelse(is.null(filt), NA, filt))
   mapply(WriteImageTxt, btss, names.noext.btss) %>%
     invisible
   if (verbose) message("Done. Please check folder.")
@@ -289,7 +290,7 @@ BrightnessTimeSeriesTxtFolder <- function(folder.path = ".", frames.per.set,
 BrightnessTimeSeriess <- function(arr3d.list, frames.per.set, tau = NA,
                                   mst = NULL, filt = NULL,
                                   n.ch = 1, verbose = FALSE,
-                                  mcc = parallel::detectCores(), seed = NULL) {
+                                  mcc = 1, seed = NULL) {
   if (is.null(mst)) {
     btss <- BiocParallel::bplapply(arr3d.list, BrightnessTimeSeries, tau = tau,
                                    filt = filt, n.ch = n.ch, verbose = verbose,
@@ -321,10 +322,6 @@ BrightnessTimeSeriess <- function(arr3d.list, frames.per.set, tau = NA,
       btss[i] <- bts.i
     }
   }
-  btss <- lapply(btss, function(x) {
-    attr(x, "mst") <- mst
-    x
-  })
   btss
 }
 
@@ -351,18 +348,18 @@ BrightnessTimeSeriess <- function(arr3d.list, frames.per.set, tau = NA,
 #' @export
 BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
   mst = NULL, filt = NULL, ext = "tif", n.ch = 1,
-  mcc = parallel::detectCores(), verbose = FALSE, seed = NULL) {
+  mcc = 1, verbose = FALSE, seed = NULL) {
   init.dir <- getwd()
   on.exit(setwd(init.dir))
   setwd(folder.path)
   if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
   ext <- ore::ore_escape(ext) %>% paste0("$")
   file.names <- list.files(pattern = ext)
-  brightnesses <- Brightnesses(file.names, tau = tau, mst = mst,
-    filt = filt, seed = seed, n.ch = n.ch)
+  brightnesses <- Brightnesses(file.names, tau = tau, mst = mst, mcc = mcc,
+                               filt = filt, seed = seed, n.ch = n.ch)
   frames <- vapply(brightnesses, function(x) attr(x, "frames"), integer(1))
-  tau <- simplify2array(lapply(brightnesses, function(x) attr(x, "tau")))
-  mst <- purrr::map(brightnesses, ~ attr(., "mst")) %>% unlist
+  tau <- purrr::map_chr(brightnesses, ~ paste(attr(., "tau"), collapse = ","))
+  mst <- purrr::map_chr(brightnesses, ~ paste(attr(., "mst"), collapse = ","))
   names.noext.brightness <- vapply(file.names, filesstrings::before_last_dot,
                                    character(1)) %>%
     paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
@@ -386,7 +383,7 @@ BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
 #' @export
 Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,
                          filt = NULL, n.ch = 1, verbose = FALSE,
-                         mcc = parallel::detectCores(), seed = NULL) {
+                         mcc = 1, seed = NULL) {
   if (is.null(mst)) {
     brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
                                            filt = filt, verbose = verbose,
@@ -411,8 +408,8 @@ Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,
     }
     for (i in sets) {
       arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh, method = mst,
-                         fail = NA)
+      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh,
+                         method = mst, fail = NA)
       brightnesses.i <- BiocParallel::bplapply(threshed, Brightness, tau = tau,
                                                filt = filt, verbose = verbose,
                                                n.ch = n.ch,
@@ -420,11 +417,6 @@ Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,
       brightnesses[i] <- brightnesses.i
     }
   }
-  if (is.null(mst)) mst <- NA
-  brightnesses <- lapply(brightnesses, function(x) {
-    attr(x, "mst") <- mst
-    x
-  })
   brightnesses
 }
 

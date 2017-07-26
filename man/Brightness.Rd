@@ -10,11 +10,11 @@ Brightness(arr, tau = NA, mst = NULL, filt = NULL, n.ch = 1,
   verbose = FALSE)
 
 BrightnessTxtFolder(folder.path = ".", tau = NA, mst = NULL,
-  filt = NULL, ext = "tif", n.ch = 1, mcc = parallel::detectCores(),
-  verbose = FALSE, seed = NULL)
+  filt = NULL, ext = "tif", n.ch = 1, mcc = 1, verbose = FALSE,
+  seed = NULL)
 
 Brightnesses(arr3d.list, tau = NA, mst = NULL, filt = NULL, n.ch = 1,
-  verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
+  verbose = FALSE, mcc = 1, seed = NULL)
 }
 \arguments{
 \item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the

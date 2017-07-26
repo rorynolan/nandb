@@ -10,11 +10,10 @@ Number(arr, tau = NA, mst = NULL, filt = NULL, n.ch = 1,
   verbose = FALSE)
 
 NumberTxtFolder(folder.path = ".", tau = NA, mst = NULL, filt = NULL,
-  ext = "tif", mcc = parallel::detectCores(), seed = NULL,
-  verbose = FALSE)
+  ext = "tif", mcc = 1, seed = NULL, verbose = FALSE)
 
 Numbers(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,
-  n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
+  n.ch = 1, verbose = FALSE, mcc = 1, seed = NULL)
 }
 \arguments{
 \item{arr}{A 3-dimensional array (the image stack) where the \eqn{n}th

@@ -4,7 +4,7 @@
 \alias{BestTau}
 \title{Find the best tau for exponential filtering detrend.}
 \usage{
-BestTau(arr3d, mst = NULL, tol = 1)
+BestTau(arr3d, mst = NULL, tol = 1, mcc = 1, seed = NULL)
 }
 \arguments{
 \item{arr3d}{A 3-dimensional array (the image stack) where the \eqn{n}th
@@ -18,20 +18,26 @@ thresholding \emph{method} here.}
 
 \item{tol}{What size of error in the estimate of the \emph{ideal} \code{tau}
 (aside from the error introduced by the random image simulation, see
-\code{vignette('AdaptiveDetrend', package = 'nandb')}) are you willing
-to tolerate? The default is 1.}
+\code{vignette('AdaptiveDetrend', package = 'nandb')}) are you willing to
+tolerate? The default is 1.}
+
+\item{mcc}{The number of cores to use for the parallel processing (this
+function can be parallelized over channels.}
+
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
 }
 \value{
-A number. The estimate of the ideal \code{tau} to use, with an
-attribute '\code{brightness.immobile}' giving the brightness of the
-simulated (from all immobile particles) image series after detrending with
-this \code{tau} (this should be very close to 1).
+A number. The estimate of the ideal \code{tau} to use, with an attribute
+'\code{brightness.immobile}' giving the brightness of the simulated (from all
+immobile particles) image series after detrending with this \code{tau} (this
+should be very close to 1).
 }
 \description{
 Say you have an image series that you wish to detrend before performing a
-brightness calculation. This function finds the best \code{tau} for an
-exponential filtering detrend. See \code{vignette('Adaptive Detrending',
-package = 'nandb')} for more details.
+brightness calculation. This function finds the best \code{tau} for an exponential
+filtering detrend. See \code{vignette('Adaptive Detrending', package =
+'nandb')} for more details.
 }
 \examples{
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))

@@ -5,10 +5,12 @@
 \alias{CorrectForBleachingFolder}
 \title{Detrend an image series}
 \usage{
-CorrectForBleaching(arr, tau, n.ch = 1)
+CorrectForBleaching(arr, tau, n.ch = 1, mst = NULL, fail = NA,
+  ignore_black = FALSE, ignore_white = FALSE, mcc = 1, seed = NULL)
 
-CorrectForBleachingFolder(folder.path = ".", tau = NA, mst = NULL,
-  ext = "tif", na = "error", mcc = parallel::detectCores(), seed = NULL)
+CorrectForBleachingFolder(folder.path = ".", n.ch = 1, tau = NA,
+  mst = NULL, ignore_black = FALSE, ignore_white = FALSE, ext = "tif",
+  na = "error", mcc = 1, seed = NULL)
 }
 \arguments{
 \item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
@@ -24,12 +26,32 @@ argument to the path to that file (a string).}
 
 \item{n.ch}{The number of channels in the image (default 1).}
 
+\item{mst}{Do you want to apply an intensity threshold prior to calculating
+brightness (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
+thresholding \emph{method} here.}
+
+\item{fail}{When using \code{auto_thresh_apply_mask}, to what value do you wish to
+set the pixels which fail to exceed the threshold. \code{fail = 'saturate'} sets
+them to saturated value (see "Details"). \code{fail = 'zero'} sets them to zero.
+You can also specify directly here a natural number (must be between 0 and
+2 ^ 16 - 1) to use in place of \code{NA}s.}
+
+\item{ignore_black}{Ignore black pixels/elements (zeros) when performing the
+thresholding?}
+
+\item{ignore_white}{Ignore white pixels when performing the thresholding? If
+set to \code{TRUE}, the function makes a good guess as to what the white
+(saturated) value would be (see "Details"). If this is set to a number, all
+pixels with value greater than or equal to that number are ignored.}
+
+\item{mcc}{The number of cores to use for the parallel processing (this
+function can be parallelized over channels.}
+
+\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
+\link{set.seed}, it won't work.}
+
 \item{folder.path}{The path (relative or absolute) to the folder you wish to
 process.}
-
-\item{mst}{Do you want to apply an intensity threshold prior to correcting
-for bleaching (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your
-thresholding \emph{method} here.}
 
 \item{ext}{The file extension of the images in the folder that you wish to
 process. You must wish to process all files with this extension; if there
@@ -41,18 +63,15 @@ values (and hence not \code{NA}s) to tiff pixels. \code{na = 'saturate'} sets th
 saturated value. \code{na = 'zero'} sets them to zero, while \code{na = 'error'} will
 give an error if the image contains \code{NA}s. Note that if you threshold, you
 are almost certain to get \code{NA}s.}
-
-\item{mcc}{The number of cores to use for the parallel processing.}
-
-\item{seed}{A seed for the random number generation for \link{BestTau}. Don't use
-\link{set.seed}, it won't work.}
 }
 \value{
-\code{CorrectForBleaching} returns the detrended image series.
+\code{CorrectForBleaching()} returns the detrended image series.
+\code{CorrectForBleachingFolder()} returns a character vector of the input tifs
+invisibly.
 }
 \description{
-\code{CorrectForBleaching} applies detrending to an image time series using the
-method described in Nolan et al. 2017. \code{CorrectForBleachingFolder} performs
+\code{CorrectForBleaching()} applies detrending to an image time series using the
+method described in Nolan et al. 2017. \code{CorrectForBleachingFolder()} performs
 this correction on all images in a folder, writing the corrected images to
 disk.
 }
@@ -63,7 +82,9 @@ thresholding first. \code{CorrectforBleachingFolder} takes care of this for you.
 \examples{
 library(magrittr)
 img <- ReadImageData(system.file("extdata", "50.tif", package = "nandb"))
-autotau <- CorrectForBleaching(img, "auto")
+autotau <- CorrectForBleaching(img, "auto", mst = "huang")
+img <- ReadImageData(system.file("extdata", "two_ch.tif", package = "nandb"))
+tau10_tri <- CorrectForBleaching(img, 10, n.ch = 2, mst = "triangle")
 setwd(tempdir())
 img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
 WriteIntImage(img, '50.tif')

@@ -5,7 +5,7 @@
 \title{Create a number time-series.}
 \usage{
 NumberTimeSeries(arr, frames.per.set, tau = NA, mst = NULL, filt = NULL,
-  n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
+  n.ch = 1, verbose = FALSE, mcc = 1, seed = NULL)
 }
 \arguments{
 \item{arr}{A 3-dimensional array (the image stack) where the \eqn{n}th

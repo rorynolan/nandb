@@ -41,8 +41,8 @@ function and then perform your desired filtering routine on the result.}
 
 \item{verbose}{If arr3d is specified as a file name, print a message to tell
 the user that that file is now being processed (useful for
-\code{BrightnessFolder}, does not work with multiple cores) and to tell when
-\code{KmersFromImagesFolder} is done.}
+\code{\link[=BrightnessTxtFolder]{BrightnessTxtFolder()}}, does not work with multiple cores) and to tell when
+\code{KmersFromImagesFolder()} is done.}
 
 \item{arrs3d}{A list of 3d arrays. To perform this on files
 that have not yet been read in, set this argument to the path to these

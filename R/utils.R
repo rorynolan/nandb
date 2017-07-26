@@ -530,8 +530,16 @@ ScaleBreaksFun <- function(include.breaks = NULL, log = FALSE) {
 Mat2ColList <- function(mat) {
   lapply(seq_len(ncol(mat)), function(i) mat[, i])
 }
-Mat2RowList <- function(mat) {
-  lapply(seq_len(nrow(mat)), function(i) mat[i, ])
+Mat2RowList <- function(mat, mcc = 1) {
+  nr <- nrow(mat)
+  slnr <- seq_len(nr)
+  if (mcc == 1) {
+    lapply(slnr, function(i) mat[i, ])
+  } else {
+    splt <- split(slnr, slnr %/% (nr / mcc))
+    BiocParallel::bplapply(splt, function(i) Mat2RowList(mat[i, ])) %>%
+      purrr::reduce(c)
+  }
 }
 
 bpp <- function(mcc, seed = NULL) {
@@ -555,11 +563,51 @@ ChannelList2Arr <- function(chnl.lst) {
     stop("The dimensions of the elements of chnl.lst must all be the same.")
   }
   if (length(dims[[1]]) == 2) {
-    purrr::reduce(chnl.lst, ~ abind::abind(.x, .y, along = 3))
+    out <- purrr::reduce(chnl.lst, ~ abind::abind(.x, .y, along = 3))
   } else if (length(dims[[1]]) == 3) {
-    purrr::reduce(chnl.lst, ~ abind::abind(.x, .y, along = 4)) %>%
+    out <- purrr::reduce(chnl.lst, ~ abind::abind(.x, .y, along = 4)) %>%
       aperm(c(1, 2, 4, 3))
   } else {
     stop("The elements of chnl.lst must be 2- or 3-dimensional.")
   }
+  if (all(purrr::map_lgl(chnl.lst, ~ "frames" %in% names(attributes(.))))) {
+    frames <- purrr::map_int(chnl.lst, ~ attr(., "frames")) %>% unique()
+    if (length(frames) == 1) attr(out, "frames") <- frames
+  }
+  att_names <- purrr::map(chnl.lst, ~ names(attributes(.)))
+  for (att_name in c("tau", "mst", "filt")) {
+    if (all(purrr::map_lgl(att_names, ~ att_name %in% .))) {
+      atts <- purrr::map(chnl.lst, ~ attr(., att_name))
+      if (filesstrings::all_equal(atts)) {
+        attr(out, att_name) <- paste(unlist(atts), collapse = ",")
+      }
+    }
+  }
+  out
+}
+
+## Translate the fail argument from what the user selects to what failed pixels
+## should be set to.
+TranslateFail <- function(arr, fail) {
+  stopifnot(length(fail) == 1)
+  if (is.na(fail)) return(NA)
+  if (is.numeric(fail)) {
+    stopifnot(fail >= 0)
+  } else if (is.character(fail)) {
+    fail <- RSAGA::match.arg.ext(fail, c("saturate", "zero"),
+                                 ignore.case = TRUE)
+  }
+  if (fail == "zero") {
+    fail = 0
+  } else if (fail == "saturate") {
+    mx <- max(arr, na.rm = TRUE)
+    if (mx >= 2 ^ 8) {
+      bits.per.sample <- 16
+    } else {
+      bits.per.sample <- 8
+    }
+    fail <- 2 ^ bits.per.sample - 1
+  }
+  if (is.numeric(fail) && !is.na(fail)) fail <- as.integer(round(fail))
+  fail
 }

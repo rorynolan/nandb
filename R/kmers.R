@@ -68,8 +68,8 @@ KmersFromBrightnesses <- function(brightnesses, monomer) {
 #'   function and then perform your desired filtering routine on the result.
 #' @param verbose If arr3d is specified as a file name, print a message to tell
 #'   the user that that file is now being processed (useful for
-#'   `BrightnessFolder`, does not work with multiple cores) and to tell when
-#'   `KmersFromImagesFolder` is done.
+#'   [BrightnessTxtFolder()], does not work with multiple cores) and to tell when
+#'   `KmersFromImagesFolder()` is done.
 #'
 #' @return A named vector (named '1mers' '2mers' '3mers' and so on) with each
 #'   element detailing the number of that kmer found, or for

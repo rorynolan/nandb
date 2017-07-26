@@ -233,6 +233,8 @@ WriteIntImage <- function(img.arr, file.name, na = "error") {
 #' @export
 ForceChannels <- function(img.arr, n.ch) {
   d <- dim(img.arr)
+  if (length(d) == 4 && d[3] == n.ch) return(img.arr)
+  if (length(d) == 3 && n.ch == 1) return(img.arr)
   if (length(d) != 3)
     stop("img.arr must be a 3-dimensional array")
   if (d[3]%%n.ch != 0) {

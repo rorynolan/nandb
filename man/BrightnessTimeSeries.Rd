@@ -6,12 +6,11 @@
 \title{Create a Brightness time-series.}
 \usage{
 BrightnessTimeSeries(arr, frames.per.set, tau = NA, mst = NULL,
-  filt = NULL, n.ch = 1, verbose = FALSE, mcc = parallel::detectCores(),
-  seed = NULL)
+  filt = NULL, n.ch = 1, verbose = FALSE, mcc = 1, seed = NULL)
 
 BrightnessTimeSeriesTxtFolder(folder.path = ".", frames.per.set,
   ext = "tif", tau = NA, mst = NULL, filt = NULL, n.ch = 1,
-  verbose = FALSE, mcc = parallel::detectCores(), seed = NULL)
+  verbose = FALSE, mcc = 1, seed = NULL)
 }
 \arguments{
 \item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the

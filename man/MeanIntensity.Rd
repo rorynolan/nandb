@@ -10,10 +10,10 @@ MeanIntensity(arr, n.ch = 1, mst = NULL, filt = NULL,
   skip.consts = FALSE, verbose = FALSE)
 
 MeanIntensityTxtFolder(folder.path = ".", mst = NULL, ext = "tif",
-  mcc = parallel::detectCores(), verbose = TRUE)
+  mcc = 1, verbose = TRUE)
 
 MeanIntensities(arr3d.list, mst = NULL, skip.consts = FALSE, fail = NA,
-  filt = NULL, verbose = FALSE, mcc = parallel::detectCores())
+  filt = NULL, verbose = FALSE, mcc = 1)
 }
 \arguments{
 \item{arr}{An array, can be 3- or 4-dimensional. The first two slots give the
