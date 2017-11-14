@@ -1,6 +1,7 @@
 #' @useDynLib nandb, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom magrittr '%>%' '%T>%' '%<>%'
+#' @importFrom tidyverse tidyverse_logo
 NULL
 
 ## quiet concerns of R CMD check re: the .'s that appear in

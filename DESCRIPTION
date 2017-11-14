@@ -36,7 +36,8 @@ Imports:
     ore,
     checkmate,
     radiant.data,
-    detrendr
+    detrendr,
+    tidyverse
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,
