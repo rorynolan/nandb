@@ -1,8 +1,6 @@
 #' @useDynLib nandb, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom magrittr '%>%' '%T>%' '%<>%'
-#' @import ggplot2
-#' @importFrom hexbin hexbin
 NULL
 
 ## quiet concerns of R CMD check re: the .'s that appear in
