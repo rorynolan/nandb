@@ -1,422 +1,299 @@
 #' Calculate brightness from image series.
 #'
-#' Given a time stack of images, `Brightness` performs a calculation of the
-#' brightness for each pixel. `BrightnessTxtFolder` does this calculation
+#' Given a time stack of images, `brightness()` performs a calculation of the
+#' brightness for each pixel. `brightness_txt_folder()` does this calculation
 #' for an entire folder, writing the results as text files via
-#' [WriteImageTxt()]. `Brightnesses` calculates the brightnesses
-#' for several image series in parallel.
+#' [write_txt_img()].
 #'
-#' Do not try to parallelize the use of `Brightness` and friends yourself
-#' (e.g. with [mclapply()]) because it will throw an error (this is
-#' because the `autothresholdr` package does not work in parallel (indeed
-#' anything run using the `rJava` package won't)). Always use
-#' `Brightnesses` for this purpose (this has a workaround whereby it does
-#' the thresholding in series and does the rest in parallel).
+#' @param def A character. Which definition of brightness do you want to use,
+#'   `"B"` or `"epsilon"`?
+#' @inheritParams detrendr::img_detrend_exp
+#' @inheritParams number
 #'
-#' @param arr An array, can be 3- or 4-dimensional. The first two slots give the
-#'   x- and y-cordinates of pixels respectively. If the array is 3-dimensional,
-#'   the third slot gives the index of the frame. If it is 4-dimensional, the
-#'   third slot indexes the channel and the fourth indexes the frame in the
-#'   stack. To perform this on a file that has not yet been read in, set this
-#'   argument to the path to that file (a string).
-#' @param n.ch The number of channels in the image (default 1).
-#' @param tau If this is specified, bleaching correction is performed with
-#'   [CorrectForBleaching()] which uses exponential filtering with
-#'   time constant `tau` (where the unit of time is the time between
-#'   frames). If this is set to `'auto'`, then the value of `tau` is
-#'   calculated automatically via [BestTau()].
-#' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   brightness (via [autothresholdr::mean_stack_thresh()])? If so, set your
-#'   thresholding \emph{method} here.
-#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
-#'   (`filt = 'median'`) filter the brightness image using
-#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
-#'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option `na_count = TRUE`. If you want to smooth/median filter the
-#'   brightness image in a different way, first calculate the brightnesses
-#'   without filtering (`filt = NULL`) using this function and then perform
-#'   your desired filtering routine on the result.
-#' @param verbose If arr3d is specified as a file name, print a message to tell
-#'   the user that that file is now being processed (useful for
-#'   `BrightnessTxtFolder`, does not work with multiple cores).
+#' @return A matrix, the brightness image.
 #'
-#' @return `Brightness` returns a matrix, the brightness image;
-#'   `Brightnesses` returns a list of these. The result of
-#'   `BrightnessTxtFolder` is the text csv files written to disk (in the
-#'   same folder as the input images).
+#' @references Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of
+#'   Molecules and Brightness in the Laser Scanning Microscope. Biophysical
+#'   Journal. 2008;94(6):2320-2332. \doi{10.1529/biophysj.107.114645}.
+#'
+#'   Dalal, RB, Digman, MA, Horwitz, AF, Vetri, V, Gratton, E (2008).
+#'   Determination of particle number and brightness using a laser scanning
+#'   confocal microscope operating in the analog mode. Microsc. Res. Tech., 71,
+#'   1:69-81. \doi{10.1002/jemt.20526}.
 #'
 #' @examples
-#' library(magrittr)
-#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-#' brightness <- Brightness(img, tau = "auto", mst = 'Huang', filt = 'median')
-#' MatrixRasterPlot(brightness, log.trans = TRUE)
-#' two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-#' brightness.2ch <- Brightness(two.channel.img, n.ch = 2)
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' display(img[, , 1])
+#' num <- brightness(img, "e", tau = NA, thresh = "Huang")
+#' num <- brightness(img, "B", tau = 10, thresh = "tri")
 #' @export
-Brightness <- function(arr, tau = NA, mst = NULL,
-                       filt = NULL, n.ch = 1, verbose = FALSE) {
-  if (is.character(arr)) {
-    if (verbose)
-      message(paste0("Now processing: ", arr, "."))
-    arr <- ReadImageData(arr)
-  }
-  d <- dim(arr)
-  if (n.ch == 1) {
-    if (length(d) != 3) {
-      stop("Expected a three-dimensional image array image but got a ",
-           length(d), " dimensional one.")
+brightness <- function(img, def, n_ch = 1, tau = NULL,
+                       thresh = NULL, fail = NA, filt = NULL,
+                       s = 1, offset = 0, readout_noise = 0, gamma = 1,
+                       seed = NULL, parallel = FALSE) {
+  checkmate::assert_string(def)
+  if (startsWith("epsilon", tolower(def))) def <- "epsilon"
+  if (def == "b") def <- "B"
+  if (! def %in% c("epsilon", "B"))
+    stop("'def' must be one of 'B' or 'epsilon'.")
+  img %<>% nb_get_img(n_ch = n_ch, min_d = 3, max_d = 4)
+  thresh %<>% extend_for_all_chs(n_ch)
+  tau %<>% extend_for_all_chs(n_ch)
+  if (!is.null(filt)) filt %<>% fix_filt()
+  filt %<>% extend_for_all_chs(n_ch)
+  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
+  thresh_atts <- NA
+  if (n_ch == 1) {
+    if (!is.na(thresh)) {
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      thresh_atts <- attr(img, "thresh")
     }
-  }
-  if (n.ch > 1) {
-    ld <- length(d)
-    if (! ld %in% c(3, 4)) {
-      stop("There is a problem with your image. It was read in as a ", ld,
-           "-dimensional image. If read in as 4-dimensional, it is left alone, ",
-           "or if read in as 3-dimensional, it is coerced to 4-dimansional ",
-           "via nandb::ForceChannels", "but for ", ld, "-dimensional image, ",
-           "there's nothing to be done.")
+    if (!is.na(tau)) {
+      img %<>% detrendr::img_detrend_exp(tau, seed = seed, parallel = parallel)
+      tau_atts <- attr(img, "parameter")
+      attr(tau_atts, "auto") <- attr(img, "auto")
     }
-    if (ld == 3) arr <- ForceChannels(arr, n.ch)
-    d <- dim(arr)
-  }
-  if (length(d) == 3) {
-    return(Brightness_(arr, tau = tau, mst = mst, filt = filt))
-  }
-  brightness.args <- list(arr3d = ListChannels(arr, n.ch), tau = tau, mst = mst,
-                          filt = filt)
-  for (i in seq_along(brightness.args)) {
-    if (is.null(brightness.args[[i]])) {
-      brightness.args[[i]] <- list(NULL)[rep(1, length(brightness.args$arr3d))]
-    }
-  }
-  brightness.args %>%
-    purrr::pmap(Brightness_) %>%
-    ChannelList2Arr
-}
-
-Brightness_ <- function(arr3d, tau = NA, mst = NULL, filt = NULL) {
-  d <- dim(arr3d)
-  if (length(d) != 3)
-    stop("arr3d must be a three-dimensional array")
-  if (!is.null(mst)) {
-    arr3d <- autothresholdr::mean_stack_thresh(arr3d, method = mst, fail = NA)
-  }
-  tau.auto <- FALSE
-  if (!is.na(tau)) {
-    if (is.character(tau)) {
-      tau <- tolower(tau)
-      if (startsWith("auto", tau)) {
-        tau <- BestTau(arr3d)
-        tau.auto <- TRUE
+    out <- (detrendr::var_pillars(img, parallel = parallel) - readout_noise) /
+      (detrendr::mean_pillars(img, parallel = parallel) - offset)
+    if (def == "epsilon") out <- out - s
+    if (!is.na(filt)) {
+      checkmate::assert_string(filt)
+      if (filt == "median") {
+        out %<>% median_filter(na_count = TRUE)
       } else {
-        stop("If tau is a string, it must be 'auto'.")
+        out %<>% smooth_filter(na_count = TRUE)
       }
-    } else if ((!is.numeric(tau)) && (!is.na(tau))) {
-      stop("If tau is not numeric, then it must be NA or 'auto'.")
     }
-    arr3d <- CorrectForBleaching(arr3d, tau)
-  }
-  brightness <- VarPillars(arr3d) / MeanPillars(arr3d)
-  if (!is.null(filt)) {
-    allowed <- c("median", "smooth")
-    filt <- tolower(filt)
-    sw <- startsWith(allowed, filt)
-    if (!any(sw))
-      stop("filt must be either 'median' or 'smooth'")
-    filt <- allowed[sw]
-    if (filt == "median") {
-      brightness <- MedianFilterB(brightness, na_count = TRUE)
-    } else {
-      brightness <- SmoothFilterB(brightness, na_count = TRUE)
+  } else {
+    out <- img[, , , 1]
+    thresh_atts <- list()
+    tau_atts <- list()
+    if (!is.null(seed)) seed <- seed + i
+    for (i in seq_len(n_ch)) {
+      out_i <- brightness(img[, , i, ], def = def, tau = tau[[i]],
+                          thresh = thresh[[i]], filt = filt[[i]],
+                          s = s, offset = offset, readout_noise = readout_noise,
+                          gamma = gamma, seed = seed, parallel = parallel)
+      out[, , i] <- out_i
+      thresh_atts[[i]] <- attr(out_i, "thresh")
+      tau_atts[[i]] <- attr(out_i, "tau")
     }
   }
-  tau <- ifelse(tau.auto, ifelse(is.na(tau), "auto=NA", stringr::str_c("auto=",
-    round(tau))), tau)
-  filter <- ifelse(is.null(filt), NA, filt)
-  mst <- ifelse(is.null(mst), NA, mst)
-  new.brightness.attrs <- list(frames = d[3], tau = tau, filter = filter,
-    mst = mst)
-  attributes(brightness) <- c(attributes(brightness), new.brightness.attrs)
-  brightness
+  brightness_img(out, def, thresh_atts, tau_atts, filt)
 }
 
-#' Create a Brightness time-series.
+#' Create a brightness time-series.
 #'
-#' Given a stack of images `arr`, use the first `frames.per.set` of
-#' them to create one brightness image, the next `frames.per.set` of them
-#' to create the next brightness image and so on to get a time-series of
-#' brightness images. If `tau` is specified, bleaching correction is
-#' performed via [CorrectForBleaching()].
+#' Given a stack of images `img`, use the first `frames_per_set` of them to
+#' create one brightness image, the next `frames_per_set` of them to create the
+#' next brightness image and so on to get a time-series of brightness images.
 #'
 #' This may discard some images, for example if 175 frames are in the input and
-#' `frames.per.set = 50`, then the last 25 are discarded. If bleaching or/and
-#' thresholding are selected, they are performed on the whole image stack before
-#' the sectioning is done for calculation of brightnesses.
+#' `frames_per_set = 50`, then the last 25 are discarded. If bleaching
+#' correction is selected, it is performed on the whole image stack before the
+#' sectioning is done for calculation of numbers.
 #'
-#' @inheritParams Brightness
-#' @param frames.per.set The number of frames with which to calculate the
-#'   successive brightnesses.
-#' @param mcc The number of cores to use for the parallel processing.
-#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
-#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
+#' @inheritParams brightness
+#' @inheritParams number
+#' @inheritParams number_time_series
 #'
-#' @return An array where the \eqn{i}th slice is the \eqn{i}th brightness image.
-#' @seealso [Brightness()].
+#' @return An object of class [brightness_ts_img].
+#'
+#'   \itemize{\item If `img` is 3-dimensional (i.e. 1-channel), a 3-dimensional
+#'   array `arr` is returned with `arr[y, x, t]` being pixel \eqn{(x, y)} of the
+#'   \eqn{t}th brightness image in the brightness time series. \item If  `img`
+#'   is 4-dimensional (i.e. 2-channel), a 4-dimensional array `arr` is returned
+#'   with `arr[y, x, c, t]` being pixel \eqn{(x, y)} of the \eqn{c}th channel of
+#'   the \eqn{t}th brightness image in the brightness time series.}
+#'
+#' @seealso [brightness()].
 #'
 #' @examples
-#' library(magrittr)
-#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' EBImage::display(EBImage::normalize(img[, , 1]), method = 'raster')
-#' bts <- BrightnessTimeSeries(img, 20, tau = NA, mst = "Huang", mcc = 2)
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' bts <- brightness_time_series(img, "e", frames_per_set = 20,
+#'                               tau = NA, thresh = "Huang", parallel = 2)
 #' @export
-BrightnessTimeSeries <- function(arr, frames.per.set, tau = NA,
-                                 mst = NULL, filt = NULL,
-                                 n.ch = 1, verbose = FALSE,
-                                 mcc = 1, seed = NULL) {
-  if (is.character(arr)) {
-    if (verbose)
-      message(paste0("Now processing: ", arr, "."))
-    arr <- ReadImageData(arr)
-  }
-  d <- dim(arr)
-  if (n.ch == 1) {
-    if (length(d) != 3) {
-      stop("Expected a three-dimensional image array image but got a ",
-           length(d), " dimensional one.")
+brightness_time_series <- function(img, def, frames_per_set, n_ch = 1,
+                                   tau = NULL, thresh = NULL, fail = NA,
+                                   filt = NULL, s = 1, offset = 0,
+                                   readout_noise = 0, gamma = 1,
+                                   parallel = FALSE, seed = NULL) {
+  if (startsWith("epsilon", tolower(def))) def <- "epsilon"
+  if (def == "b") def <- "B"
+  img %<>% nb_get_img(n_ch = n_ch, min_d = 3, max_d = 4)
+  d <- dim(img)
+  thresh %<>% extend_for_all_chs(n_ch)
+  tau %<>% extend_for_all_chs(n_ch)
+  if (!is.null(filt)) filt %<>% fix_filt()
+  filt %<>% extend_for_all_chs(n_ch)
+  thresh_atts <- NA
+  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
+  if (n_ch == 1) {
+    frames <- d[3]
+    if (frames < frames_per_set) {
+      stop("You have selected ", frames_per_set, " frames per set, ",
+           "but there are only ", frames, " frames in total.")
+    }
+    sets <- frames %/% frames_per_set
+    if (!is.na(thresh)) {
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      thresh_atts <- attr(img, "thresh")
+    }
+    if (!is.na(tau)) {
+      img %<>% detrendr::img_detrend_exp(tau = tau,
+                                         seed = seed, parallel = parallel)
+      tau_atts <- attr(img, "parameter")
+      attr(tau_atts, "auto") <- attr(img, "auto")
+    }
+    out <- img[, , seq_len(sets)]
+    if (sets == 1) dim(out) %<>% c(1)
+    for (i in seq_len(sets)) {
+      if (!is.null(seed)) seed <- seed + i
+      indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
+      out[, , i] <- brightness(img[, , indices_i], def = def, filt = filt,
+                               s = s, offset = offset,
+                               readout_noise = readout_noise, gamma = gamma,
+                               seed = seed, parallel = parallel)
+    }
+  } else {
+    frames <- d[4]
+    sets <- frames %/% frames_per_set
+    out <- img[, , , seq_len(sets)]
+    if (sets == 1) dim(out) %<>% c(1)
+    thresh_atts <- list()
+    tau_atts <- list()
+    for (i in seq_len(n_ch)) {
+      out_i <- brightness_time_series(img[, , i, ], def = def,
+                                     frames_per_set = frames_per_set,
+                                      tau = tau[[i]], thresh = thresh[[i]],
+                                      filt = filt[[i]], offset = offset,
+                                      readout_noise = readout_noise,
+                                      seed = seed + i, parallel = parallel)
+      out[, , i, ] <- out_i
+      thresh_atts[[i]] <- attr(out_i, "thresh")
+      tau_atts[[i]] <- attr(out_i, "tau")
     }
   }
-  if (n.ch > 1) {
-    ld <- length(d)
-    if (! ld %in% c(3, 4)) {
-      stop("There is a problem with your image. It was read in as a ", ld,
-           "-dimensional image. If read in as 4-dimensional, it is left alone, ",
-           "or if read in as 3-dimensional, it is coerced to 4-dimansional ",
-           "via nandb::ForceChannels", "but for ", ld, "-dimensional image, ",
-           "there's nothing to be done.")
-    }
-    if (ld == 3) arr <- ForceChannels(arr, n.ch)
-    d <- dim(arr)
-  }
-  if (length(d) == 3) {
-    return(BrightnessTimeSeries_(arr, frames.per.set = frames.per.set,
-                                 tau = tau, mst = mst, filt = filt,
-                                 verbose = verbose, mcc = mcc, seed = seed))
-  }
-  bts.args <- list(arr3d = ListChannels(arr, n.ch), frames.per.set = frames.per.set,
-                   tau = tau, mst = mst, filt = filt,
-                   verbose = verbose, mcc = mcc, seed = seed)
-  for (i in seq_along(bts.args)) {
-    if (is.null(bts.args[[i]])) {
-      bts.args[[i]] <- list(NULL)[rep(1, length(bts.args$arr3d))]
-    }
-  }
-  bts.args %>%
-    purrr::pmap(BrightnessTimeSeries_) %>%
-    ChannelList2Arr
-}
-BrightnessTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
-                                  mst = NULL, filt = NULL, verbose = FALSE,
-                                  mcc = 1, seed = NULL) {
-  d <- dim(arr3d)
-  if (length(d) != 3) stop("arr3d must be a three-dimensional array")
-  if (frames.per.set > d[3]) {
-    stop("frames.per.set must not be greater than the depth of arr3d")
-  }
-  if (!is.null(mst)) arr3d <- autothresholdr::mean_stack_thresh(arr3d, mst)
-  tau.auto <- FALSE
-  if (is.character(tau)) if (startsWith("auto", tolower(tau))) tau.auto <- TRUE
-  if (tau.auto) tau <- BestTau(arr3d)
-  if (!is.na(tau)) arr3d <- CorrectForBleaching(arr3d, tau)
-  n.sets <- d[3] %/% frames.per.set
-  set.indices <- lapply(seq_len(n.sets), function(x) {
-    ((x - 1) * frames.per.set + 1):(x * frames.per.set)
-  })
-  sets <- lapply(set.indices, Slices, arr3d)
-  brightnesses <- Brightnesses(sets, tau = NA, mst = NULL,
-                               filt = filt, mcc = mcc, seed = seed)
-  atts <- attributes(brightnesses[[1]])
-  brightnesses <- Reduce(function(x, y) abind::abind(x, y, along = 3),
-                         brightnesses)
-  if (length(dim(brightnesses)) == 2) {
-    brightnesses <- abind::abind(brightnesses, along = 3)
-  }
-  atts <- atts[! names(atts) %in% names(attributes(brightnesses))]
-  attributes(brightnesses) <- c(attributes(brightnesses), atts)
-  if (tau.auto) tau <- paste0("tau=", tau)
-  attr(brightnesses, "tau") <- tau
-  brightnesses
+  brightness_ts_img(out, def = def, frames_per_set = frames_per_set,
+                    thresh = thresh_atts, tau = tau_atts, filt = filt)
 }
 
-#' @rdname BrightnessTimeSeries
+brightness_file <- function(path, def, n_ch = 1, tau = NULL,
+                            thresh = NULL, fail = NA, filt = NULL,
+                            s = 1, offset = 0, readout_noise = 0, gamma = 1,
+                            seed = NULL, parallel = FALSE, rds = FALSE) {
+  checkmate::assert_string(path)
+  b <- brightness(path, def, n_ch = n_ch, tau = tau,
+                  thresh = thresh, fail = fail, filt = filt,
+                  s = s, offset = offset, readout_noise = readout_noise,
+                  gamma = gamma, seed = seed, parallel = parallel)
+  path %<>% filesstrings::before_last_dot()
+  write_txt_img(b, paste0(path, make_nb_filename_ending(b)), rds = rds)
+}
+
+brightness_time_series_file <- function(path, def, frames_per_set, n_ch = 1,
+                                        tau = NULL, thresh = NULL, fail = NA,
+                                        filt = NULL, s = 1, offset = 0,
+                                        readout_noise = 0, gamma = 1,
+                                        parallel = FALSE, seed = NULL,
+                                        rds = FALSE) {
+  if (startsWith("epsilon", tolower(def))) def <- "epsilon"
+  if (def == "b") def <- "B"
+  checkmate::assert_string(path)
+  bts <- brightness_time_series(path, def, frames_per_set = frames_per_set,
+                                n_ch = n_ch, tau = tau,
+                                thresh = thresh, fail = fail, filt = filt,
+                                s = s, offset = offset,
+                                readout_noise = readout_noise, gamma = gamma,
+                                seed = seed, parallel = parallel)
+  path %<>% filesstrings::before_last_dot()
+  write_txt_img(bts, paste0(path, make_nb_filename_ending(bts)), rds = rds)
+}
+
+
+#' Brightness calculations for every image in a folder.
 #'
-#' @param folder.path The path to the folder to process (defaults to current location).
-#' @param ext The file extension of the images in the folder that you wish to
-#'   process. You must wish to process all files with this extension; if there
-#'   are files that you don't want to process, take them out of the folder. The
-#'   default is for tiff files. Do not use regular expression in this argument.
+#' Perform [brightness()] calculations on all tif images in a folder and save the
+#' resulting brightness images to disk as text images (and optionally also as RDS
+#' files).
+#'
+#' @inheritParams brightness
+#' @inheritParams number
+#' @inheritParams number_folder
+#' @inheritParams write_txt_img
+#'
+#' @seealso [number()]
 #'
 #' @examples
 #' setwd(tempdir())
-#' WriteIntImage(img, '50.tif')
-#' WriteIntImage(img, '50again.tif')
-#' BrightnessTimeSeriesTxtFolder(tau = NA, mcc = 2, frames.per.set = 20)
-#' list.files()
-#' file.remove(list.files())  # cleanup
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' write_tif(img, 'img1.tif')
+#' write_tif(img, 'img2.tif')
+#' brightness_folder(def = "B", tau = NA, thresh = "Huang",
+#'                   parallel = 2, n_ch = 1)
+#' suppressWarnings(file.remove(list.files()))  # cleanup
 #' @export
-BrightnessTimeSeriesTxtFolder <- function(folder.path = ".", frames.per.set,
-  ext = "tif", tau = NA, mst = NULL, filt = NULL, n.ch = 1, verbose = FALSE,
-  mcc = 1, seed = NULL) {
-  init.dir <- getwd()
-  on.exit(setwd(init.dir))
-  setwd(folder.path)
-  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
-  ext <- ore::ore_escape(ext) %>% paste0("$")
-  file.names <- list.files(pattern = ext)
-  btss <- BrightnessTimeSeriess(file.names, tau = tau, mst = mst,
-                                filt = filt, seed = seed, n.ch = n.ch,
-                                frames.per.set = frames.per.set)
-  frames <- purrr::map_chr(btss, ~ paste(attr(., "frames"), collapse = ","))
-  tau <- purrr::map_chr(btss, ~ paste(attr(., "tau"), collapse = ","))
-  names.noext.btss <- vapply(file.names, filesstrings::before_last_dot,
-                                   character(1)) %>%
-    paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
-           paste(unlist(mst), collapse = ","),
-           "_filter=", ifelse(is.null(filt), NA, filt))
-  mapply(WriteImageTxt, btss, names.noext.btss) %>%
-    invisible
-  if (verbose) message("Done. Please check folder.")
-}
-BrightnessTimeSeriess <- function(arr3d.list, frames.per.set, tau = NA,
-                                  mst = NULL, filt = NULL,
-                                  n.ch = 1, verbose = FALSE,
-                                  mcc = 1, seed = NULL) {
-  if (is.null(mst)) {
-    btss <- BiocParallel::bplapply(arr3d.list, BrightnessTimeSeries, tau = tau,
-                                   filt = filt, n.ch = n.ch, verbose = verbose,
-                                   frames.per.set = frames.per.set, BPPARAM = bpp(mcc, seed = seed))
-  } else if (is.list(arr3d.list)) {
-    arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
-                         method = mst, fail = NA)
-    btss <- BiocParallel::bplapply(arr3d.list, BrightnessTimeSeries, tau = tau,
-                                   filt = filt, n.ch = n.ch, verbose = verbose,
-                                   frames.per.set = frames.per.set,
-                                   BPPARAM = bpp(mcc, seed = seed))
-  } else {
-    if (!is.character(arr3d.list)) {
-      stop("arr3d.list must either be a list of 3d arrays, ",
-           "or a character vector of paths to the locations ",
-           "of 3d arrays on disk.")
-    }
-    btss <- list()
-    sets <- seq_along(arr3d.list) %>% {
-      split(., ((. - 1) %/% mcc) + 1)
-    }
-    for (i in sets) {
-      arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh, method = mst,
-                         fail = NA)
-      bts.i <- BiocParallel::bplapply(threshed, BrightnessTimeSeries, tau = tau,
-        filt = filt, n.ch = n.ch, verbose = verbose,
-        frames.per.set = frames.per.set, BPPARAM = bpp(mcc, seed = seed))
-      btss[i] <- bts.i
-    }
-  }
-  btss
+brightness_folder <- function(folder_path = ".", def, n_ch = 1,
+                              tau = NULL, thresh = NULL, fail = NA, filt = NULL,
+                              s = 1, offset = 0, readout_noise = 0, gamma = 1,
+                              seed = NULL, parallel = FALSE, rds = FALSE) {
+  if (startsWith("epsilon", tolower(def))) def <- "epsilon"
+  if (def == "b") def <- "B"
+  init_dir <- getwd()
+  on.exit(setwd(init_dir))
+  setwd(folder_path)
+  file_names <- list.files(pattern = "\\.tif")
+  purrr::map(file_names, brightness_file, def = def, n_ch = n_ch, tau = tau,
+             thresh = thresh, fail = fail, filt = filt, s = s, offset = offset,
+             readout_noise = readout_noise, gamma = gamma,
+             seed = seed, parallel = parallel, rds = rds) %>%
+    magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
+    invisible()
 }
 
-
-#' @rdname Brightness
+#' Brightness time-series calculations for every image in a folder.
 #'
-#' @param folder.path The path (relative or absolute) to the folder you wish to
-#'   process.
-#' @param ext The file extension of the images in the folder that you wish to
-#'   process. You must wish to process all files with this extension; if there
-#'   are files that you don't want to process, take them out of the folder. The
-#'   default is for tiff files. Do not use regular expression in this argument.
-#' @param mcc The number of cores to use for the parallel processing.
-#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
-#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
+#' Perform [brightness_time_series()] calculations on all tif images in a folder
+#' and save the resulting number images to disk as text images (and optionally
+#' also as RDS files).
+#'
+#' @inheritParams brightness
+#' @inheritParams brightness_time_series
+#' @inheritParams brightness_folder
+#' @inheritParams number
+#' @inheritParams number_time_series
+#' @inheritParams number_folder
+#' @inheritParams write_txt_img
+#'
+#' @seealso [brightness_time_series()]
 #'
 #' @examples
 #' setwd(tempdir())
-#' WriteIntImage(img, '50.tif')
-#' WriteIntImage(img, '50again.tif')
-#' BrightnessTxtFolder(tau = NA, mcc = 2)
-#' list.files()
-#' file.remove(list.files())  # cleanup
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' write_tif(img, 'img1.tif')
+#' write_tif(img, 'img2.tif')
+#' brightness_time_series_folder(def = "e", tau = NA, thresh = "Huang",
+#'                               frames_per_set = 20, parallel = 2, n_ch = 1)
+#' suppressWarnings(file.remove(list.files()))  # cleanup
 #' @export
-BrightnessTxtFolder <- function(folder.path = ".", tau = NA,
-  mst = NULL, filt = NULL, ext = "tif", n.ch = 1,
-  mcc = 1, verbose = FALSE, seed = NULL) {
-  init.dir <- getwd()
-  on.exit(setwd(init.dir))
-  setwd(folder.path)
-  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
-  ext <- ore::ore_escape(ext) %>% paste0("$")
-  file.names <- list.files(pattern = ext)
-  brightnesses <- Brightnesses(file.names, tau = tau, mst = mst, mcc = mcc,
-                               filt = filt, seed = seed, n.ch = n.ch)
-  frames <- vapply(brightnesses, function(x) attr(x, "frames"), integer(1))
-  tau <- purrr::map_chr(brightnesses, ~ paste(attr(., "tau"), collapse = ","))
-  mst <- purrr::map_chr(brightnesses, ~ paste(attr(., "mst"), collapse = ","))
-  names.noext.brightness <- vapply(file.names, filesstrings::before_last_dot,
-                                   character(1)) %>%
-    paste0("_brightness_frames=", frames, "_tau=", tau, "_mst=",
-      mst, "_filter=", ifelse(is.null(filt), NA, filt))
-  mapply(WriteImageTxt, brightnesses, names.noext.brightness) %>%
-    invisible
-  if (verbose)
-    message("Done. Please check folder.")
-}
-
-#' @rdname Brightness
-#'
-#' @param arr3d.list A list of 3-dimensional arrays. To perform this on files
-#'   that have not yet been read in, set this argument to the path to these
-#'   files (a character vector).
-#'
-#' @examples
-#' img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-#' brightnesses <- Brightnesses(img.paths, tau = NA, mcc = 2)
-#'
-#' @export
-Brightnesses <- function(arr3d.list, tau = NA, mst = NULL,
-                         filt = NULL, n.ch = 1, verbose = FALSE,
-                         mcc = 1, seed = NULL) {
-  if (is.null(mst)) {
-    brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
-                                           filt = filt, verbose = verbose,
-                                           n.ch = n.ch,
-                                           BPPARAM = bpp(mcc, seed = seed))
-  } else if (is.list(arr3d.list)) {
-    arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
-                         method = mst, fail = NA)
-    brightnesses <- BiocParallel::bplapply(arr3d.list, Brightness, tau = tau,
-                                           filt = filt, verbose = verbose,
-                                           n.ch = n.ch,
-                                           BPPARAM = bpp(mcc, seed = seed))
-  } else {
-    if (!is.character(arr3d.list)) {
-      stop("arr3d.list must either be a list of 3d arrays, ",
-        "or a character vector of paths to the locations ",
-        "of 3d arrays on disk.")
-    }
-    brightnesses <- list()
-    sets <- seq_along(arr3d.list) %>% {
-      split(., ((. - 1) %/% mcc) + 1)
-    }
-    for (i in sets) {
-      arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh,
-                         method = mst, fail = NA)
-      brightnesses.i <- BiocParallel::bplapply(threshed, Brightness, tau = tau,
-                                               filt = filt, verbose = verbose,
-                                               n.ch = n.ch,
-                                               BPPARAM = bpp(mcc, seed = seed))
-      brightnesses[i] <- brightnesses.i
-    }
-  }
-  brightnesses
+brightness_time_series_folder <- function(folder_path = ".", def,
+                                          frames_per_set, n_ch = 1, tau = NULL,
+                                          thresh = NULL, fail = NA, filt = NULL,
+                                          s = 1, offset = 0, readout_noise = 0,
+                                          gamma = 1, seed = NULL,
+                                          parallel = FALSE, rds = FALSE) {
+  if (startsWith("epsilon", tolower(def))) def <- "epsilon"
+  if (def == "b") def <- "B"
+  init_dir <- getwd()
+  on.exit(setwd(init_dir))
+  setwd(folder_path)
+  file_names <- list.files(pattern = "\\.tif")
+  purrr::map(file_names, brightness_time_series_file, def = def, n_ch = n_ch,
+             frames_per_set = frames_per_set,
+             tau = tau, thresh = thresh, fail = fail, filt = filt,
+             s = s, offset = offset, readout_noise = readout_noise,
+             gamma = gamma, seed = seed, parallel = parallel, rds = rds) %>%
+    magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
+    invisible()
 }
 

@@ -3,11 +3,9 @@
 language: R
 sudo: true
 cache: packages
-bioc_packages:
-  - BiocParallel
-  - EBImage
-before_install:
-  - jdk_switcher use oraclejdk8
+r_github_packages:
+  - rorynolan/filesstrings
+  - rorynolan/detrendr
 after_success:
   - travis_wait 30 Rscript -e 'covr::codecov(line_exclusions = "R/nandb.R")'
 apt_packages:
@@ -16,6 +14,3 @@ apt_packages:
   - libfftw3-dev
   - libcurl4-openssl-dev
   - libxml2-dev
-  - default-jre
-  - default-jdk
-  - libboost-all-dev

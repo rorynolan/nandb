@@ -12,7 +12,7 @@ double sign(double x) {
 
 //' Smooth and median filters with options for handling NAs.
 //'
-//' These is an alternative to [EBImage][EBImage::EBImage]'s
+//' These are alternatives to [EBImage][EBImage::EBImage]'s
 //' [filter2][EBImage::filter2] and [medianFilter][EBImage::medianFilter] for
 //' smooth and median filtering respectively. These functions have many options
 //' for dealing with \code{NA} values which \code{EBImage}'s functions lack.
@@ -33,13 +33,13 @@ double sign(double x) {
 //' m <- matrix(1:9, nrow = 3)
 //' m[2:3, 2:3] <- NA
 //' print(m)
-//' MedianFilterB(m)
-//' MedianFilterB(m, na_rm = TRUE)
-//' MedianFilterB(m, na_count = TRUE)
+//' median_filter(m)
+//' median_filter(m, na_rm = TRUE)
+//' median_filter(m, na_count = TRUE)
 //'
 //' @export
 // [[Rcpp::export]]
-NumericMatrix MedianFilterB(NumericMatrix mat, int size = 1,
+NumericMatrix median_filter(NumericMatrix mat, int size = 1,
                             bool na_rm = false, bool na_count = false) {
   int nr = mat.nrow();
   int nc = mat.ncol();
@@ -81,16 +81,16 @@ NumericMatrix MedianFilterB(NumericMatrix mat, int size = 1,
   return median_filtered;
 }
 
-//' @rdname MedianFilterB
+//' @rdname median_filter
 //'
 //' @examples
-//' MedianFilterB(m)
-//' MedianFilterB(m, na_rm = TRUE)
-//' MedianFilterB(m, na_count = TRUE)
+//' smooth_filter(m)
+//' smooth_filter(m, na_rm = TRUE)
+//' smooth_filter(m, na_count = TRUE)
 //'
 //' @export
 // [[Rcpp::export]]
-NumericMatrix SmoothFilterB(NumericMatrix mat, int size = 1,
+NumericMatrix smooth_filter(NumericMatrix mat, int size = 1,
                             bool na_rm = false, bool na_count = false) {
   int nr = mat.nrow();
   int nc = mat.ncol();

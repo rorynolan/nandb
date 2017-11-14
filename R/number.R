@@ -1,333 +1,325 @@
 #' Calculate number from image series.
 #'
-#' Given a time stack of images, `Number` performs a calculation of the
-#' number for each pixel. `NumberTxtFolder` does this
-#' calculation for an entire folder, writing the results as text files via
-#' [WriteImageTxt()]. `Numbers` calculates the numbers for
-#' several image series in parallel.
+#' Given a time stack of images, `number()` performs a calculation of the number
+#' for each pixel. `number_txt_folder()` does this calculation for an entire
+#' folder, writing the results as text files via [write_txt_img()].
 #'
-#' Do not try to parallelize the use of `Number` and friends yourself (e.g.
-#' with [mclapply()]) because it will throw an error (this is because
-#' the `autothresholdr` package does not work in parallel (indeed anything
-#' run using the `rJava` package won't)). Always use `Numbers` for
-#' this purpose (this has a workaround whereby it does the thresholding in
-#' series and does the rest in parallel).
-#'
-#' @param arr A 3-dimensional array (the image stack) where the \eqn{n}th
-#'   slice is the \eqn{n}th image in the time series. To perform this on a file
-#'   that has not yet been read in, set this argument to the path to that file
-#'   (a string).
-#' @param n.ch The number of channels in the image (default 1).
-#' @param tau If this is specified, bleaching correction is performed with
-#'   [CorrectForBleaching()] which uses exponential filtering with
-#'   time constant `tau` (where the unit of time is the time between
-#'   frames). If this is set to `'auto'`, then the value of `tau` is
-#'   calculated automatically via [BestTau()].
-#' @param mst Do you want to apply an intensity threshold prior to calculating
-#'   number (via [autothresholdr::mean_stack_thresh()])? If so, set your thresholding
-#'   \emph{method} here.
+#' @param img The image to perform the calculation on. This can be a
+#'   single-channel image (which would be a 3-d array `img[y, x, frame]`) or a
+#'   multi channel (`img[y, x, channel, frame]`). To perform this on a file that
+#'   has not yet been read in, set this argument to the path to that file (a
+#'   string).
+#' @param def A character. Which definition of number do you want to use, `"n"`
+#'   or `"N"`?
+#' @param n_ch The number of channels in the image (default 1).
+#' @param tau The exponential parameter to be passed to
+#'   [detrendr::img_detrend_exp()]. This can be a positive number or `"auto"`.
+#' @param thresh The threshold or thresholding method (see
+#'   [autothresholdr::mean_stack_thresh()]) to use on the image prior to
+#'   detrending and brightness calculations.
 #' @param fail If thresholding is done, to which value should pixels not
-#'   exceeeding the threshold be set?
-#' @param filt Do you want to smooth (`filt = 'smooth'`) or median
-#'   (`filt = 'median'`) filter the number image using
-#'   [SmoothFilterB()] or [MedianFilterB()] respectively? If
-#'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option `na_count = TRUE`. If you want to smooth/median filter the
-#'   number image in a different way, first calculate the numbers without
-#'   filtering (`filt = NULL`) using this function and then perform your
-#'   desired filtering routine on the result.
-#' @param verbose If arr3d is specified as a file name, print a message to tell
-#'   the user that that file is now being processed (useful for
-#'   `NumberTxtFolder`, does not work with multiple cores).
+#'   exceeding the threshold be set?
+#' @param filt Do you want to smooth (`filt = 'mean'`) or median (`filt =
+#'   'median'`) filter the number image using [smooth_filter()] or
+#'   [median_filter()] respectively? If selected, these are invoked here with a
+#'   filter radius of 1 (with corners included, so each median is the median of
+#'   9 elements) and with the option `na_count = TRUE`. If you want to
+#'   smooth/median filter the number image in a different way, first calculate
+#'   the numbers without filtering (`filt = NULL`) using this function and then
+#'   perform your desired filtering routine on the result.
+#' @param offset,readout_noise Microscope acquisition parameters. See reference
+#'   Dalal et al.
+#' @param s A number. The \eqn{S}-factor of microscope acquisition.
+#' @param gamma Factor for correction of number \eqn{n} due to the illumination
+#'   profile. The default (`gamma = 1`) has no effect. Changing gamma will have
+#'   the effect of dividing the result by `gamma`, so the result with `gamma =
+#'   0.5` is two times the result with `gamma = 1`. For a Gaussian illumination
+#'   profile, use `gamma = 0.3536`; for a Gaussian-Lorentzian illumination
+#'   profile, use `gamma = 0.0760`.
+#' @inheritParams detrendr::img_detrend_exp
 #'
-#' @return `Number` returns a matrix, the number image; `Numbers`
-#'   returns a list of these. The result of `NumberTxtFolder` is the text
-#'   csv files written to disk (in the same folder as the input images).
+#' @return A matrix, the number image.
+#'
+#' @references Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of
+#'   Molecules and Brightness in the Laser Scanning Microscope. Biophysical
+#'   Journal. 2008;94(6):2320-2332. \doi{10.1529/biophysj.107.114645}.
+#'
+#'   Dalal, RB, Digman, MA, Horwitz, AF, Vetri, V, Gratton, E (2008).
+#'   Determination of particle number and brightness using a laser scanning
+#'   confocal microscope operating in the analog mode. Microsc. Res. Tech., 71,
+#'   1:69-81. \doi{10.1002/jemt.20526}.
 #'
 #' @examples
-#' library(EBImage)
-#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' display(normalize(img[, , 1]), method = 'raster')
-#' number <- Number(img, tau = NA, mst = "Huang")
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' display(img[, , 1])
+#' num <- number(img, "N", tau = NA, thresh = "Huang")
+#' num <- number(img, "n", tau = 10, thresh = "tri")
 #' @export
-Number <- function(arr, tau = NA, mst = NULL,
-                   filt = NULL, n.ch = 1, verbose = FALSE) {
-  if (is.character(arr)) {
-    if (verbose)
-      message(paste0("Now processing: ", arr, "."))
-    arr <- ReadImageData(arr)
-  }
-  d <- dim(arr)
-  if (n.ch == 1) {
-    if (length(d) != 3) {
-      stop("Expected a three-dimensional image array image but got a ",
-           length(d), " dimensional one.")
+number <- function(img, def, n_ch = 1, tau = NULL,
+                   thresh = NULL, fail = NA, filt = NULL,
+                   s = 1, offset = 0, readout_noise = 0, gamma = 1,
+                   seed = NULL, parallel = FALSE) {
+  checkmate::assert_string(def)
+  if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
+  img %<>% nb_get_img(n_ch = n_ch, min_d = 3, max_d = 4)
+  thresh %<>% extend_for_all_chs(n_ch)
+  tau %<>% extend_for_all_chs(n_ch)
+  if (!is.null(filt)) filt %<>% fix_filt()
+  filt %<>% extend_for_all_chs(n_ch)
+  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
+  thresh_atts <- NA
+  if (n_ch == 1) {
+    if (!is.na(thresh)) {
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      thresh_atts <- attr(img, "thresh")
+    }
+    if (!is.na(tau)) {
+      img %<>% detrendr::img_detrend_exp(tau, seed = seed, parallel = parallel)
+      tau_atts <- attr(img, "parameter")
+      attr(tau_atts, "auto") <- attr(img, "auto")
+    }
+    if (def == "N") {
+      out <- (detrendr::mean_pillars(img, parallel = parallel) - offset) ^ 2 /
+        (detrendr::var_pillars(img, parallel = parallel) - readout_noise)
+    } else {
+      out <- (detrendr::mean_pillars(img, parallel = parallel) - offset) %>% {
+        . ^ 2 / (detrendr::var_pillars(img, parallel = parallel) -
+                   readout_noise - s * .)
+      } / gamma
+    }
+    if (!is.na(filt)) {
+      checkmate::assert_string(filt)
+      if (filt == "median") {
+        out %<>% median_filter(na_count = TRUE)
+      } else {
+        out %<>% smooth_filter(na_count = TRUE)
+      }
+    }
+  } else {
+    out <- img[, , , 1]
+    thresh_atts <- list()
+    tau_atts <- list()
+    if (!is.null(seed)) seed <- seed + i
+    for (i in seq_len(n_ch)) {
+      out_i <- number(img[, , i, ], def = def, tau = tau[[i]],
+                      thresh = thresh[[i]], filt = filt[[i]],
+                      s = s, offset = offset, readout_noise = readout_noise,
+                      gamma = gamma, seed = seed, parallel = parallel)
+      out[, , i] <- out_i
+      thresh_atts[[i]] <- attr(out_i, "thresh")
+      tau_atts[[i]] <- attr(out_i, "tau")
     }
   }
-  if (n.ch > 1) {
-    ld <- length(d)
-    if (! ld %in% c(3, 4)) {
-      stop("There is a problem with your image. It was read in as a ", ld,
-           "-dimensional image. If read in as 4-dimensional, it is left alone, ",
-           "or if read in as 3-dimensional, it is coerced to 4-dimansional ",
-           "via nandb::ForceChannels", "but for ", ld, "-dimensional image, ",
-           "there's nothing to be done.")
-    }
-    if (ld == 3) arr <- ForceChannels(arr, n.ch)
-    d <- dim(arr)
-  }
-  if (length(d) == 3) {
-    return(Number_(arr, tau = tau, mst = mst, filt = filt))
-  }
-  number.args <- list(arr3d = ListChannels(arr, n.ch), tau = tau, mst = mst,
-                      filt = filt)
-  for (i in seq_along(number.args)) {
-    if (is.null(number.args[[i]])) {
-      number.args[[i]] <- list(NULL)[rep(1, length(number.args$arr3d))]
-    }
-  }
-  number.args %>%
-    purrr::pmap(Number_) %>%
-    ChannelList2Arr
+  number_img(out, def, thresh_atts, tau_atts, filt)
 }
 
-Number_ <- function(arr3d, tau = NA, mst = NULL,
-  fail = NA, filt = NULL) {
-  d <- dim(arr3d)
-  if (length(d) != 3)
-    stop("arr3d must be a three-dimensional array")
-  if (!is.null(mst)) {
-    arr3d <- autothresholdr::mean_stack_thresh(arr3d, method = mst, fail = fail)
-  }
-  tau.auto <- FALSE
-  if (!is.na(tau)) {
-    if (is.character(tau)) {
-      tau <- tolower(tau)
-      if (startsWith("auto", tau)) {
-        tau <- BestTau(arr3d)
-        tau.auto <- TRUE
-      } else {
-        stop("If tau is a string, it must be 'auto'.")
-      }
-    } else if ((!is.numeric(tau)) && (!is.na(tau))) {
-      stop("If tau is not numeric, then it must be NA or 'auto'.")
-    }
-    arr3d <- CorrectForBleaching(arr3d, tau)
-  }
-  number <- MeanPillars(arr3d) ^ 2 / VarPillars(arr3d)
-  if (!is.null(filt)) {
-    allowed <- c("median", "smooth")
-    filt <- tolower(filt)
-    sw <- startsWith(allowed, filt)
-    if (!any(sw))
-      stop("filt must be either 'median' or 'smooth'")
-    filt <- allowed[sw]
-    if (filt == "median") {
-      number <- MedianFilterB(number, na_count = TRUE)
-    } else {
-      number <- SmoothFilterB(number, na_count = TRUE)
-    }
-  }
-  attributes(number) <- c(attributes(number), list(frames = d[3],
-    tau = as.character(ifelse(tau.auto, ifelse(is.na(tau), "auto=NA",
-      stringr::str_c("auto=", round(tau))), tau)),
-    filter = ifelse(is.null(filt), NA, filt),
-    mst = ifelse(is.null(mst), NA, mst)))
-  number
-}
 
 #' Create a number time-series.
 #'
-#' Given a stack of images `arr3d`, use the first `frames.per.set` of them to
-#' create one number image, the next `frames.per.set` of them to create
-#' the next number image and so on to get a time-series of number
-#' images. If `tau` is specified, bleaching correction is performed via
-#' [CorrectForBleaching()].
+#' Given a stack of images `img`, use the first `frames_per_set` of them to
+#' create one number image, the next `frames_per_set` of them to create the next
+#' number image and so on to get a time-series of number images.
 #'
 #' This may discard some images, for example if 175 frames are in the input and
-#' `frames.per.set = 50`, then the last 25 are discarded. If bleaching
+#' `frames_per_set = 50`, then the last 25 are discarded. If bleaching
 #' correction is selected, it is performed on the whole image stack before the
 #' sectioning is done for calculation of numbers.
 #'
-#' @inheritParams Number
-#' @param frames.per.set The number of frames with which to calculate the
+#' @inheritParams number
+#' @param frames_per_set The number of frames with which to calculate the
 #'   successive numbers.
-#' @param n.ch The number of channels in the image (default 1).
-#' @param mcc The number of cores to use for the parallel processing.
-#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
-#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
 #'
-#' @return An array where the \eqn{i}th slice is the \eqn{i}th number image.
-#' @seealso [Number()].
+#' @return An object of class [number_ts_img].
+#'
+#'   \itemize{\item If `img` is 3-dimensional (i.e. 1-channel), a 3-dimensional
+#'   array `arr` is returned with `arr[y, x, t]` being pixel \eqn{(x, y)} of the
+#'   \eqn{t}th number image in the number time series. \item If  `img` is
+#'   4-dimensional (i.e. 2-channel), a 4-dimensional array `arr` is returned
+#'   with `arr[y, x, c, t]` being pixel \eqn{(x, y)} of the \eqn{c}th channel of
+#'   the \eqn{t}th number image in the number time series.}
+#'
+#' @seealso [number()].
 #'
 #' @examples
-#' library(EBImage)
-#' img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-#' bts <- NumberTimeSeries(img, 20, tau = NA, mst = "Huang", mcc = 2)
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' nts <- number_time_series(img, "n", frames_per_set = 20,
+#'                           tau = NA, thresh = "Huang", parallel = 2)
 #' @export
-NumberTimeSeries <- function(arr, frames.per.set, tau = NA,
-                             mst = NULL, filt = NULL,
-                             n.ch = 1, verbose = FALSE,
-                             mcc = 1, seed = NULL) {
-  if (is.character(arr)) {
-    if (verbose)
-      message(paste0("Now processing: ", arr, "."))
-    arr <- ReadImageData(arr)
-  }
-  d <- dim(arr)
-  if (n.ch == 1) {
-    if (length(d) != 3) {
-      stop("Expected a three-dimensional image array image but got a ",
-           length(d), " dimensional one.")
+number_time_series <- function(img, def, frames_per_set, n_ch = 1,
+                               tau = NULL, thresh = NULL, fail = NA,
+                               filt = NULL, s = 1, offset = 0,
+                               readout_noise = 0, gamma = 1,
+                               parallel = FALSE, seed = NULL) {
+  if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
+  img %<>% nb_get_img(n_ch = n_ch, min_d = 3, max_d = 4)
+  d <- dim(img)
+  thresh %<>% extend_for_all_chs(n_ch)
+  tau %<>% extend_for_all_chs(n_ch)
+  if (!is.null(filt)) filt %<>% fix_filt()
+  filt %<>% extend_for_all_chs(n_ch)
+  thresh_atts <- NA
+  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
+  if (n_ch == 1) {
+    frames <- d[3]
+    if (frames < frames_per_set) {
+      stop("You have selected ", frames_per_set, " frames per set, ",
+           "but there are only ", frames, " frames in total.")
+    }
+    sets <- frames %/% frames_per_set
+    if (!is.na(thresh)) {
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      thresh_atts <- attr(img, "thresh")
+    }
+    if (!is.na(tau)) {
+      img %<>% detrendr::img_detrend_exp(tau = tau,
+                                         seed = seed, parallel = parallel)
+      tau_atts <- attr(img, "parameter")
+      attr(tau_atts, "auto") <- attr(img, "auto")
+    }
+    out <- img[, , seq_len(sets)]
+    if (sets == 1) dim(out) %<>% c(1)
+    for (i in seq_len(sets)) {
+      if (!is.null(seed)) seed <- seed + i
+      indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
+      out[, , i] <- number(img[, , indices_i], def = def, filt = filt,
+                           s = s, offset = offset,
+                           readout_noise = readout_noise, gamma = gamma,
+                           seed = seed, parallel = parallel)
+    }
+  } else {
+    frames <- d[4]
+    sets <- frames %/% frames_per_set
+    out <- img[, , , seq_len(sets)]
+    if (sets == 1) dim(out) %<>% c(1)
+    thresh_atts <- list()
+    tau_atts <- list()
+    for (i in seq_len(n_ch)) {
+      out_i <- number_time_series(img[, , i, ], def = def,
+                                  frames_per_set = frames_per_set,
+                                  tau = tau[[i]], thresh = thresh[[i]],
+                                  filt = filt[[i]], offset = offset,
+                                  readout_noise = readout_noise,
+                                  seed = seed + i, parallel = parallel)
+      out[, , i, ] <- out_i
+      thresh_atts[[i]] <- attr(out_i, "thresh")
+      tau_atts[[i]] <- attr(out_i, "tau")
     }
   }
-  if (n.ch > 1) {
-    ld <- length(d)
-    if (! ld %in% c(3, 4)) {
-      stop("There is a problem with your image. It was read in as a ", ld,
-           "-dimensional image. If read in as 4-dimensional, it is left alone, ",
-           "or if read in as 3-dimensional, it is coerced to 4-dimansional ",
-           "via nandb::ForceChannels", "but for ", ld, "-dimensional image, ",
-           "there's nothing to be done.")
-    }
-    if (ld == 3) arr <- ForceChannels(arr, n.ch)
-    d <- dim(arr)
-  }
-  if (length(d) == 3) {
-    return(NumberTimeSeries_(arr, frames.per.set = frames.per.set,
-                                 tau = tau, mst = mst,
-                                 filt = filt, mcc = mcc, seed = seed))
-  }
-  nts.args <- list(arr3d = ListChannels(arr, n.ch), frames.per.set = frames.per.set,
-                   tau = tau, mst = mst, filt = filt, mcc = mcc, seed = seed)
-  for (i in seq_along(nts.args)) {
-    if (is.null(nts.args[[i]])) {
-      nts.args[[i]] <- list(NULL)[rep(1, length(nts.args$arr3d))]
-    }
-  }
-  nts.args %>%
-    purrr::pmap(NumberTimeSeries_) %>%
-    ChannelList2Arr
+  number_ts_img(out, def = def, frames_per_set = frames_per_set,
+                thresh = thresh_atts, tau = tau_atts, filt = filt)
 }
 
-NumberTimeSeries_ <- function(arr3d, frames.per.set, tau = NA,
-                              mst = NULL, filt = NULL,
-                              mcc = 1, seed = NULL) {
-  d <- dim(arr3d)
-  if (length(d) != 3)
-    stop("arr3d must be a three-dimensional array")
-  if (frames.per.set > d[3]) {
-    stop("frames.per.set must not be greater than the depth of arr3d")
-  }
-  if (!is.na(tau))
-    arr3d <- CorrectForBleaching(arr3d, tau)
-  n.sets <- floor(d[3]/frames.per.set)
-  set.indices <- lapply(seq_len(n.sets), function(x) {
-    ((x - 1) * frames.per.set + 1):(x * frames.per.set)
-  })
-  sets <- lapply(set.indices, Slices, arr3d)
-  numbers <- Numbers(sets, tau = NA, mst = NULL, filt = filt,
-                     mcc = mcc, seed = seed) %>%
-    Reduce(function(x, y) abind::abind(x, y, along = 3), .)
-  if (length(dim(numbers)) == 2) {
-    numbers <- abind::abind(numbers, along = 3)
-  }
-  numbers
+number_file <- function(path, def, n_ch = 1, tau = NULL,
+                        thresh = NULL, fail = NA, filt = NULL,
+                        s = 1, offset = 0, readout_noise = 0, gamma = 1,
+                        seed = NULL, parallel = FALSE, rds = FALSE) {
+  if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
+  checkmate::assert_string(path)
+  num <- number(path, def, n_ch = n_ch, tau = tau,
+                thresh = thresh, fail = fail, filt = filt,
+                s = s, offset = offset, readout_noise = readout_noise,
+                gamma = gamma, seed = seed, parallel = parallel)
+  path %<>% filesstrings::before_last_dot()
+  write_txt_img(num, paste0(path, make_nb_filename_ending(num)), rds = rds)
 }
 
-#' @rdname Number
+number_time_series_file <- function(path, def, frames_per_set, n_ch = 1,
+                                    tau = NULL, thresh = NULL, fail = NA,
+                                    filt = NULL, s = 1, offset = 0,
+                                    readout_noise = 0, gamma = 1,
+                                    parallel = FALSE, seed = NULL,
+                                    rds = FALSE) {
+  if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
+  checkmate::assert_string(path)
+  nts <- number_time_series(path, def, frames_per_set = frames_per_set,
+                            n_ch = n_ch, tau = tau,
+                            thresh = thresh, fail = fail, filt = filt,
+                            s = s, offset = offset,
+                            readout_noise = readout_noise, gamma = gamma,
+                            seed = seed, parallel = parallel)
+  path %<>% filesstrings::before_last_dot()
+  write_txt_img(nts, paste0(path, make_nb_filename_ending(nts)), rds = rds)
+}
+
+
+#' Number calculations for every image in a folder.
 #'
-#' @param folder.path The path (relative or absolute) to the folder you wish to
+#' Perform [number()] calculations on all tif images in a folder and save the
+#' resulting number images to disk as text images (and optionally also as RDS
+#' files).
+#'
+#' @param folder_path The path (relative or absolute) to the folder you wish to
 #'   process.
-#' @param ext The file extension of the images in the folder that you wish to
-#'   process. You must wish to process all files with this extension; if there
-#'   are files that you don't want to process, take them out of the folder. The
-#'   default is for tiff files. Do not use regular expression in this argument.
+#'
+#' @inheritParams number
+#' @inheritParams write_txt_img
+#'
+#' @seealso [number()]
 #'
 #' @examples
 #' setwd(tempdir())
-#' WriteIntImage(img, '50.tif')
-#' WriteIntImage(img, '50again.tif')
-#' NumberTxtFolder(tau = NA, mst = "Huang", mcc = 2)
-#' file.remove(list.files())  # cleanup
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' write_tif(img, 'img1.tif')
+#' write_tif(img, 'img2.tif')
+#' number_folder(def = "n", tau = NA, thresh = "Huang", parallel = 2, n_ch = 1)
+#' suppressWarnings(file.remove(list.files()))  # cleanup
 #' @export
-NumberTxtFolder <- function(folder.path = ".", tau = NA, mst = NULL,
-                            filt = NULL, ext = "tif",
-                            mcc = 1, seed = NULL,
-                            verbose = FALSE) {
-  init.dir <- getwd()
-  on.exit(setwd(init.dir))
-  setwd(folder.path)
-  if (filesstrings::str_elem(ext, 1) != ".") ext <- paste0(".", ext)
-  ext <- ore::ore_escape(ext) %>% paste0("$")
-  file.names <- list.files(pattern = ext)
-  numbers <- Numbers(file.names, tau = tau, mst = mst,
-                     filt = filt, mcc = mcc, seed = seed)
-  frames <- vapply(numbers, function(x) attr(x, "frames"), integer(1))
-  tau <- vapply(numbers, function(x) attr(x, "tau"), character(1))
-  mst <- purrr::map(numbers, ~ attr(., "mst")) %>% unlist
-  names.noext.number <- vapply(file.names, filesstrings::before_last_dot,
-                               character(1)) %>%
-    paste0("_number_frames=", frames, "_tau=", tau, "_mst=",
-      mst, "_filter=", ifelse(is.null(filt), NA, filt))
-  mapply(WriteImageTxt, numbers, names.noext.number) %>% invisible
-  if (verbose)
-    message("Done. Please check folder.")
+number_folder <- function(folder_path = ".", def, n_ch = 1,
+                          tau = NULL, thresh = NULL, fail = NA, filt = NULL,
+                          s = 1, offset = 0, readout_noise = 0, gamma = 1,
+                          seed = NULL, parallel = FALSE, rds = FALSE) {
+  if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
+  init_dir <- getwd()
+  on.exit(setwd(init_dir))
+  setwd(folder_path)
+  file_names <- list.files(pattern = "\\.tif")
+  purrr::map(file_names, number_file, def = def, n_ch = n_ch, tau = tau,
+             thresh = thresh, fail = fail, filt = filt, s = s, offset = offset,
+             readout_noise = readout_noise, gamma = gamma,
+             seed = seed, parallel = parallel, rds = rds) %>%
+    magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
+    invisible()
 }
 
-#' @rdname Number
+#' Number time-series calculations for every image in a folder.
 #'
-#' @param arr3d.list A list of 3-dimensional arrays. To perform this on files
-#'   that have not yet been read in, set this argument to the path to these
-#'   files (a character vector).
-#' @param mcc The number of cores to use for the parallel processing.
-#' @param seed If using parallel processing (`mcc` > 1), a seed for the random
-#'   number generation for [BestTau]. Don't use [set.seed], it won't work.
+#' Perform [number_time_series()] calculations on all tif images in a folder and
+#' save the resulting number images to disk as text images (and optionally also
+#' as RDS files).
+#'
+#' @inheritParams number
+#' @inheritParams number_time_series
+#' @inheritParams number_folder
+#' @inheritParams write_txt_img
+#'
+#' @seealso [number_time_series()]
 #'
 #' @examples
-#' img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-#' numbers <- Numbers(img.paths, mst = 'otsu', mcc = 2)
-#'
+#' setwd(tempdir())
+#' img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' write_tif(img, 'img1.tif')
+#' write_tif(img, 'img2.tif')
+#' number_time_series_folder(def = "n", tau = NA, thresh = "Huang",
+#'                           frames_per_set = 20, parallel = 2, n_ch = 1)
+#' suppressWarnings(file.remove(list.files()))  # cleanup
 #' @export
-Numbers <- function(arr3d.list, tau = NA, mst = NULL, fail = NA, filt = NULL,                                        n.ch = 1, verbose = FALSE, mcc = 1,
-                    seed = NULL) {
-  if (is.null(mst)) {
-    numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
-                                      n.ch = n.ch, filt = filt,
-                                      verbose = verbose,
-                                      BPPARAM = bpp(mcc, seed = seed))
-  } else if (is.list(arr3d.list)) {
-    arr3d.list <- lapply(arr3d.list, autothresholdr::mean_stack_thresh,
-                         method = mst, fail = fail)
-    numbers <- BiocParallel::bplapply(arr3d.list, Number, tau = tau,
-                                      n.ch = n.ch, filt = filt,
-                                      verbose = verbose,
-                                      BPPARAM = bpp(mcc, seed = seed))
-  } else {
-    if (!is.character(arr3d.list)) {
-      stop("arr3d.list must either be a list of 3d arrays, ",
-        "or a character vector of paths to the locations ",
-        "of 3d arrays on disk.")
-    }
-    numbers <- list()
-    sets <- seq_along(arr3d.list) %>% {
-      split(., ((. - 1) %/% mcc) + 1)
-    }
-    for (i in sets) {
-      arrays <- lapply(arr3d.list[i], ReadImageData)
-      threshed <- lapply(arrays, autothresholdr::mean_stack_thresh,
-                         method = mst, fail = fail)
-      numbers.i <- BiocParallel::bplapply(threshed, Number, tau = tau,
-                                          n.ch = n.ch, filt = filt,
-                                          verbose = verbose,
-                                          BPPARAM = bpp(mcc, seed = seed))
-      numbers[i] <- numbers.i
-    }
-  }
-  if (is.null(mst)) mst <- NA
-  numbers <- lapply(numbers, function(x) {
-    attr(x, "mst") <- mst
-    x
-  })
-  numbers
+number_time_series_folder <- function(folder_path = ".", def, frames_per_set,
+                                      n_ch = 1, tau = NULL,
+                                      thresh = NULL, fail = NA, filt = NULL,
+                                      s = 1, offset = 0, readout_noise = 0,
+                                      gamma = 1, seed = NULL, parallel = FALSE,
+                                      rds = FALSE) {
+  if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
+  init_dir <- getwd()
+  on.exit(setwd(init_dir))
+  setwd(folder_path)
+  file_names <- list.files(pattern = "\\.tif")
+  purrr::map(file_names, number_time_series_file, def = def, n_ch = n_ch,
+             frames_per_set = frames_per_set,
+             tau = tau, thresh = thresh, fail = fail, filt = filt,
+             s = s, offset = offset, readout_noise = readout_noise,
+             gamma = gamma, seed = seed, parallel = parallel, rds = rds) %>%
+    magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
+    invisible()
 }
+

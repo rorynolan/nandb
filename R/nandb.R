@@ -1,6 +1,6 @@
 #' @useDynLib nandb, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-#' @importFrom magrittr '%>%' '%T>%'
+#' @importFrom magrittr '%>%' '%T>%' '%<>%'
 #' @import ggplot2
 #' @importFrom hexbin hexbin
 NULL
@@ -11,13 +11,8 @@ if (getRversion() >= "2.15.1") {
   utils::globalVariables(c(".", "Var1", "Var2", "value", "x", "y", "colour"))
 }
 
-.onLoad <- function(libname, pkgname) {
-  ## Workaround needed for BiocParallel MulticoreParam to work on mac
-  options(bphost = "localhost")
-}
-
 .onUnload <- function (libpath) {
-  library.dynam.unload("nandb", libpath)
+ library.dynam.unload("nandb", libpath)
 }
 
 #' nandb: Number and brightness in R.

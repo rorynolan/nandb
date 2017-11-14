@@ -151,7 +151,7 @@ CorrectForBleachings <- function(arr.list, tau, n.ch = 1,
                                  ignore_black = FALSE,
                                  ignore_white = FALSE,
                                  mcc = 1, seed = NULL) {
-  if (is.character(arr.list)) arr.list <- purrr:::map(arr.list, ReadImageData)
+  if (is.character(arr.list)) arr.list <- purrr::map(arr.list, ReadImageData)
   arr.list <- purrr::map(arr.list, ForceChannels, n.ch)
   if (!is.null(mst)) {
     if (! length(mst) %in% c(1, n.ch)) {

@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Number and Brightness Image Analysis
-Version: 0.2.1
+Version: 1.0.0
 Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
                     role = c("aut", "cre", "cph")),
              person("Luis", "Alvarez", email = "lalvarez@well.ox.ac.uk",
@@ -43,7 +43,9 @@ Imports:
     ore,
     DescTools,
     checkmate,
-    radiant.data
+    radiant.data,
+    imager,
+    detrendr
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,

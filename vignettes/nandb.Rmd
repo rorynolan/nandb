@@ -17,7 +17,7 @@ set.seed(1)
 ### Loading the libraries
 
 ```{r load library, results='hide', message=FALSE}
-required <- c("nandb", "EBImage", "dplyr", "ggplot2", "matrixStats")
+required <- c("nandb", "tidyverse", "matrixStats")
 sapply(required, library, character.only = TRUE)
 ```
 
@@ -25,37 +25,38 @@ sapply(required, library, character.only = TRUE)
 
 Now let's read in an image:
 ```{r read image}
-img <- system.file("extdata", "50.tif", package = "nandb") %>% ReadImageData
+img <- read_tif(system.file("extdata", "50_big.tif", package = "nandb"))
 dim(img)  # get img's dimensions
 ```
-So we can see that `img` is a 3-dimensional array of 70 slices each of which is a $`r nrow(img)` \times `r ncol(img)`$ image. We can view the first slice:
+So we can see that `img` is a 3-dimensional array of $`r dim(img)[3]`$ slices each of which is a $`r dim(img)[1]` \times `r dim(img)[2]`$ image. We can view the mean projection of the stack:
 ```{r display image, fig.width=7, fig.height=7}
-display(normalize(img[, , 1]), method = "raster")
+display(detrendr::mean_pillars(img))
 ```
 
 ### Preprocessing, Brightness Calculation and Post-Filtering
 
 Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames and using the Huang thresholding method via 
 ```{r Brightness calculation with bleaching correction, fig.width=7, fig.height=7}
-img_brightness <- Brightness(img, tau = "auto", mst = "Huang")
-MatrixRasterPlot(img_brightness, log.trans = TRUE)
+img_brightness <- brightness(img, "e", tau = "auto", thresh = "Huang")
+display(img_brightness)
 ```
 
 and we can see what happens when we median filter. 
 ```{r Brightness Plot, fig.width=7, fig.height=7}
-Brightness(img, tau = "auto", mst = "Huang", filt = "median") %>% 
-  MatrixRasterPlot(scale.name = "brightness", log.trans = TRUE)
+img_brightness_med <- brightness(img, "e", tau = "auto", 
+                                 thresh = "Huang", filt = "median")
+display(img_brightness_med)
 ```
 
 ### Saving Text Images
 
 We can save the brightness image (let's do it without median filtering this time). It saves as a text csv file (not as a tiff image, since the brightness values can be any non-negative real number, but tiff images can only store pixel values as integers).
 ```{r Brightness write to txt}
-WriteImageTxt(img_brightness, "BrightnessImage")
-list.files(pattern = "\\.csv$")  # check that the csv file was written to the folder
+write_txt_img(img_brightness, "BrightnessImage")
+list.files(pattern = "\\.txt$")  # check that the .txt file was written to the folder
 ```
 ```{r, echo=FALSE, results="hide"}
-file.remove("BrightnessImage.csv")  # remove that file (clean up)
+file.remove("BrightnessImage.txt")  # remove that file (clean up)
 ```
 
 ### Studying the Distribution of Brightnesses
@@ -66,23 +67,16 @@ db <- density(img_brightness, na.rm = TRUE) %>%
   {data.frame(x = .$x, y = .$y)}
 ggplot(db, aes(x, y)) + geom_line() + 
   labs(x = "brightness", y = "frequency") +
-  xlim(0.5, 2)
+  xlim(-2, 2)
 ```
 
 and we can compare it to the distribution of brightnesses from immobile particles:
 ```{r immobile plot, fig.width=7, fig.height=7}
 immobile_brightnesses <- matrix(rpois(50 * 10^6, 50), nrow = 10^6) %>% 
-  {rowVars(.) / rowMeans(.)}
+  {rowVars(.) / rowMeans(.) - 1}
 di <- density(immobile_brightnesses) %>% {data.frame(x = .$x, y = .$y)}
 rbind(mutate(db, mobility = "mobile"), mutate(di, mobility = "immobile")) %>%      mutate(mobility = factor(mobility)) %>% 
   ggplot(aes(x, y)) + geom_line(aes(colour = mobility)) + 
   labs(x = "brightness", y = "frequency") +
-  xlim(0.5, 2)
-```
-
-### Calculating the Brightness of a Monomer
-
-Say we know that our monomeric brightness is 1.02. Then we can create a plot of all kmers present:
-```{r kmer plot, fig.width=7, fig.height=7}
-KmerPlot(img_brightness, 1.04)
-```
+  xlim(-2, 2)
+``` 

@@ -1,123 +1,93 @@
-test_that("Brightness works", {
-  library(magrittr)
+context("Brightness")
+
+test_that("brightness works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
-  set.seed(33)
-  brightness <- Brightness(img, tau = 'auto', mst = 'Huang', filt = 'median',
-                           verbose = TRUE)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0239)
+  brightness <- brightness(img, "e", tau = 'auto', thresh = 'Huang',
+                           filt = 'median', seed = 0, parallel = 2)
+  if (not_windows()) {
+    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 0.0242)
   }
-  brightness <- Brightness(img, tau = 1000, mst = 'Huang', filt = 'smooth',
-                           verbose = TRUE)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0442)
+  brightness <- brightness(img, "B", tau = 1000, thresh = 'Huang',
+                           filt = 'mean', seed = 9)
+  if (not_windows()) {
+    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0433)
   }
-  expect_error(Brightness(img, "abc"),
-               "If tau is a string, it must be 'auto'.")
-  expect_error(Brightness(img, FALSE),
-               "If tau is not numeric, then it must be NA or 'auto'.")
-  img <- ReadImageData(img)
-  brightness <- Brightness(img, filt = "smooth")
-  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  brightness.2ch <- Brightness(two.channel.img, n.ch = 2, filt = "smooth")
-  expect_equal(brightness.2ch, abind::abind(brightness, brightness, along = 3))
-  expect_error(Brightness(two.channel.img), "dimensional one")
-  expect_error(Brightness(matrix(1:4, nrow = 2)), "dimensional one")
-  expect_error(Brightness(matrix(1:4, nrow = 2), n.ch = 2),
-               "nothing to be done")
+  expect_error(brightness(img, "e", tau = "abc"), "If tau is a string")
+  expect_error(brightness(img, "B", tau = FALSE),
+               "tau must be specified as a positive number or")
+  img %<>% read_tif()
+  brightness <- brightness(img, "B", filt = "median")
+  two_channel_img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  brightness_2ch <- brightness(two_channel_img, "B", n_ch = 2, filt = "median")
+  expect_equal(brightness_2ch %>% {list(dim(.), as.vector(.))},
+               abind::abind(brightness, brightness, along = 3) %>%
+                 {list(dim(.), as.vector(.))},
+               check.attributes = FALSE)
+  expect_error(brightness(two_channel_img, "e"),
+               "as having 1 channels, but it looks like it has 2")
+  expect_error(brightness(matrix(1:4, nrow = 2), "B"), "has dimension 2")
+  expect_error(brightness(matrix(1:4, nrow = 2), "B", n_ch = 2),
+               "but has dimension 2")
 })
 
- test_that("BrightnessTimeSeries works", {
+ test_that("brightness_time_series works", {
   library(magrittr)
   img <- system.file('extdata', '50.tif', package = 'nandb')
-  set.seed(333)
-  bts <- BrightnessTimeSeries(img, 20, tau = 100, mst = 'Huang',
-                              filt = 'median', mcc = 2, seed = 9,
-                              verbose = TRUE)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), 0.977)
+  bts <- brightness_time_series(img, "e", 20, tau = 100, thresh = 'Huang',
+                                filt = 'median', parallel = 2, seed = 9)
+  if (not_windows()) {
+    expect_equal(round(mean(bts, na.rm = TRUE), 3), -0.018)
   }
-  bts <- BrightnessTimeSeries(img, 30, tau = NA, mst = 'tri',
-                              filt = 'median', mcc = 2, seed = 99,
-                              verbose = TRUE)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+  bts <- brightness_time_series(img, "B", 30, tau = NA, thresh = 'tri',
+                                filt = 'median', parallel = 2, seed = 99)
+  if (not_windows()) {
     expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.008)
   }
-  expect_error(BrightnessTimeSeries(img, 51),
-               "frames.per.set must not be greater than the depth of arr3d")
-  img <- ReadImageData(img)
-  bts <- BrightnessTimeSeries(img, 10)
-  two.channel.img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
-  bts.2ch <- BrightnessTimeSeries(two.channel.img, 10, n.ch = 2)
-  expect_equal(bts.2ch,
-               abind::abind(bts, bts, along = 4) %>% aperm(c(1, 2, 4, 3)))
-  expect_error(BrightnessTimeSeries(two.channel.img), "dimensional one")
-  expect_error(BrightnessTimeSeries(matrix(1:4, nrow = 2)), "dimensional one")
-  expect_error(BrightnessTimeSeries(matrix(1:4, nrow = 2), n.ch = 2),
-               "nothing to be done")
+  expect_error(brightness_time_series(img, "b", 51),
+               paste("You have selected 51 frames per set,",
+                     "but there are only 50 frames in total"))
+  img <- read_tif(img)
+  bts <- brightness_time_series(img, "b", 10)
+  two_channel_img <- abind::abind(img, img, along = 4) %>% aperm(c(1, 2, 4, 3))
+  bts_2ch <- brightness_time_series(two_channel_img, "b", 10, n_ch = 2)
+  expect_equal(bts_2ch %>% {list(dim(.), as.vector(.))},
+               abind::abind(bts, bts, along = 4) %>% aperm(c(1, 2, 4, 3)) %>%
+                 {list(dim(.), as.vector(.))})
+  expect_error(brightness_time_series(two_channel_img, "e"),
+               "as having 1 channels, but it looks like it has 2")
+  expect_error(brightness_time_series(matrix(1:4, nrow = 2)),
+               "argument.*def.*is missing, with no default")
+  expect_error(brightness_time_series(matrix(1:4, nrow = 2), "b", n_ch = 2),
+               "Assertion.*failed.*Must have >=3 dimensions.*has dimension 2")
   setwd(tempdir())
-  WriteIntImage(img, '50.tif')
-  WriteIntImage(img, '50again.tif')
-  BrightnessTimeSeriesTxtFolder(tau = 333, mst = 'tri', mcc = 2,
-                                frames.per.set = 20, seed = 0)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
+  write_tif(img, '50.tif')
+  write_tif(img, '50again.tif')
+  brightness_time_series_folder(def = "B", tau = 333, thresh = 'tri',
+                                frames_per_set = 20, seed = 0)
+  if (not_windows()) {
     expect_true(all(
-      c("50_brightness_frames=20_tau=333_mst=tri_filter=NA_1.csv",
-        "50_brightness_frames=20_tau=333_mst=tri_filter=NA_2.csv") %in%
+      paste0("50", c("_brightness_B_timeseries_",
+                     "again_brightness_B_timeseries_"),
+             c("frames=20_tau=333_thresh=Triangle=0.68_filt=NA_1.txt",
+               "frames=20_tau=333_thresh=Triangle=0.68_filt=NA_2.txt")) %in%
         list.files()))
   }
   suppressWarnings(file.remove(list.files()))  # cleanup
 })
 
-test_that("BrightnessTxtFolder works", {
-  img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
+test_that("brightness_folder works", {
+  img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
-  WriteIntImage(img, '50.tif')
-  WriteIntImage(img, '50again.tif')
-  WriteIntImage(array(4, dim = rep(3, 3)), "const.tif")
-  BrightnessTxtFolder(tau = NA, mst = NULL, mcc = 2, seed = 3)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_true(
-      all(c("50_brightness_frames=50_tau=NA_mst=NA_filter=NA.csv",
-            "50again_brightness_frames=50_tau=NA_mst=NA_filter=NA.csv") %in%
-        list.files())
-    )
-    BrightnessPlotFolder()
-    expect_true(
-      all(c("50_brightness_frames=50_tau=NA_mst=NA_filter=NA.pdf",
-            "50again_brightness_frames=50_tau=NA_mst=NA_filter=NA.pdf") %in%
-            list.files())
-    )
-  }
+  write_tif(img, '50.tif')
+  write_tif(img, '50again.tif')
+  write_tif(array(4, dim = rep(3, 3)), "const.tif")
+  brightness_folder(def = "B", tau = NA, seed = 3)
+  expect_true(
+    all(c("50_brightness_B_tau=NA_thresh=NA_filt=NA.txt",
+          "50again_brightness_B_tau=NA_thresh=NA_filt=NA.txt") %in%
+          list.files())
+  )
   suppressWarnings(file.remove(list.files()))
-})
-
-test_that("Brightnesses works", {
-  img.paths <- rep(system.file('extdata', '50.tif', package = 'nandb'), 2)
-  brightnesses <- Brightnesses(img.paths, mst = 'Huang', tau = 250, mcc = 2,
-                               seed = 7)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(mean(unlist(brightnesses), na.rm = TRUE), 3), 1.039)
-  }
-  expect_error(Brightnesses(1:2, mst = "tri"),
-               "must either be a list of 3d arrays")
-})
-
-test_that("BrightnessTimeSeriess works", {
-  img <- ReadImageData(system.file('extdata', '50.tif', package = 'nandb'))
-  arr3d.list <- list(img, img)
-  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 20)
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-                 rep(1.0124, 2))
-  }
-  btss <- nandb:::BrightnessTimeSeriess(arr3d.list, 20, mst = "otsu")
-  if (!stringr::str_detect(tolower(Sys.info()['sysname']), "windows")) {
-    expect_equal(round(purrr::map_dbl(btss, mean, na.rm = TRUE), 4),
-                 rep(1.0105, 2))
-  }
-  expect_error(nandb:::BrightnessTimeSeriess(1:2, 10, mst = "tri"),
-               "either.*vector of path")
 })
