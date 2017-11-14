@@ -30,8 +30,6 @@ sudo apt-get install default-jre default-jdk libboost-all-dev
 
 1. In R, run
 ```{r Install nandb for Linux, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 install.packages("nandb")
 ```
 
@@ -41,8 +39,6 @@ install.packages("nandb")
 
 1. In R, run
 ```{r Install nandb for Windows, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 install.packages("nandb")
 ```
 
@@ -50,16 +46,12 @@ install.packages("nandb")
 
 In R, run
 ```{r Install nandb for Mac, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 install.packages("nandb")
 ```
 
 ## Installing the development version
 The release version is recommended (and installed with `install.packages("nandb")` as above), but to install the development version, in R enter
 ```{r Install nandb dev, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 devtools::install_github("rorynolan/nandb")
 ```
 

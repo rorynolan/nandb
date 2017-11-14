@@ -5,12 +5,12 @@ test_that("number works", {
   number <- number(img, "n", tau = 'auto', thresh = 'Huang',
                            filt = 'median', seed = 0, parallel = 2)
   if (not_windows()) {
-    expect_equal(round(median(number, na.rm = TRUE), 4), -31.7808)
+    expect_equal(round(median(number, na.rm = TRUE), 3), -31.781)
   }
   number <- number(img, "N", tau = 1000, thresh = 'Huang',
                    filt = 'mean', seed = 9)
   if (not_windows()) {
-    expect_equal(round(mean(number, na.rm = TRUE), 4), 17.501)
+    expect_equal(round(mean(number, na.rm = TRUE), 1), 17.5)
   }
   expect_error(number(img, "n", tau = "abc"), "If tau is a string")
   expect_error(number(img, "n", tau = FALSE),
@@ -36,7 +36,7 @@ test_that("number_time_series works", {
   nts <- number_time_series(img, "N", 20, tau = 100, thresh = 'Huang',
                             filt = 'median', parallel = 2, seed = 9)
   if (not_windows()) {
-    expect_equal(round(mean(nts, na.rm = TRUE), 3), 17.776)
+    expect_equal(round(mean(nts, na.rm = TRUE)), 18)
   }
   nts <- number_time_series(img, "n", 30, tau = NA, thresh = 'tri',
                             filt = 'median', parallel = 2, seed = 99)

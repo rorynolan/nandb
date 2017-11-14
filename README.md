@@ -20,8 +20,6 @@ Installation
 2.  In R, run
 
 ``` r
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 install.packages("nandb")
 ```
 
@@ -32,8 +30,6 @@ install.packages("nandb")
 2.  In R, run
 
 ``` r
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 install.packages("nandb")
 ```
 
@@ -42,8 +38,6 @@ install.packages("nandb")
 In R, run
 
 ``` r
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 install.packages("nandb")
 ```
 
@@ -53,8 +47,6 @@ Installing the development version
 The release version is recommended (and installed with `install.packages("nandb")` as above), but to install the development version, in R enter
 
 ``` r
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("EBImage", "BiocParallel"))
 devtools::install_github("rorynolan/nandb")
 ```
 

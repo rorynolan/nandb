@@ -5,12 +5,12 @@ test_that("brightness works", {
   brightness <- brightness(img, "e", tau = 'auto', thresh = 'Huang',
                            filt = 'median', seed = 0, parallel = 2)
   if (not_windows()) {
-    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 0.0242)
+    expect_equal(round(mean(brightness, na.rm = TRUE), 3), 0.024)
   }
   brightness <- brightness(img, "B", tau = 1000, thresh = 'Huang',
                            filt = 'mean', seed = 9)
   if (not_windows()) {
-    expect_equal(round(mean(brightness, na.rm = TRUE), 4), 1.0433)
+    expect_equal(round(mean(brightness, na.rm = TRUE), 3), 1.043)
   }
   expect_error(brightness(img, "e", tau = "abc"), "If tau is a string")
   expect_error(brightness(img, "B", tau = FALSE),
@@ -36,7 +36,7 @@ test_that("brightness works", {
   bts <- brightness_time_series(img, "e", 20, tau = 100, thresh = 'Huang',
                                 filt = 'median', parallel = 2, seed = 9)
   if (not_windows()) {
-    expect_equal(round(mean(bts, na.rm = TRUE), 3), -0.018)
+    expect_equal(round(mean(bts, na.rm = TRUE), 2), -0.02)
   }
   bts <- brightness_time_series(img, "B", 30, tau = NA, thresh = 'tri',
                                 filt = 'median', parallel = 2, seed = 99)
