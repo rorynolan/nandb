@@ -47,6 +47,9 @@ is_windows <- function() {
   stringr::str_detect(tolower(Sys.info()['sysname']), "windows")
 }
 not_windows <- function() !is_windows()
+is_mac <- function() {
+  stringr::str_detect(tolower(Sys.info()['sysname']), "darwin")
+}
 
 fix_filt <- function(filt) {
   if (is.null(filt)) filt <- NA

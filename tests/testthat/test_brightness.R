@@ -4,7 +4,7 @@ test_that("brightness works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   brightness <- brightness(img, "e", tau = 'auto', thresh = 'Huang',
                            filt = 'median', seed = 0, parallel = 2)
-  if (not_windows()) {
+  if (is_mac()) {
     expect_equal(round(mean(brightness, na.rm = TRUE), 3), 0.024)
   }
   brightness <- brightness(img, "B", tau = 1000, thresh = 'Huang',

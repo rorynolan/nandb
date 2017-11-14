@@ -4,7 +4,7 @@ test_that("number works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   number <- number(img, "n", tau = 'auto', thresh = 'Huang',
                            filt = 'median', seed = 0, parallel = 2)
-  if (not_windows()) {
+  if (is_mac()) {
     expect_equal(round(median(number, na.rm = TRUE), 3), -31.781)
   }
   number <- number(img, "N", tau = 1000, thresh = 'Huang',
