@@ -6,10 +6,9 @@
 \alias{brightness_ts_img}
 \title{Number and brightness time series image classes.}
 \usage{
-number_ts_img(img, def, frames_per_set, thresh = NA, tau = NA, filt = NA)
+number_ts_img(img, def, frames_per_set, thresh, tau, filt)
 
-brightness_ts_img(img, def, frames_per_set, thresh = NA, tau = NA,
-  filt = NA)
+brightness_ts_img(img, def, frames_per_set, thresh, tau, filt)
 }
 \arguments{
 \item{img}{The calculated number or brightness time series image series.}

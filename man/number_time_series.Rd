@@ -4,24 +4,20 @@
 \alias{number_time_series}
 \title{Create a number time-series.}
 \usage{
-number_time_series(img, def, frames_per_set, n_ch = 1, tau = NULL,
-  thresh = NULL, fail = NA, filt = NULL, s = 1, offset = 0,
-  readout_noise = 0, gamma = 1, parallel = FALSE, seed = NULL)
+number_time_series(img, def, frames_per_set, tau = NULL, thresh = NULL,
+  fail = NA, filt = NULL, s = 1, offset = 0, readout_noise = 0,
+  gamma = 1, parallel = FALSE, seed = NULL)
 }
 \arguments{
-\item{img}{The image to perform the calculation on. This can be a
-single-channel image (which would be a 3-d array \code{img[y, x, frame]}) or a
-multi channel (\code{img[y, x, channel, frame]}). To perform this on a file that
-has not yet been read in, set this argument to the path to that file (a
-string).}
+\item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
+calculation on. To perform this on a file that has not yet been read in,
+set this argument to the path to that file (a string).}
 
 \item{def}{A character. Which definition of number do you want to use, \code{"n"}
 or \code{"N"}?}
 
 \item{frames_per_set}{The number of frames with which to calculate the
 successive numbers.}
-
-\item{n_ch}{The number of channels in the image (default 1).}
 
 \item{tau}{The exponential parameter to be passed to
 \code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.}
@@ -85,7 +81,7 @@ correction is selected, it is performed on the whole image stack before the
 sectioning is done for calculation of numbers.
 }
 \examples{
-img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 nts <- number_time_series(img, "n", frames_per_set = 20,
                           tau = NA, thresh = "Huang", parallel = 2)
 }

@@ -4,10 +4,10 @@
 \alias{number_time_series_folder}
 \title{Number time-series calculations for every image in a folder.}
 \usage{
-number_time_series_folder(folder_path = ".", def, frames_per_set, n_ch = 1,
+number_time_series_folder(folder_path = ".", def, frames_per_set,
   tau = NULL, thresh = NULL, fail = NA, filt = NULL, s = 1,
   offset = 0, readout_noise = 0, gamma = 1, seed = NULL,
-  parallel = FALSE, rds = FALSE)
+  parallel = FALSE)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to
@@ -18,8 +18,6 @@ or \code{"N"}?}
 
 \item{frames_per_set}{The number of frames with which to calculate the
 successive numbers.}
-
-\item{n_ch}{The number of channels in the image (default 1).}
 
 \item{tau}{The exponential parameter to be passed to
 \code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.}
@@ -60,22 +58,23 @@ here.}
 \item{parallel}{Would you like to use multiple cores to speed up this
 function? If so, set the number of cores here, or to use all available
 cores, use \code{parallel = TRUE}.}
-
-\item{rds}{In addition to writing a text file, save the image as an RDS (a
-single R object) file?}
 }
 \description{
 Perform \code{\link[=number_time_series]{number_time_series()}} calculations on all tif images in a folder and
-save the resulting number images to disk as text images (and optionally also
-as RDS files).
+save the resulting number images to disk.
+}
+\note{
+Extreme number values (of magnitude greater than 3.40282e+38) will be
+written to the TIFF file as \code{NA}, since TIFF files cannot handle such huge
+numbers.
 }
 \examples{
 setwd(tempdir())
-img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-write_tif(img, 'img1.tif')
-write_tif(img, 'img2.tif')
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+ijtiff::write_tif(img, 'img1.tif')
+ijtiff::write_tif(img, 'img2.tif')
 number_time_series_folder(def = "n", tau = NA, thresh = "Huang",
-                          frames_per_set = 20, parallel = 2, n_ch = 1)
+                          frames_per_set = 20, parallel = 2)
 suppressWarnings(file.remove(list.files()))  # cleanup
 }
 \seealso{

@@ -3,16 +3,18 @@
 #' The `number_img` and `brightness_img` classes are designed to hold objects
 #' which are images calculated from the *number and brightness* technique.
 #'
-#' An object of class `number_img` or `brightness_img` is a matrix of real
-#' numbers with 4 attributes: \describe{\item{`def`}{Are we using the `"N"` or
-#' `"n"` definition of number, or the `"B"` or `"epsilon"` definition of
-#' brightness?} \item{`thresh`}{A positive integer, possibly an object of class
-#' [autothresholdr::th] detailing which threshold and thresholding method was
-#' used in preprocessing (in the multi-channel case, one threshold per channel
-#' is given).} \item{`tau`}{A positive number indicating the tau parameter used
-#' for detrending with an attribute `auto` which is a logical indicating whether
-#' or not the tau parameter was chosen automatically.}\item{`filt`}{Was mean or
-#' median filtering used in postprocessing?}}
+#' An object of class `number_img` or `brightness_img` is a 4-dimensional array
+#' of real numbers in the mould of an [ijtiff_img][ijtiff::ijtiff_img] (indexed
+#' as `img[y, x, channel, frame]`) with 4 attributes: \describe{\item{`def`}{Are
+#' we using the `"N"` or `"n"` definition of number, or the `"B"` or `"epsilon"`
+#' definition of brightness?} \item{`thresh`}{A positive integer, possibly an
+#' object of class [autothresholdr::th] detailing which threshold and
+#' thresholding method was used in preprocessing (in the multi-channel case, one
+#' threshold per channel is given).} \item{`tau`}{A positive number indicating
+#' the tau parameter used for detrending with an attribute `auto` which is a
+#' logical indicating whether or not the tau parameter was chosen
+#' automatically.}\item{`filt`}{Was mean or median filtering used in
+#' postprocessing?}}
 #'
 #' @param img The calculated number or brightness image.
 #' @param def The number or brightness definition used.
@@ -30,23 +32,23 @@
 #'   image had different filters, this may be specified as a character vector,
 #'   one element for each channel.
 #'
-#' @return An object of class `number`.
+#' @return An object of class `number_img` or `brightness_img`.
 #'
 #' @name nb-img-classes
 NULL
 
 #' @rdname nb-img-classes
 #' @export
-number_img <- function(img, def, thresh = NA, tau = NA, filt = NA) {
-  checkmate::assert_array(img, min.d = 2, max.d = 3)
-  n_ch <- dim(img) %>% {dplyr::if_else(length(.) == 3, .[3], 1L)}
+number_img <- function(img, def, thresh, tau, filt) {
+  checkmate::assert_array(img, min.d = 2, max.d = 4)
+  n_ch <- dim(img) %>% {dplyr::if_else(length(.) >= 3, .[3], 1L)}
   img %<>% number_img_common(n_ch = n_ch, def = def,
-                         thresh = thresh, tau = tau, filt = filt)
+                             thresh = thresh, tau = tau, filt = filt)
   class(img) %<>% c("number_img", .)
   img
 }
 
-number_img_common <- function(img, n_ch, def, thresh = NA, tau = NA, filt = NA) {
+number_img_common <- function(img, n_ch, def, thresh, tau, filt) {
   checkmate::assert_string(def)
   if (!isTRUE(def %in% c("n", "N"))) stop("def must be one of 'n' or 'N'.")
   if (length(thresh) == 1 && n_ch > 1) thresh %<>% {rep(list(.), n_ch)}
@@ -87,12 +89,19 @@ number_img_common <- function(img, n_ch, def, thresh = NA, tau = NA, filt = NA) 
          "as the number of channel in 'img'.")
   }
   for (att in c("def", "thresh", "tau", "filt")) attr(img, att) <- get(att)
+  if (length(dim(img)) < 4) {
+    if (n_ch == 1 && length(dim(img)) == 3) {
+      dim(img) <- c(dim(img)[1:2], 1, dim(img)[3])
+    } else {
+      dim(img) %<>% c(rep(1, max(0, 4 - length(.))))
+    }
+  }
   img
 }
 
 #' @rdname nb-img-classes
 #' @export
-brightness_img <- function(img, def, thresh = NA, tau = NA, filt = NA) {
+brightness_img <- function(img, def, thresh, tau, filt) {
   checkmate::assert_string(def)
   def %<>% tolower()
   if (def == "b") {
@@ -171,11 +180,11 @@ NULL
 #' @rdname nb-ts-img-classes
 #' @export
 number_ts_img <- function(img, def, frames_per_set,
-                          thresh = NA, tau = NA, filt = NA) {
+                          thresh, tau, filt) {
   checkmate::assert_array(img, min.d = 3, max.d = 4)
   n_ch <- dim(img) %>% {dplyr::if_else(length(.) == 4, .[3], 1L)}
   img %<>% number_img_common(n_ch = n_ch, def = def,
-                         thresh = thresh, tau = tau, filt = filt)
+                             thresh = thresh, tau = tau, filt = filt)
   class(img) %<>% c("number_ts_img", .)
   attr(img, "frames_per_set") <- frames_per_set
   img
@@ -184,7 +193,7 @@ number_ts_img <- function(img, def, frames_per_set,
 #' @rdname nb-ts-img-classes
 #' @export
 brightness_ts_img <- function(img, def, frames_per_set,
-                              thresh = NA, tau = NA, filt = NA) {
+                              thresh, tau, filt) {
   checkmate::assert_string(def)
   def %<>% tolower()
   if (def == "b") {

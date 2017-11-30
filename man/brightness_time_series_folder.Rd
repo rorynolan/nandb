@@ -5,9 +5,9 @@
 \title{Brightness time-series calculations for every image in a folder.}
 \usage{
 brightness_time_series_folder(folder_path = ".", def, frames_per_set,
-  n_ch = 1, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-  s = 1, offset = 0, readout_noise = 0, gamma = 1, seed = NULL,
-  parallel = FALSE, rds = FALSE)
+  tau = NULL, thresh = NULL, fail = NA, filt = NULL, s = 1,
+  offset = 0, readout_noise = 0, gamma = 1, seed = NULL,
+  parallel = FALSE)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to
@@ -19,11 +19,11 @@ process.}
 \item{frames_per_set}{The number of frames with which to calculate the
 successive numbers.}
 
-\item{n_ch}{The number of channels in the image (default 1).}
-
 \item{tau}{The \eqn{tau} parameter for \emph{exponential filtering} detrending.
 This must be a positive number. Set this to "auto" to use Nolan's algorithm
-to automatically find a suitable value for this parameter (recommended).}
+to automatically find a suitable value for this parameter (recommended).
+For multi-channel images, it is possible to have a different \code{tau} for each
+channel by specifying \code{tau} as a vector or list.}
 
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
@@ -61,22 +61,18 @@ here.}
 \item{parallel}{Would you like to use multiple cores to speed up this
 function? If so, set the number of cores here, or to use all available
 cores, use \code{parallel = TRUE}.}
-
-\item{rds}{In addition to writing a text file, save the image as an RDS (a
-single R object) file?}
 }
 \description{
 Perform \code{\link[=brightness_time_series]{brightness_time_series()}} calculations on all tif images in a folder
-and save the resulting number images to disk as text images (and optionally
-also as RDS files).
+and save the resulting number images to disk.
 }
 \examples{
 setwd(tempdir())
-img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-write_tif(img, 'img1.tif')
-write_tif(img, 'img2.tif')
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+ijtiff::write_tif(img, 'img1.tif')
+ijtiff::write_tif(img, 'img2.tif')
 brightness_time_series_folder(def = "e", tau = NA, thresh = "Huang",
-                              frames_per_set = 20, parallel = 2, n_ch = 1)
+                              frames_per_set = 20, parallel = 2)
 suppressWarnings(file.remove(list.files()))  # cleanup
 }
 \seealso{

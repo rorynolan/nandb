@@ -4,21 +4,17 @@
 \alias{number}
 \title{Calculate number from image series.}
 \usage{
-number(img, def, n_ch = 1, tau = NULL, thresh = NULL, fail = NA,
-  filt = NULL, s = 1, offset = 0, readout_noise = 0, gamma = 1,
-  seed = NULL, parallel = FALSE)
+number(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
+  s = 1, offset = 0, readout_noise = 0, gamma = 1, seed = NULL,
+  parallel = FALSE)
 }
 \arguments{
-\item{img}{The image to perform the calculation on. This can be a
-single-channel image (which would be a 3-d array \code{img[y, x, frame]}) or a
-multi channel (\code{img[y, x, channel, frame]}). To perform this on a file that
-has not yet been read in, set this argument to the path to that file (a
-string).}
+\item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
+calculation on. To perform this on a file that has not yet been read in,
+set this argument to the path to that file (a string).}
 
 \item{def}{A character. Which definition of number do you want to use, \code{"n"}
 or \code{"N"}?}
-
-\item{n_ch}{The number of channels in the image (default 1).}
 
 \item{tau}{The exponential parameter to be passed to
 \code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.}
@@ -62,12 +58,11 @@ A matrix, the number image.
 }
 \description{
 Given a time stack of images, \code{number()} performs a calculation of the number
-for each pixel. \code{number_txt_folder()} does this calculation for an entire
-folder, writing the results as text files via \code{\link[=write_txt_img]{write_txt_img()}}.
+for each pixel.
 }
 \examples{
-img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-display(img[, , 1])
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+ijtiff::display(img[, , 1, 1])
 num <- number(img, "N", tau = NA, thresh = "Huang")
 num <- number(img, "n", tau = 10, thresh = "tri")
 }

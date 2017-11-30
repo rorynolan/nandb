@@ -4,23 +4,24 @@
 \alias{brightness}
 \title{Calculate brightness from image series.}
 \usage{
-brightness(img, def, n_ch = 1, tau = NULL, thresh = NULL, fail = NA,
-  filt = NULL, s = 1, offset = 0, readout_noise = 0, gamma = 1,
-  seed = NULL, parallel = FALSE)
+brightness(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
+  s = 1, offset = 0, readout_noise = 0, gamma = 1, seed = NULL,
+  parallel = FALSE)
 }
 \arguments{
-\item{img}{The image series to be detrended. This must be a 3-dimensional
-array of non-negative integers, with the matrix defined as \code{img[, , 1]}
-being the first frame of the image series.}
+\item{img}{A 4-dimensional array in the style of an
+\link[ijtiff:ijtiff_img]{ijtiff_img} (indexed by \code{img[y, x, channel, frame]})
+or a 3-dimensional array which is a single channel of an
+\link[ijtiff:ijtiff_img]{ijtiff_img} (indexed by \code{img[y, x, frame]}).}
 
 \item{def}{A character. Which definition of brightness do you want to use,
 \code{"B"} or \code{"epsilon"}?}
 
-\item{n_ch}{The number of channels in the image (default 1).}
-
 \item{tau}{The \eqn{tau} parameter for \emph{exponential filtering} detrending.
 This must be a positive number. Set this to "auto" to use Nolan's algorithm
-to automatically find a suitable value for this parameter (recommended).}
+to automatically find a suitable value for this parameter (recommended).
+For multi-channel images, it is possible to have a different \code{tau} for each
+channel by specifying \code{tau} as a vector or list.}
 
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
@@ -64,13 +65,11 @@ A matrix, the brightness image.
 }
 \description{
 Given a time stack of images, \code{brightness()} performs a calculation of the
-brightness for each pixel. \code{brightness_txt_folder()} does this calculation
-for an entire folder, writing the results as text files via
-\code{\link[=write_txt_img]{write_txt_img()}}.
+brightness for each pixel.
 }
 \examples{
-img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-display(img[, , 1])
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+ijtiff::display(img[, , , 1])
 num <- brightness(img, "e", tau = NA, thresh = "Huang")
 num <- brightness(img, "B", tau = 10, thresh = "tri")
 }

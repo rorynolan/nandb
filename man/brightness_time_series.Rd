@@ -4,14 +4,15 @@
 \alias{brightness_time_series}
 \title{Create a brightness time-series.}
 \usage{
-brightness_time_series(img, def, frames_per_set, n_ch = 1, tau = NULL,
-  thresh = NULL, fail = NA, filt = NULL, s = 1, offset = 0,
-  readout_noise = 0, gamma = 1, parallel = FALSE, seed = NULL)
+brightness_time_series(img, def, frames_per_set, tau = NULL, thresh = NULL,
+  fail = NA, filt = NULL, s = 1, offset = 0, readout_noise = 0,
+  gamma = 1, parallel = FALSE, seed = NULL)
 }
 \arguments{
-\item{img}{The image series to be detrended. This must be a 3-dimensional
-array of non-negative integers, with the matrix defined as \code{img[, , 1]}
-being the first frame of the image series.}
+\item{img}{A 4-dimensional array in the style of an
+\link[ijtiff:ijtiff_img]{ijtiff_img} (indexed by \code{img[y, x, channel, frame]})
+or a 3-dimensional array which is a single channel of an
+\link[ijtiff:ijtiff_img]{ijtiff_img} (indexed by \code{img[y, x, frame]}).}
 
 \item{def}{A character. Which definition of brightness do you want to use,
 \code{"B"} or \code{"epsilon"}?}
@@ -19,11 +20,11 @@ being the first frame of the image series.}
 \item{frames_per_set}{The number of frames with which to calculate the
 successive numbers.}
 
-\item{n_ch}{The number of channels in the image (default 1).}
-
 \item{tau}{The \eqn{tau} parameter for \emph{exponential filtering} detrending.
 This must be a positive number. Set this to "auto" to use Nolan's algorithm
-to automatically find a suitable value for this parameter (recommended).}
+to automatically find a suitable value for this parameter (recommended).
+For multi-channel images, it is possible to have a different \code{tau} for each
+channel by specifying \code{tau} as a vector or list.}
 
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
@@ -84,7 +85,7 @@ correction is selected, it is performed on the whole image stack before the
 sectioning is done for calculation of numbers.
 }
 \examples{
-img <- read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 bts <- brightness_time_series(img, "e", frames_per_set = 20,
                               tau = NA, thresh = "Huang", parallel = 2)
 }

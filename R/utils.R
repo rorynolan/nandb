@@ -7,6 +7,7 @@ extend_for_all_chs <- function(x, n_ch) {
   x
 }
 make_nb_filename_ending <- function(nb_img) {
+  checkmate::assert_array(nb_img, d = 4)
   def <- attr(nb_img, "def")
   tau <- attr(nb_img, "tau")
   auto <- attr(tau, "auto")
@@ -15,9 +16,8 @@ make_nb_filename_ending <- function(nb_img) {
   nb <- dplyr::if_else(stringr::str_detect(pasted_class, "number"),
                        "number", "brightness")
   is_ts <- stringr::str_detect(pasted_class, "_ts_")
-  n_ch <- 1
   d <- dim(nb_img)
-  if ((is_ts && length(d) == 4) || ((!is_ts) && length(d) == 3)) n_ch <- d[3]
+  n_ch <- d[3]
   if ("autothresh_method" %in% names(attributes(thresh))) {
     thresh_method <- attr(thresh, "autothresh_method")
   } else {
@@ -26,14 +26,24 @@ make_nb_filename_ending <- function(nb_img) {
   filt <- attr(nb_img, "filt")
   stopifnot(filesstrings::all_equal(c(length(tau), length(auto), length(thresh),
                                       length(thresh_method), length(filt))))
+  tau_part <- ""
+  for (i in seq_len(n_ch)) {
+    tau_part %<>% paste0(dplyr::if_else(auto[i], "auto=", ""), tau[i], ",")
+  }
+  tau_part %<>% stringr::str_sub(1, -2)
+  thresh_part <- ""
+  for (i in seq_len(n_ch)) {
+    thresh_part %<>% paste0(dplyr::if_else(is.na(thresh_method[i]), "",
+                                           paste0(thresh_method[i], "=")),
+                            thresh[i], ",")
+  }
+  thresh_part %<>% stringr::str_sub(1, -2)
   paste0("_", nb, "_", def, "_",
          dplyr::if_else(is_ts, paste0("timeseries", "_", "frames=",
-                                      attr(nb_img, "frames_per_set"), "_"),
-                        ""),
-         "tau=", dplyr::if_else(auto, "auto=", ""), tau, "_",
-         "thresh=", dplyr::if_else(is.na(thresh_method), "",
-                                   paste0(thresh_method, "=")), thresh, "_",
-         "filt=", filt)
+                                      attr(nb_img, "frames_per_set"), "_"), ""),
+         "tau=", tau_part, "_",
+         "thresh=", thresh_part, "_",
+         "filt=", paste(filt, collapse = ","))
 }
 
 enlist_cols <- function(mat) {

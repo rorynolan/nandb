@@ -25,12 +25,12 @@ sapply(required, library, character.only = TRUE)
 
 Now let's read in an image:
 ```{r read image}
-img <- read_tif(system.file("extdata", "50_big.tif", package = "nandb"))
+img <- ijtiff::read_tif(system.file("extdata", "50_big.tif", package = "nandb"))
 dim(img)  # get img's dimensions
 ```
 So we can see that `img` is a 3-dimensional array of $`r dim(img)[3]`$ slices each of which is a $`r dim(img)[1]` \times `r dim(img)[2]`$ image. We can view the mean projection of the stack:
 ```{r display image, fig.width=7, fig.height=7}
-display(detrendr::mean_pillars(img))
+ijtiff::display(detrendr::mean_pillars(img)[, , 1, 1])  # first channel, first frame
 ```
 
 ### Preprocessing, Brightness Calculation and Post-Filtering
@@ -38,25 +38,25 @@ display(detrendr::mean_pillars(img))
 Now we can calculate the brightness image based on this image series, with an exponential filtering detrend with a time constant of (say) 10 frames and using the Huang thresholding method via 
 ```{r Brightness calculation with bleaching correction, fig.width=7, fig.height=7}
 img_brightness <- brightness(img, "e", tau = "auto", thresh = "Huang")
-display(img_brightness)
+ijtiff::display(img_brightness[, , 1, 1])
 ```
 
 and we can see what happens when we median filter. 
 ```{r Brightness Plot, fig.width=7, fig.height=7}
 img_brightness_med <- brightness(img, "e", tau = "auto", 
                                  thresh = "Huang", filt = "median")
-display(img_brightness_med)
+ijtiff::display(img_brightness_med[, , 1, 1])
 ```
 
-### Saving Text Images
+### Saving Images
 
-We can save the brightness image (let's do it without median filtering this time). It saves as a text csv file (not as a tiff image, since the brightness values can be any non-negative real number, but tiff images can only store pixel values as integers).
+We can save the brightness image (let's do it without median filtering this time). 
 ```{r Brightness write to txt}
-write_txt_img(img_brightness, "BrightnessImage")
+ijtiff::write_tif(img_brightness, "BrightnessImage")
 list.files(pattern = "\\.txt$")  # check that the .txt file was written to the folder
 ```
 ```{r, echo=FALSE, results="hide"}
-file.remove("BrightnessImage.txt")  # remove that file (clean up)
+file.remove("BrightnessImage.tif")  # remove that file (clean up)
 ```
 
 ### Studying the Distribution of Brightnesses

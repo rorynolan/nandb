@@ -6,9 +6,9 @@
 \alias{brightness_img}
 \title{Number and brightness image classes.}
 \usage{
-number_img(img, def, thresh = NA, tau = NA, filt = NA)
+number_img(img, def, thresh, tau, filt)
 
-brightness_img(img, def, thresh = NA, tau = NA, filt = NA)
+brightness_img(img, def, thresh, tau, filt)
 }
 \arguments{
 \item{img}{The calculated number or brightness image.}
@@ -32,21 +32,23 @@ image had different filters, this may be specified as a character vector,
 one element for each channel.}
 }
 \value{
-An object of class \code{number}.
+An object of class \code{number_img} or \code{brightness_img}.
 }
 \description{
 The \code{number_img} and \code{brightness_img} classes are designed to hold objects
 which are images calculated from the \emph{number and brightness} technique.
 }
 \details{
-An object of class \code{number_img} or \code{brightness_img} is a matrix of real
-numbers with 4 attributes: \describe{\item{\code{def}}{Are we using the \code{"N"} or
-\code{"n"} definition of number, or the \code{"B"} or \code{"epsilon"} definition of
-brightness?} \item{\code{thresh}}{A positive integer, possibly an object of class
-\link[autothresholdr:th]{autothresholdr::th} detailing which threshold and thresholding method was
-used in preprocessing (in the multi-channel case, one threshold per channel
-is given).} \item{\code{tau}}{A positive number indicating the tau parameter used
-for detrending with an attribute \code{auto} which is a logical indicating whether
-or not the tau parameter was chosen automatically.}\item{\code{filt}}{Was mean or
-median filtering used in postprocessing?}}
+An object of class \code{number_img} or \code{brightness_img} is a 4-dimensional array
+of real numbers in the mould of an \link[ijtiff:ijtiff_img]{ijtiff_img} (indexed
+as \code{img[y, x, channel, frame]}) with 4 attributes: \describe{\item{\code{def}}{Are
+we using the \code{"N"} or \code{"n"} definition of number, or the \code{"B"} or \code{"epsilon"}
+definition of brightness?} \item{\code{thresh}}{A positive integer, possibly an
+object of class \link[autothresholdr:th]{autothresholdr::th} detailing which threshold and
+thresholding method was used in preprocessing (in the multi-channel case, one
+threshold per channel is given).} \item{\code{tau}}{A positive number indicating
+the tau parameter used for detrending with an attribute \code{auto} which is a
+logical indicating whether or not the tau parameter was chosen
+automatically.}\item{\code{filt}}{Was mean or median filtering used in
+postprocessing?}}
 }
