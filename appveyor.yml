@@ -19,9 +19,9 @@ build_script:
   - travis-tool.sh install_deps
   - travis-tool.sh install_r locfit tiff jpeg png fftwtools
   - travis-tool.sh install_github rorynolan/filesstrings
+  - travis-tool.sh install_github rorynolan/ijtiff
   - travis-tool.sh install_github rorynolan/detrendr
   - travis-tool.sh install_github rorynolan/autothresholdr
-  - travis-tool.sh install_github rorynolan/ijtiff
 
 test_script:
   - travis-tool.sh run_tests

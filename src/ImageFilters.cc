@@ -68,7 +68,7 @@ NumericMatrix median_filter(NumericMatrix mat, int size = 1,
       }
       double filtered_ij;
       if (na_count) {
-        if (sum(is_na(square)) > pow(square_side_len, 2) / 2.0)
+        if (sum(is_na(square)) > square_side_len * square_side_len / 2.0)
           filtered_ij = NA_REAL;
         else
           filtered_ij = median(square, true);
@@ -96,7 +96,7 @@ NumericMatrix smooth_filter(NumericMatrix mat, int size = 1,
   int nc = mat.ncol();
   NumericMatrix smoothed(nr, nc);
   int square_side_len = 2 * size + 1;
-  int square_size = pow(square_side_len, 2);
+  int square_size = square_side_len * square_side_len;
   NumericMatrix square(square_side_len, square_side_len);
   int row;
   int col;
