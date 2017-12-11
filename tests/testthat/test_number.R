@@ -1,6 +1,5 @@
-context("Number")
-
 test_that("number works", {
+  context("number()")
   img <- system.file('extdata', '50.tif', package = 'nandb')
   number <- number(img, "n", tau = 'auto', thresh = 'Huang',
                            filt = 'median', seed = 0, parallel = 2)
@@ -25,6 +24,7 @@ test_that("number works", {
 })
 
 test_that("number_time_series works", {
+  context("number_time_series()")
   library(magrittr)
   img <- system.file('extdata', '50.tif', package = 'nandb')
   nts <- number_time_series(img, "N", 20, tau = 100, thresh = 'Huang',
@@ -62,6 +62,7 @@ test_that("number_time_series works", {
 })
 
 test_that("number_folder works", {
+  context("number_folder()")
   img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
   cwd <- getwd()
   on.exit(setwd(cwd))

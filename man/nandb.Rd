@@ -4,6 +4,7 @@
 \name{nandb}
 \alias{nandb}
 \alias{nandb-package}
+\alias{nandb-package}
 \title{nandb: Number and brightness in R.}
 \description{
 The \code{nandb} package gives functions for calculation of molecular number and

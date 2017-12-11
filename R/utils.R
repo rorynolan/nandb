@@ -46,23 +46,8 @@ make_nb_filename_ending <- function(nb_img) {
          "filt=", paste(filt, collapse = ","))
 }
 
-enlist_cols <- function(mat) {
-  purrr::map(seq_len(ncol(mat)), ~ mat[, .])
-}
-enlist_rows <- function(mat) {
-  purrr::map(seq_len(nrow(mat)), ~ mat[., ])
-}
-
-is_windows <- function() {
-  stringr::str_detect(tolower(Sys.info()['sysname']), "windows")
-}
-not_windows <- function() !is_windows()
-is_mac <- function() {
-  stringr::str_detect(tolower(Sys.info()['sysname']), "darwin")
-}
-
 fix_filt <- function(filt) {
-  if (is.null(filt)) filt <- NA
+  if (is.null(filt)) filt <- NA_character_
   checkmate::assert_character(filt)
   filt %<>% tolower()
   filt[startsWith("mean", filt)] <- "mean"
@@ -70,4 +55,20 @@ fix_filt <- function(filt) {
   if (!all((filt %in% c("mean", "median")) | is.na(filt)))
     stop("All elements of 'filt' must be either 'mean', 'median' or 'NA'.")
   filt
+}
+
+nb_get_img <- function(img) {
+  if (is.character(img)) {
+    if (length(img) != 1) {
+      stop("If 'img' is specified as a character vector ",
+           "(i.e. a file name), it must be length 1")
+    }
+    img %<>% ijtiff::read_tif()
+  }
+  checkmate::assert_array(img, min.d = 3, max.d = 4)
+  checkmate::assert_numeric(img, lower = 0)
+  if (!isTRUE(all.equal(img, floor(img), check.attributes = FALSE))) {
+    stop("`img` must be positive integers (and NAs) only")
+  }
+  img
 }

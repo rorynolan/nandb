@@ -26,8 +26,8 @@ each channel.}
 
 \item{tau}{A positive number with an attribute \code{auto}. If the different
 channels of the image had different \code{tau}s, this argument may be specified
-as a list(of positive numbers with attributes \code{auto}), one element for each
-channel.}
+as a list (of positive numbers with attributes \code{auto}), one element for
+each channel.}
 
 \item{filt}{A string, the filtering method used. Must be either \code{"mean"} or
 \code{"median"}, or \code{NA} for no filtering. If the different channels of the

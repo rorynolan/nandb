@@ -25,8 +25,8 @@
 #'   each channel.
 #' @param tau A positive number with an attribute `auto`. If the different
 #'   channels of the image had different `tau`s, this argument may be specified
-#'   as a list(of positive numbers with attributes `auto`), one element for each
-#'   channel.
+#'   as a list (of positive numbers with attributes `auto`), one element for
+#'   each channel.
 #' @param filt A string, the filtering method used. Must be either `"mean"` or
 #'   `"median"`, or `NA` for no filtering. If the different channels of the
 #'   image had different filters, this may be specified as a character vector,
@@ -40,8 +40,9 @@ NULL
 #' @rdname nb-img-classes
 #' @export
 number_img <- function(img, def, thresh, tau, filt) {
-  checkmate::assert_array(img, min.d = 2, max.d = 4)
-  n_ch <- dim(img) %>% {dplyr::if_else(length(.) >= 3, .[3], 1L)}
+  checkmate::assert_array(img, min.d = 2, max.d = 3)
+  checkmate::assert_numeric(img)
+  n_ch <- dim(img) %>% {dplyr::if_else(length(.) == 3, .[3], 1L)}
   img %<>% number_img_common(n_ch = n_ch, def = def,
                              thresh = thresh, tau = tau, filt = filt)
   class(img) %<>% c("number_img", .)
@@ -86,7 +87,7 @@ number_img_common <- function(img, n_ch, def, thresh, tau, filt) {
   if (!filesstrings::all_equal(c(length(thresh), length(tau),
                                  length(filt), n_ch))) {
     stop("The lengths of 'thresh', 'tau' and 'filt' must all be the same ",
-         "as the number of channel in 'img'.")
+         "as the number of channels in 'img'.")
   }
   for (att in c("def", "thresh", "tau", "filt")) attr(img, att) <- get(att)
   if (length(dim(img)) < 4) {
@@ -111,8 +112,6 @@ brightness_img <- function(img, def, thresh, tau, filt) {
   } else {
     stop("'def' must be one of 'B' or 'epsilon'.")
   }
-  if (!isTRUE(def %in% c("B", "epsilon")))
-    stop("def must be one of 'B' or 'epsilon'.")
   out <- number_img(img, "n", thresh, tau, filt)
   attr(out, "def") <- def
   class(out)[class(out) == "number_img"] <- "brightness_img"
@@ -182,6 +181,7 @@ NULL
 number_ts_img <- function(img, def, frames_per_set,
                           thresh, tau, filt) {
   checkmate::assert_array(img, min.d = 3, max.d = 4)
+  checkmate::assert_numeric(img)
   n_ch <- dim(img) %>% {dplyr::if_else(length(.) == 4, .[3], 1L)}
   img %<>% number_img_common(n_ch = n_ch, def = def,
                              thresh = thresh, tau = tau, filt = filt)
@@ -203,8 +203,6 @@ brightness_ts_img <- function(img, def, frames_per_set,
   } else {
     stop("'def' must be one of 'B' or 'epsilon'.")
   }
-  if (!isTRUE(def %in% c("B", "epsilon")))
-    stop("def must be one of 'B' or 'epsilon'.")
   out <- number_ts_img(img, "n", frames_per_set = frames_per_set,
                        thresh = thresh, tau = tau, filt = filt)
   attr(out, "def") <- def

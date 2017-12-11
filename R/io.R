@@ -2,7 +2,7 @@ nb_get_img <- function(img) {
   if (is.character(img)) {
     if (length(img) != 1) {
       stop("If 'img' is specified as a character vector ",
-           "(file name), it must be length 1")
+           "(i.e. a file name), it must be length 1")
     }
     img %<>% ijtiff::read_tif()
   }

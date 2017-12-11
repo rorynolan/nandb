@@ -5,6 +5,16 @@
 
 using namespace Rcpp;
 
+// float_max
+double float_max();
+RcppExport SEXP _nandb_float_max() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(float_max());
+    return rcpp_result_gen;
+END_RCPP
+}
 // median_filter
 NumericMatrix median_filter(NumericMatrix mat, int size, bool na_rm, bool na_count);
 RcppExport SEXP _nandb_median_filter(SEXP matSEXP, SEXP sizeSEXP, SEXP na_rmSEXP, SEXP na_countSEXP) {
@@ -33,21 +43,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// float_max
-double float_max();
-RcppExport SEXP _nandb_float_max() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(float_max());
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_nandb_float_max", (DL_FUNC) &_nandb_float_max, 0},
     {"_nandb_median_filter", (DL_FUNC) &_nandb_median_filter, 4},
     {"_nandb_smooth_filter", (DL_FUNC) &_nandb_smooth_filter, 4},
-    {"_nandb_float_max", (DL_FUNC) &_nandb_float_max, 0},
     {NULL, NULL, 0}
 };
 
