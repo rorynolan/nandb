@@ -5,9 +5,9 @@
 * The package style is now in accordance with the tidyverse style guide.
 * `brightness()` and `number()` now include options to set `offset`, S-factor, `readout_noise` and `gamma` correction terms.
 * `brightness()` and `number()` now enable calculation of both definitions ("B" and "epsilon"; "N" and "n") of brightness and number.
-* Detrending and tiff I/O are outsourced to the `detrendr` package. This makes detrending more accurate and much faster.
+* Detrending is outsourced to the `detrendr` package. This new package makes detrending more accurate and much faster.
+* TIFF I/O and graphics `display()` are now outsourced to the `ijtiff` package. This means R users no longer have to tell `nandb` how many channels are in the images.
 * The package now has its own S3 class system.
-* Graphics are streamlined to one `display()` function.
 
 
 #### BUG FIXES 

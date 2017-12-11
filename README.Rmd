@@ -14,7 +14,9 @@ An R package for performing number and brightness analysis as in Digman et al. 2
 [![codecov](https://codecov.io/gh/rorynolan/nandb/branch/master/graph/badge.svg)](https://codecov.io/gh/rorynolan/nandb)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
 ![RStudio CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/nandb)
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+![RStudio CRAN monthly downloads](http://cranlogs.r-pkg.org/badges/nandb)
+[![Rdocumentation](http://www.rdocumentation.org/badges/version/nandb)](http://www.rdocumentation.org/packages/nandb)
+![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)
 
 ## Installation
 
