@@ -169,7 +169,7 @@ c_list_attr_na <- function(x) {
 #' @param frames_per_set The number of frames used in the calculation of each
 #'   point in the number or brightness time series.
 #'
-#' @return An object of class `number`.
+#' @return An object of class `number_ts_img` or `brightness_ts_img`.
 #'
 #' @seealso [number_time_series()], [brightness_time_series()].
 #'

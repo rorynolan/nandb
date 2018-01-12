@@ -35,7 +35,7 @@ image had different filters, this may be specified as a character vector,
 one element for each channel.}
 }
 \value{
-An object of class \code{number}.
+An object of class \code{number_ts_img} or \code{brightness_ts_img}.
 }
 \description{
 The \code{number_ts_img} and \code{brightness_ts_img} classes are designed to hold
