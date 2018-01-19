@@ -4,8 +4,7 @@
 #' @importFrom tidyverse tidyverse_logo
 NULL
 
-## quiet concerns of R CMD check re: the .'s that appear in
-## pipelines
+## quiet concerns of R CMD check re: the .'s that appear in pipelines
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(c(".", "Var1", "Var2", "value", "x", "y", "colour"))
 }

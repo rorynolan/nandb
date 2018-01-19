@@ -18,7 +18,12 @@ or a 3-dimensional array which is a single channel of an
 \code{"B"} or \code{"epsilon"}?}
 
 \item{frames_per_set}{The number of frames with which to calculate the
-successive numbers.}
+successive brightnesses.
+
+This may discard some images, for example if 175 frames are in the input and
+\code{frames_per_set = 50}, then the last 25 are discarded. If bleaching
+correction is selected, it is performed on the whole image stack before the
+sectioning is done for calculation of numbers.}
 
 \item{tau}{The \eqn{tau} parameter for \emph{exponential filtering} detrending.
 This must be a positive number. Set this to "auto" to use Nolan's algorithm
@@ -77,12 +82,6 @@ the \eqn{t}th brightness image in the brightness time series.}
 Given a stack of images \code{img}, use the first \code{frames_per_set} of them to
 create one brightness image, the next \code{frames_per_set} of them to create the
 next brightness image and so on to get a time-series of brightness images.
-}
-\details{
-This may discard some images, for example if 175 frames are in the input and
-\code{frames_per_set = 50}, then the last 25 are discarded. If bleaching
-correction is selected, it is performed on the whole image stack before the
-sectioning is done for calculation of numbers.
 }
 \examples{
 img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))

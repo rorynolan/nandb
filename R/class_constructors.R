@@ -118,32 +118,6 @@ brightness_img <- function(img, def, thresh, tau, filt) {
   out
 }
 
-c_list_attr_na <- function(x) {
-  l <- length(x)
-  if (is.list(x)) {
-    x_attr_names <- x %>%
-      purrr::map(~ names(attributes(.))) %>%
-      unlist() %>%
-      unique()
-    for (i in seq_along(x)) {
-      attr(x[[i]], "class") <- class(x[[i]])[1]
-      for (name in x_attr_names) {
-        if (! name %in% names(attributes(x[[i]]))) {
-          attr(x[[i]], name) <- NA
-        }
-      }
-    }
-    atts <- x %>%
-      purrr::map(~ attributes(.)) %>%
-      dplyr::bind_rows()
-    atts$class <- NULL
-    x %<>% purrr::reduce(c)
-    attributes(x) <- atts
-  }
-  stopifnot(length(x) == l)
-  x
-}
-
 #' Number and brightness time series image classes.
 #'
 #' The `number_ts_img` and `brightness_ts_img` classes are designed to hold

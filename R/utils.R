@@ -1,11 +1,18 @@
 extend_for_all_chs <- function(x, n_ch) {
-  if (is.null(x)) x <- rep(NA, n_ch)
-  if (length(x) == 1) x %<>% rep(n_ch)
+  if (is.null(x)) x <- list(NA)[rep(1, n_ch)]
+  if (length(x) == 1) {
+    if (is.list(x)) {
+      x <- x[rep(1, n_ch)]
+    } else {
+      x <- list(x)[rep(1, n_ch)]
+    }
+  }
   sq <- seq_len(n_ch)
   x <- x[sq]
   for (i in sq) if (is.null(x[[i]])) x[[i]] <- NA
   x
 }
+
 make_nb_filename_ending <- function(nb_img) {
   checkmate::assert_array(nb_img, d = 4)
   def <- attr(nb_img, "def")
@@ -71,4 +78,30 @@ nb_get_img <- function(img) {
     stop("`img` must be positive integers (and NAs) only")
   }
   img
+}
+
+c_list_attr_na <- function(x) {
+  l <- length(x)
+  if (is.list(x)) {
+    x_attr_names <- x %>%
+      purrr::map(~ names(attributes(.))) %>%
+      unlist() %>%
+      unique()
+    for (i in seq_along(x)) {
+      attr(x[[i]], "class") <- class(x[[i]])[1]
+      for (name in x_attr_names) {
+        if (! name %in% names(attributes(x[[i]]))) {
+          attr(x[[i]], name) <- NA
+        }
+      }
+    }
+    atts <- x %>%
+      purrr::map(~ attributes(.)) %>%
+      dplyr::bind_rows()
+    atts$class <- NULL
+    x %<>% purrr::reduce(c)
+    attributes(x) <- atts
+  }
+  stopifnot(length(x) == l)
+  x
 }

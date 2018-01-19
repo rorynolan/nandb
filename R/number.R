@@ -65,9 +65,10 @@ number <- function(img, def, tau = NULL,
   thresh %<>% extend_for_all_chs(n_ch)
   tau %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch)
-  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
-  thresh_atts <- NA
+  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  tau_atts <- extend_for_all_chs(rlang::set_attrs(NA, auto = FALSE),
+                                 n_ch)
+  thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     if (!is.na(thresh)) {
       img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
@@ -98,10 +99,10 @@ number <- function(img, def, tau = NULL,
       }
     }
   } else {
+    out <- img[, , , 1]
+    thresh_atts <- list()
+    tau_atts <- list()
     for (i in seq_len(n_ch)) {
-      out <- img[, , , 1]
-      thresh_atts <- list()
-      tau_atts <- list()
       if (!is.null(seed)) seed <- seed + i
       for (i in seq_len(n_ch)) {
         out_i <- number(img[, , i, ], def = def, tau = tau[[i]],
@@ -162,9 +163,10 @@ number_time_series <- function(img, def, frames_per_set,
   thresh %<>% extend_for_all_chs(n_ch)
   tau %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch)
-  thresh_atts <- NA
-  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
+  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  tau_atts <- extend_for_all_chs(rlang::set_attrs(NA, auto = FALSE),
+                                 n_ch)
+  thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     frames <- dim(img)[3]
     if (frames < frames_per_set) {
@@ -202,6 +204,7 @@ number_time_series <- function(img, def, frames_per_set,
     thresh_atts <- list()
     tau_atts <- list()
     for (i in seq_len(n_ch)) {
+      if (!is.null(seed)) seed <- seed + i
       out_i <- number_time_series(img[, , i, ], def = def,
                                   frames_per_set = frames_per_set,
                                   tau = tau[[i]], thresh = thresh[[i]],

@@ -17,7 +17,12 @@ process.}
 \code{"B"} or \code{"epsilon"}?}
 
 \item{frames_per_set}{The number of frames with which to calculate the
-successive numbers.}
+successive brightnesses.
+
+This may discard some images, for example if 175 frames are in the input and
+\code{frames_per_set = 50}, then the last 25 are discarded. If bleaching
+correction is selected, it is performed on the whole image stack before the
+sectioning is done for calculation of numbers.}
 
 \item{tau}{The \eqn{tau} parameter for \emph{exponential filtering} detrending.
 This must be a positive number. Set this to "auto" to use Nolan's algorithm

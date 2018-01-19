@@ -70,8 +70,8 @@ brightness for each pixel.
 \examples{
 img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 ijtiff::display(img[, , , 1])
-num <- brightness(img, "e", tau = NA, thresh = "Huang")
-num <- brightness(img, "B", tau = 10, thresh = "tri")
+b <- brightness(img, "e", tau = NA, thresh = "Huang")
+b <- brightness(img, "B", tau = 10, thresh = "tri")
 }
 \references{
 Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of

@@ -22,8 +22,8 @@
 #' @examples
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 #' ijtiff::display(img[, , , 1])
-#' num <- brightness(img, "e", tau = NA, thresh = "Huang")
-#' num <- brightness(img, "B", tau = 10, thresh = "tri")
+#' b <- brightness(img, "e", tau = NA, thresh = "Huang")
+#' b <- brightness(img, "B", tau = 10, thresh = "tri")
 #' @export
 brightness <- function(img, def, tau = NULL,
                        thresh = NULL, fail = NA, filt = NULL,
@@ -41,9 +41,10 @@ brightness <- function(img, def, tau = NULL,
   thresh %<>% extend_for_all_chs(n_ch)
   tau %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch)
-  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
-  thresh_atts <- NA
+  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  tau_atts <- extend_for_all_chs(rlang::set_attrs(NA, auto = FALSE),
+                                 n_ch)
+  thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     if (!is.na(thresh)) {
       img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
@@ -68,20 +69,18 @@ brightness <- function(img, def, tau = NULL,
       }
     }
   } else {
+    out <- img[, , , 1]
+    thresh_atts <- list()
+    tau_atts <- list()
     for (i in seq_len(n_ch)) {
-      out <- img[, , , 1]
-      thresh_atts <- list()
-      tau_atts <- list()
       if (!is.null(seed)) seed <- seed + i
-      for (i in seq_len(n_ch)) {
-        out_i <- brightness(img[, , i, ], def = def, tau = tau[[i]],
-                            thresh = thresh[[i]], filt = filt[[i]],
-                            s = s, offset = offset, readout_noise = readout_noise,
-                            gamma = gamma, seed = seed, parallel = parallel)
-        out[, , i] <- out_i
-        thresh_atts[[i]] <- attr(out_i, "thresh")
-        tau_atts[[i]] <- attr(out_i, "tau")
-      }
+      out_i <- brightness(img[, , i, ], def = def, tau = tau[[i]],
+                          thresh = thresh[[i]], filt = filt[[i]],
+                          s = s, offset = offset, readout_noise = readout_noise,
+                          gamma = gamma, seed = seed, parallel = parallel)
+      out[, , i] <- out_i
+      thresh_atts[[i]] <- attr(out_i, "thresh")
+      tau_atts[[i]] <- attr(out_i, "tau")
     }
   }
   brightness_img(out, def, thresh_atts, tau_atts, filt)
@@ -93,6 +92,9 @@ brightness <- function(img, def, tau = NULL,
 #' create one brightness image, the next `frames_per_set` of them to create the
 #' next brightness image and so on to get a time-series of brightness images.
 #'
+#' @param frames_per_set The number of frames with which to calculate the
+#'   successive brightnesses.
+#'
 #' This may discard some images, for example if 175 frames are in the input and
 #' `frames_per_set = 50`, then the last 25 are discarded. If bleaching
 #' correction is selected, it is performed on the whole image stack before the
@@ -100,7 +102,6 @@ brightness <- function(img, def, tau = NULL,
 #'
 #' @inheritParams brightness
 #' @inheritParams number
-#' @inheritParams number_time_series
 #'
 #' @return An object of class [brightness_ts_img].
 #'
@@ -132,9 +133,10 @@ brightness_time_series <- function(img, def, frames_per_set,
   thresh %<>% extend_for_all_chs(n_ch)
   tau %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch)
-  thresh_atts <- NA
-  tau_atts <- radiant.data::set_attr(NA, "auto", FALSE)
+  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  tau_atts <- extend_for_all_chs(rlang::set_attrs(NA, auto = FALSE),
+                                 n_ch)
+  thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     frames <- dim(img)[3]
     if (frames < frames_per_set) {
@@ -172,6 +174,7 @@ brightness_time_series <- function(img, def, frames_per_set,
     thresh_atts <- list()
     tau_atts <- list()
     for (i in seq_len(n_ch)) {
+      if (!is.null(seed)) seed <- seed + i
       out_i <- brightness_time_series(img[, , i, ], def = def,
                                      frames_per_set = frames_per_set,
                                       tau = tau[[i]], thresh = thresh[[i]],
@@ -247,7 +250,7 @@ brightness_folder <- function(folder_path = ".", def,
   init_dir <- getwd()
   on.exit(setwd(init_dir))
   setwd(folder_path)
-  file_names <- list.files(pattern = "\\.tif")
+  file_names <- list.files(pattern = "\\.tiff*$")
   purrr::map(file_names, brightness_file, def = def, tau = tau,
              thresh = thresh, fail = fail, filt = filt, s = s, offset = offset,
              readout_noise = readout_noise, gamma = gamma,
