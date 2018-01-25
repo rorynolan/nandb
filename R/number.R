@@ -9,11 +9,12 @@
 #'   set this argument to the path to that file (a string).
 #' @param def A character. Which definition of number do you want to use, `"n"`
 #'   or `"N"`?
-#' @param tau The exponential parameter to be passed to
-#'   [detrendr::img_detrend_exp()]. This can be a positive number or `"auto"`.
 #' @param thresh The threshold or thresholding method (see
 #'   [autothresholdr::mean_stack_thresh()]) to use on the image prior to
-#'   detrending and brightness calculations.
+#'   detrending and number calculations.
+#' @param tau The exponential detrending parameter to be passed to
+#'   [detrendr::img_detrend_exp()]. This can be a positive number or `"auto"`.
+#'   Default is no detrending.
 #' @param fail If thresholding is done, to which value should pixels not
 #'   exceeding the threshold be set?
 #' @param filt Do you want to smooth (`filt = 'mean'`) or median (`filt =
@@ -71,7 +72,8 @@ number <- function(img, def, tau = NULL,
   thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     if (!is.na(thresh)) {
-      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail,
+                                                 ignore_na = TRUE)
       thresh_atts <- attr(img, "thresh")
       img <- img[, , 1, ]
     }
@@ -175,7 +177,8 @@ number_time_series <- function(img, def, frames_per_set,
     }
     sets <- frames %/% frames_per_set
     if (!is.na(thresh)) {
-      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail,
+                                                 ignore_na = TRUE)
       thresh_atts <- attr(img, "thresh")
       img <- img[, , 1, ]
     }
@@ -225,14 +228,25 @@ number_file <- function(path, def, tau = NULL,
                         s = 1, offset = 0, readout_noise = 0, gamma = 1,
                         seed = NULL, parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
-  checkmate::assert_string(path)
+  checkmate::assert_file_exists(path)
+  need_to_change_dir <- stringr::str_detect(path, "/")
+  if (need_to_change_dir) {
+    dir <- filesstrings::str_before_last(path, "/")
+    cwd <- getwd()
+    on.exit(setwd(cwd))
+    setwd(dir)
+    path %<>% filesstrings::str_after_last("/")
+  }
   num <- number(path, def, tau = tau,
                 thresh = thresh, fail = fail, filt = filt,
                 s = s, offset = offset, readout_noise = readout_noise,
                 gamma = gamma, seed = seed, parallel = parallel)
   num[abs(num) >= float_max()] <- NA
-  path %<>% filesstrings::before_last_dot()
-  ijtiff::write_tif(num, paste0(path, make_nb_filename_ending(num)))
+  suppressMessages(filesstrings::create_dir("number"))
+  path %<>% filesstrings::before_last_dot() %>%
+    paste0("number", "/", ., make_nb_filename_ending(num)) %>%
+    deduplicate_nb_filename()
+  ijtiff::write_tif(num, path)
 }
 
 number_time_series_file <- function(path, def, frames_per_set,
@@ -241,7 +255,15 @@ number_time_series_file <- function(path, def, frames_per_set,
                                     readout_noise = 0, gamma = 1,
                                     parallel = FALSE, seed = NULL) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
-  checkmate::assert_string(path)
+  checkmate::assert_file_exists(path)
+  need_to_change_dir <- stringr::str_detect(path, "/")
+  if (need_to_change_dir) {
+    dir <- filesstrings::str_before_last(path, "/")
+    cwd <- getwd()
+    on.exit(setwd(cwd))
+    setwd(dir)
+    path %<>% filesstrings::str_after_last("/")
+  }
   nts <- number_time_series(path, def, frames_per_set = frames_per_set,
                             tau = tau,
                             thresh = thresh, fail = fail, filt = filt,
@@ -249,8 +271,11 @@ number_time_series_file <- function(path, def, frames_per_set,
                             readout_noise = readout_noise, gamma = gamma,
                             seed = seed, parallel = parallel)
   nts[abs(nts) >= float_max()] <- NA
-  path %<>% filesstrings::before_last_dot()
-  ijtiff::write_tif(nts, paste0(path, make_nb_filename_ending(nts)))
+  suppressMessages(filesstrings::create_dir("number_time_series"))
+  path %<>% filesstrings::before_last_dot() %>%
+    paste0("number_time_series", "/", ., make_nb_filename_ending(nts)) %>%
+    deduplicate_nb_filename()
+  ijtiff::write_tif(nts, path)
 }
 
 

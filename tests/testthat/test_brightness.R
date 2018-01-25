@@ -23,46 +23,6 @@ test_that("brightness works", {
                "but has dimension 2")
 })
 
-context("brightness_time_series()")
-test_that("brightness_time_series works", {
-  library(magrittr)
-  img <- system.file('extdata', '50.tif', package = 'nandb')
-  bts <- brightness_time_series(img, "e", 20, tau = 100, thresh = 'Huang',
-                                filt = 'median', parallel = 2, seed = 9)
-  expect_equal(round(mean(bts, na.rm = TRUE), 2), -0.02)
-  bts <- brightness_time_series(img, "B", 30, tau = NA, thresh = 'tri',
-                                filt = 'median', parallel = 2, seed = 99)
-  expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.008)
-  expect_error(brightness_time_series(img, "b", 51),
-               paste("You have selected 51 frames per set,",
-                     "but there are only 50 frames in total"))
-  img <- ijtiff::read_tif(img)
-  bts <- brightness_time_series(img, "b", 10)
-  two_channel_img <- abind::abind(img, img, along = 3)
-  bts_2ch <- brightness_time_series(two_channel_img, "b", 10)
-  expect_equal(bts_2ch %>% {list(dim(.), as.vector(.))},
-               abind::abind(bts, bts, along = 3) %>%
-                 {list(dim(.), as.vector(.))})
-  expect_error(brightness_time_series(matrix(1:4, nrow = 2)),
-               "argument.*def.*is missing, with no default")
-  expect_error(brightness_time_series(matrix(1:4, nrow = 2), "b"),
-               "Assertion.*failed.*Must have >=3 dimensions.*has dimension 2")
-  cwd <- getwd()
-  on.exit(setwd(cwd))
-  setwd(tempdir())
-  ijtiff::write_tif(img, '50.tif')
-  ijtiff::write_tif(img, '50again.tif')
-  brightness_time_series_folder(def = "B", tau = 333, thresh = 'tri',
-                                frames_per_set = 20, seed = 0)
-  expect_true(all(
-    paste0("50", c("_brightness_B_timeseries_",
-                   "again_brightness_B_timeseries_"),
-           c("frames=20_tau=333_thresh=Triangle=0.68_filt=NA.tif",
-             "frames=20_tau=333_thresh=Triangle=0.68_filt=NA.tif")) %in%
-      list.files()))
-  suppressWarnings(file.remove(list.files()))  # cleanup
-})
-
 context("brightness_folder()")
 test_that("brightness_folder works", {
   img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
@@ -78,7 +38,64 @@ test_that("brightness_folder works", {
           "50again_brightness_B_tau=NA_thresh=NA_filt=NA.tif",
           paste0("const_brightness_B_tau=NA,NA,NA,NA_",
                  "thresh=NA,NA,NA,NA_filt=NA,NA,NA,NA.tif")) %in%
-          list.files())
+          list.files("brightness"))
   )
+  filesstrings::create_dir("tempwithintemp")
+  ijtiff::write_tif(img, 'tempwithintemp/50.tif')
+  brightness_file("tempwithintemp/50.tif", def = "B")
+  expect_true(stringr::str_detect(dir("tempwithintemp/brightness"),
+                                  "^50_brightness_B.*tif$"))
+  filesstrings::dir.remove("tempwithintemp")
   suppressWarnings(file.remove(list.files()))
 })
+
+context("brightness_time_series()")
+test_that("brightness_time_series works", {
+  library(magrittr)
+  img <- system.file('extdata', '50.tif', package = 'nandb')
+  bts <- brightness_time_series(img, "e", 20, tau = 100, thresh = 'Huang',
+                                filt = 'median', parallel = 2, seed = 9)
+  expect_equal(round(mean(bts, na.rm = TRUE), 2), -0.02)
+  bts <- brightness_time_series(img, "B", 30, tau = NA, thresh = 'tri',
+                                filt = 'median', parallel = 2, seed = 99)
+  expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.008)
+  expect_error(brightness_time_series(img, "b", 51),
+               paste("You have selected 51 frames per set,",
+                     "but there are only 50 frames in total"))
+  img %<>% ijtiff::read_tif()
+  bts <- brightness_time_series(img, "b", 10)
+  two_channel_img <- abind::abind(img, img, along = 3)
+  bts_2ch <- brightness_time_series(two_channel_img, "b", 10)
+  expect_equal(bts_2ch %>% {list(dim(.), as.vector(.))},
+               abind::abind(bts, bts, along = 3) %>%
+                 {list(dim(.), as.vector(.))})
+  expect_error(brightness_time_series(matrix(1:4, nrow = 2)),
+               "argument.*def.*is missing, with no default")
+  expect_error(brightness_time_series(matrix(1:4, nrow = 2), "b"),
+               "Assertion.*failed.*Must have >=3 dimensions.*has dimension 2")
+  cwd <- getwd()
+  on.exit(setwd(cwd))
+  setwd(tempdir())
+  ijtiff::write_tif(img, '50.tif')
+  ijtiff::write_tif(img, '50again.tif')
+  context("brightness_time_series_folder()")
+  filesstrings::create_dir("tempwithintemp")
+  ijtiff::write_tif(img, 'tempwithintemp/50.tif')
+  brightness_time_series_file("tempwithintemp/50.tif", def = "B",
+                              frames_per_set = 10)
+  expect_true(stringr::str_detect(
+                dir("tempwithintemp/brightness_time_series"),
+                "^50_brightness_B_timeseries.*tif$"))
+  filesstrings::dir.remove("tempwithintemp")
+  brightness_time_series_folder(def = "B", tau = 333, thresh = 'tri',
+                                frames_per_set = 20, seed = 0)
+  expect_true(all(
+    paste0("50", c("_brightness_B_timeseries_",
+                   "again_brightness_B_timeseries_"),
+           c("frames=20_tau=333_thresh=Triangle=0.68_filt=NA.tif",
+             "frames=20_tau=333_thresh=Triangle=0.68_filt=NA.tif")) %in%
+      list.files("brightness_time_series")))
+  suppressWarnings(file.remove(list.files()))  # cleanup
+})
+
+

@@ -5,6 +5,9 @@
 #'
 #' @param def A character. Which definition of brightness do you want to use,
 #'   `"B"` or `"epsilon"`?
+#' @param thresh The threshold or thresholding method (see
+#'   [autothresholdr::mean_stack_thresh()]) to use on the image prior to
+#'   detrending and brightness calculations.
 #' @inheritParams detrendr::img_detrend_exp
 #' @inheritParams number
 #'
@@ -47,7 +50,8 @@ brightness <- function(img, def, tau = NULL,
   thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     if (!is.na(thresh)) {
-      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail,
+                                                 ignore_na = TRUE)
       thresh_atts <- attr(img, "thresh")
       img <- img[, , 1, ]
     }
@@ -145,7 +149,8 @@ brightness_time_series <- function(img, def, frames_per_set,
     }
     sets <- frames %/% frames_per_set
     if (!is.na(thresh)) {
-      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail)
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail,
+                                                 ignore_na = TRUE)
       thresh_atts <- attr(img, "thresh")
       img <- img[, , 1, ]
     }
@@ -194,13 +199,24 @@ brightness_file <- function(path, def, tau = NULL,
                             thresh = NULL, fail = NA, filt = NULL,
                             s = 1, offset = 0, readout_noise = 0, gamma = 1,
                             seed = NULL, parallel = FALSE) {
-  checkmate::assert_string(path)
+  checkmate::assert_file_exists(path)
+  need_to_change_dir <- stringr::str_detect(path, "/")
+  if (need_to_change_dir) {
+    dir <- filesstrings::str_before_last(path, "/")
+    cwd <- getwd()
+    on.exit(setwd(cwd))
+    setwd(dir)
+    path %<>% filesstrings::str_after_last("/")
+  }
   b <- brightness(path, def, tau = tau,
                   thresh = thresh, fail = fail, filt = filt,
                   s = s, offset = offset, readout_noise = readout_noise,
                   gamma = gamma, seed = seed, parallel = parallel)
-  path %<>% filesstrings::before_last_dot()
-  ijtiff::write_tif(b, paste0(path, make_nb_filename_ending(b)))
+  suppressMessages(filesstrings::create_dir("brightness"))
+  path %<>% filesstrings::before_last_dot() %>%
+    paste0("brightness", "/", ., make_nb_filename_ending(b)) %>%
+    deduplicate_nb_filename()
+  ijtiff::write_tif(b, path)
 }
 
 brightness_time_series_file <- function(path, def, frames_per_set,
@@ -210,15 +226,26 @@ brightness_time_series_file <- function(path, def, frames_per_set,
                                         parallel = FALSE, seed = NULL) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
-  checkmate::assert_string(path)
+  checkmate::assert_file_exists(path)
+  need_to_change_dir <- stringr::str_detect(path, "/")
+  if (need_to_change_dir) {
+    dir <- filesstrings::str_before_last(path, "/")
+    cwd <- getwd()
+    on.exit(setwd(cwd))
+    setwd(dir)
+    path %<>% filesstrings::str_after_last("/")
+  }
   bts <- brightness_time_series(path, def, frames_per_set = frames_per_set,
                                 tau = tau,
                                 thresh = thresh, fail = fail, filt = filt,
                                 s = s, offset = offset,
                                 readout_noise = readout_noise, gamma = gamma,
                                 seed = seed, parallel = parallel)
-  path %<>% filesstrings::before_last_dot()
-  ijtiff::write_tif(bts, paste0(path, make_nb_filename_ending(bts)))
+  suppressMessages(filesstrings::create_dir("brightness_time_series"))
+  path %<>% filesstrings::before_last_dot() %>%
+    paste0("brightness_time_series", "/", ., make_nb_filename_ending(bts)) %>%
+    deduplicate_nb_filename()
+  ijtiff::write_tif(bts, path)
 }
 
 

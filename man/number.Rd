@@ -16,12 +16,13 @@ set this argument to the path to that file (a string).}
 \item{def}{A character. Which definition of number do you want to use, \code{"n"}
 or \code{"N"}?}
 
-\item{tau}{The exponential parameter to be passed to
-\code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.}
+\item{tau}{The exponential detrending parameter to be passed to
+\code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.
+Default is no detrending.}
 
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
-detrending and brightness calculations.}
+detrending and number calculations.}
 
 \item{fail}{If thresholding is done, to which value should pixels not
 exceeding the threshold be set?}

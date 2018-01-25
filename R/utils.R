@@ -105,3 +105,56 @@ c_list_attr_na <- function(x) {
   stopifnot(length(x) == l)
   x
 }
+
+deduplicate_nb_filename <- function(path) {
+  checkmate::assert_string(path)
+  has_been_through_detrendr <- path %>%
+    stringr::str_detect(paste0("detrended_",
+                               c("boxcar", "exponential", "polynomial"))) %>%
+    any()
+  if (any(stringr::str_detect(path, paste0("detrended_",
+                                           c("boxcar",
+                                             "exponential",
+                                             "polynomial"))))) {
+    thresh_pattern <- "_thresh=.*?_"
+    n_threshs <- filesstrings::count_matches(path, thresh_pattern)
+    if (n_threshs == 2) {
+      second_thresh_indices <- stringr::str_locate_all(path,
+                                                       thresh_pattern)[[1]][2, ]
+      if (stringr::str_detect(stringr::str_sub(path,
+                                               second_thresh_indices["start"],
+                                               second_thresh_indices["end"]),
+                              "_thresh=NA,*(NA,)*(NA)*_")) {
+        if (second_thresh_indices["end"] == nchar(path)) {
+          path %<>% stringr::str_sub(1, second_thresh_indices["start"] - 1)
+        } else {
+          path <- paste0(
+                    stringr::str_sub(path,
+                                     1, second_thresh_indices["start"] - 1),
+                    stringr::str_sub(path,
+                                     second_thresh_indices["end"], -1))
+        }
+      }
+    }
+    tau_pattern <- "_tau=.*?_"
+    n_taus <- filesstrings::count_matches(path, tau_pattern)
+    if (n_taus == 2) {
+      second_tau_indices <- stringr::str_locate_all(path,
+                                                    tau_pattern)[[1]][2, ]
+      if (stringr::str_detect(stringr::str_sub(path,
+                                               second_tau_indices["start"],
+                                               second_tau_indices["end"]),
+                              "_tau=NA,*(NA,)*(NA)*_")) {
+        if (second_tau_indices["end"] == nchar(path)) {
+          path %<>% stringr::str_sub(1, second_tau_indices["start"] - 1)
+        } else {
+          path <- paste0(stringr::str_sub(path,
+                                          1, second_tau_indices["start"] - 1),
+                         stringr::str_sub(path,
+                                          second_tau_indices["end"], -1))
+        }
+      }
+    }
+  }
+  path
+}

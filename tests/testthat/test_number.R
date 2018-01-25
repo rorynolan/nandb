@@ -23,6 +23,32 @@ test_that("number works", {
                "but has dimension 2")
 })
 
+test_that("number_folder works", {
+  context("number_folder()")
+  img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+  cwd <- getwd()
+  on.exit(setwd(cwd))
+  setwd(tempdir())
+  ijtiff::write_tif(img, '50.tif')
+  ijtiff::write_tif(img, '50again.tif')
+  ijtiff::write_tif(array(4, dim = rep(3, 4)), "const.tif")
+  number_folder(def = "N", tau = NA, seed = 3)
+  expect_true(
+    all(c("50_number_N_tau=NA_thresh=NA_filt=NA.tif",
+          "50again_number_N_tau=NA_thresh=NA_filt=NA.tif",
+          paste0("const_number_N_tau=NA,NA,NA_",
+                 "thresh=NA,NA,NA_filt=NA,NA,NA.tif")) %in%
+          list.files("number"))
+  )
+  filesstrings::create_dir("tempwithintemp")
+  ijtiff::write_tif(img, 'tempwithintemp/50.tif')
+  number_file("tempwithintemp/50.tif", def = "n")
+  expect_true(stringr::str_detect(dir("tempwithintemp/number"),
+                                  "^50_number_n.*tif$"))
+  filesstrings::dir.remove("tempwithintemp")
+  suppressWarnings(file.remove(list.files()))
+})
+
 test_that("number_time_series works", {
   context("number_time_series()")
   library(magrittr)
@@ -50,6 +76,13 @@ test_that("number_time_series works", {
   setwd(tempdir())
   ijtiff::write_tif(img, '50.tif')
   ijtiff::write_tif(img, '50again.tif')
+  filesstrings::create_dir("tempwithintemp")
+  ijtiff::write_tif(img, 'tempwithintemp/50.tif')
+  number_time_series_file("tempwithintemp/50.tif", def = "n",
+                          frames_per_set = 10)
+  expect_true(stringr::str_detect(dir("tempwithintemp/number_time_series"),
+                                  "^50_number_n_timeseries.*tif$"))
+  filesstrings::dir.remove("tempwithintemp")
   number_time_series_folder(def = "n", tau = 333, thresh = 'tri',
                                 frames_per_set = 20, seed = 0)
   expect_true(all(
@@ -57,26 +90,6 @@ test_that("number_time_series works", {
                    "again_number_n_timeseries_"),
            c("frames=20_tau=333_thresh=Triangle=0.68_filt=NA.tif",
              "frames=20_tau=333_thresh=Triangle=0.68_filt=NA.tif")) %in%
-      list.files()))
+      list.files("number_time_series")))
   suppressWarnings(file.remove(list.files()))  # cleanup
-})
-
-test_that("number_folder works", {
-  context("number_folder()")
-  img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-  cwd <- getwd()
-  on.exit(setwd(cwd))
-  setwd(tempdir())
-  ijtiff::write_tif(img, '50.tif')
-  ijtiff::write_tif(img, '50again.tif')
-  ijtiff::write_tif(array(4, dim = rep(3, 4)), "const.tif")
-  number_folder(def = "N", tau = NA, seed = 3)
-  expect_true(
-    all(c("50_number_N_tau=NA_thresh=NA_filt=NA.tif",
-          "50again_number_N_tau=NA_thresh=NA_filt=NA.tif",
-          paste0("const_number_N_tau=NA,NA,NA_",
-                 "thresh=NA,NA,NA_filt=NA,NA,NA.tif")) %in%
-          list.files())
-  )
-  suppressWarnings(file.remove(list.files()))
 })

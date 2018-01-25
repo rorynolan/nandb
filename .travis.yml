@@ -7,7 +7,6 @@ r_github_packages:
   - rorynolan/filesstrings
   - rorynolan/ijtiff
   - rorynolan/detrendr
-  - rorynolan/autothresholdr
 after_success:
   - travis_wait 30 Rscript -e 'covr::codecov(line_exclusions = "R/nandb.R")'
 apt_packages:
