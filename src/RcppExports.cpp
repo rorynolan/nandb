@@ -5,6 +5,30 @@
 
 using namespace Rcpp;
 
+// cross_var_Cpp
+double cross_var_Cpp(NumericVector x, NumericVector y);
+RcppExport SEXP _nandb_cross_var_Cpp(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(cross_var_Cpp(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cross_var_pillars_Cpp
+NumericMatrix cross_var_pillars_Cpp(NumericVector x3d, NumericVector y3d);
+RcppExport SEXP _nandb_cross_var_pillars_Cpp(SEXP x3dSEXP, SEXP y3dSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x3d(x3dSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y3d(y3dSEXP);
+    rcpp_result_gen = Rcpp::wrap(cross_var_pillars_Cpp(x3d, y3d));
+    return rcpp_result_gen;
+END_RCPP
+}
 // float_max
 double float_max();
 RcppExport SEXP _nandb_float_max() {
@@ -45,6 +69,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_nandb_cross_var_Cpp", (DL_FUNC) &_nandb_cross_var_Cpp, 2},
+    {"_nandb_cross_var_pillars_Cpp", (DL_FUNC) &_nandb_cross_var_pillars_Cpp, 2},
     {"_nandb_float_max", (DL_FUNC) &_nandb_float_max, 0},
     {"_nandb_median_filter", (DL_FUNC) &_nandb_median_filter, 4},
     {"_nandb_smooth_filter", (DL_FUNC) &_nandb_smooth_filter, 4},

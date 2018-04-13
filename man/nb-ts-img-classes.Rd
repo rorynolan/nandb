@@ -58,5 +58,5 @@ many frames were used in the calculation of each point in the number or
 brightness time series.}}
 }
 \seealso{
-\code{\link[=number_time_series]{number_time_series()}}, \code{\link[=brightness_time_series]{brightness_time_series()}}.
+\code{\link[=number_timeseries]{number_timeseries()}}, \code{\link[=brightness_timeseries]{brightness_timeseries()}}.
 }

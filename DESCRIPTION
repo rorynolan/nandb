@@ -13,36 +13,27 @@ URL: https://github.com/rorynolan/nandb
 BugReports: https://github.com/rorynolan/nandb/issues
 Description: Functions for calculation of molecular number and brightness from 
     images, as detailed in Digman et al. 2008 <doi:10.1529/biophysj.107.114645>. 
-    Includes the implementation of the novel "automatic detrending" technique.
 License: BSD_3_clause + file LICENSE
 LazyData: TRUE
-LinkingTo: Rcpp,
-    BH
+LinkingTo: Rcpp
 Imports:
     Rcpp,
-    filesstrings (>= 2.0.0),
+    filesstrings (>= 2.1.0),
     magrittr,
-    readr,
-    R.utils,
-    autothresholdr (>= 1.1.0),
-    abind,
+    autothresholdr (>= 1.2.0),
     dplyr,
-    matrixStats,
     stringr,
-    RSAGA,
-    RcppRoll,
-    tibble,
     purrr,
-    ore,
     checkmate,
-    detrendr,
-    tidyverse,
-    ijtiff,
+    detrendr (>= 0.4.0),
+    ijtiff (>= 1.0.0),
     rlang
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,
     rmarkdown,
     covr,
-    testthat
+    testthat,
+    tidyverse,
+    abind
 VignetteBuilder: knitr

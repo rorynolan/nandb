@@ -27,4 +27,22 @@ test_that("Class construction edge cases function correctly", {
   expect_error(number_img(img, "n", 5,
                           rlang::set_attrs(4:5, auto = rep(FALSE, 2)), NA),
                "thresh.*tau.*filt.*same.*channels")
+  expect_error(cc_number_img_common(img, 1, 2, "s"),
+               "If `tau` is specified, it must have an attribute.*auto")
+  expect_error(cc_number_img_common(img, 1:2,
+                                    rlang::set_attrs(1, auto = TRUE), "s"),
+               "Assertion on.*tau.*failed: Must have length 2.* has length 1")
+  expect_error(cc_number_img_common(img, 1:2,
+                                    rlang::set_attrs(1, auto = 1:2), "s"),
+               "auto.* attr.* of.*tau.*must be.*same length as.*tau.*itself")
+  expect_error(cc_number_img_common(img, 1:2,
+                                    rlang::set_attrs(1, auto = NA), "s"),
+               paste("Each element of.*tau.*must have .* attribute.*auto.*",
+                     "which must be `TRUE` or `FALSE` and not `NA`."))
+  expect_equal(cc_number_img_common(img, 1:2,
+                                    rlang::set_attrs(1:2, auto = rep(TRUE, 2)),
+                                    "smooth"),
+               cc_number_img_common(img, 1:2,
+                                    rlang::set_attrs(1:2, auto = TRUE),
+                                    "smooth"))
 })

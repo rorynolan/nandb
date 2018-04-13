@@ -1,7 +1,6 @@
 #' @useDynLib nandb, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom magrittr '%>%' '%T>%' '%<>%'
-#' @importFrom tidyverse tidyverse_logo
 NULL
 
 ## quiet concerns of R CMD check re: the .'s that appear in pipelines
@@ -10,7 +9,7 @@ if (getRversion() >= "2.15.1") {
 }
 
 .onUnload <- function (libpath) {
- library.dynam.unload("nandb", libpath)
+  library.dynam.unload("nandb", libpath)
 }
 
 #' nandb: Number and brightness in R.

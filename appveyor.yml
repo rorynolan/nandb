@@ -13,15 +13,12 @@ install:
 # Adapt as necessary starting from here
 
 environment:
-  JAVA_HOME: ""
+  global:
+    R_VERSION: release
+    R_ARCH: x64
 
 build_script:
-  - travis-tool.sh install_github rorynolan/filesstrings
-  - travis-tool.sh install_github rorynolan/ijtiff@for_appveyor
-  - travis-tool.sh install_github rorynolan/detrendr
-  - travis-tool.sh install_github rorynolan/autothresholdr
   - travis-tool.sh install_deps
-  - travis-tool.sh install_r locfit tiff jpeg png fftwtools
 
 test_script:
   - travis-tool.sh run_tests

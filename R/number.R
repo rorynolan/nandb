@@ -53,10 +53,9 @@
 #' num <- number(img, "N", tau = NA, thresh = "Huang")
 #' num <- number(img, "n", tau = 10, thresh = "tri")
 #' @export
-number <- function(img, def, tau = NULL,
-                   thresh = NULL, fail = NA, filt = NULL,
+number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
                    s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                   seed = NULL, parallel = FALSE) {
+                   parallel = FALSE) {
   checkmate::assert_string(def)
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   img %<>% nb_get_img()
@@ -78,7 +77,8 @@ number <- function(img, def, tau = NULL,
       img <- img[, , 1, ]
     }
     if (!is.na(tau)) {
-      img %<>% detrendr::img_detrend_exp(tau, seed = seed, parallel = parallel)
+      img %<>% detrendr::img_detrend_exp(tau, parallel = parallel,
+                                         purpose = "FFS")
       tau_atts <- attr(img, "parameter")
       attr(tau_atts, "auto") <- attr(img, "auto")
       img <- img[, , 1, ]
@@ -105,12 +105,11 @@ number <- function(img, def, tau = NULL,
     thresh_atts <- list()
     tau_atts <- list()
     for (i in seq_len(n_ch)) {
-      if (!is.null(seed)) seed <- seed + i
       for (i in seq_len(n_ch)) {
         out_i <- number(img[, , i, ], def = def, tau = tau[[i]],
                         thresh = thresh[[i]], filt = filt[[i]],
                         s = s, offset = offset, readout_noise = readout_noise,
-                        gamma = gamma, seed = seed, parallel = parallel)
+                        gamma = gamma, parallel = parallel)
         out[, , i] <- out_i
         thresh_atts[[i]] <- attr(out_i, "thresh")
         tau_atts[[i]] <- attr(out_i, "tau")
@@ -149,14 +148,14 @@ number <- function(img, def, tau = NULL,
 #'
 #' @examples
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-#' nts <- number_time_series(img, "n", frames_per_set = 20,
+#' nts <- number_timeseries(img, "n", frames_per_set = 20,
 #'                           tau = NA, thresh = "Huang", parallel = 2)
 #' @export
-number_time_series <- function(img, def, frames_per_set,
+number_timeseries <- function(img, def, frames_per_set,
                                tau = NULL, thresh = NULL, fail = NA,
                                filt = NULL, s = 1, offset = 0,
                                readout_noise = 0, gamma = 1,
-                               parallel = FALSE, seed = NULL) {
+                               parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   img %<>% nb_get_img()
   d <- dim(img)
@@ -183,8 +182,8 @@ number_time_series <- function(img, def, frames_per_set,
       img <- img[, , 1, ]
     }
     if (!is.na(tau)) {
-      img %<>% detrendr::img_detrend_exp(tau = tau,
-                                         seed = seed, parallel = parallel)
+      img %<>% detrendr::img_detrend_exp(tau = tau, purpose = "FFS",
+                                         parallel = parallel)
       tau_atts <- attr(img, "parameter")
       attr(tau_atts, "auto") <- attr(img, "auto")
       img <- img[, , 1, ]
@@ -192,12 +191,11 @@ number_time_series <- function(img, def, frames_per_set,
     out <- img[, , seq_len(sets)]
     if (sets == 1) dim(out) %<>% c(1)
     for (i in seq_len(sets)) {
-      if (!is.null(seed)) seed <- seed + i
       indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
       out[, , i] <- number(img[, , indices_i], def = def, filt = filt,
                            s = s, offset = offset,
                            readout_noise = readout_noise, gamma = gamma,
-                           seed = seed, parallel = parallel)
+                           parallel = parallel)
     }
   } else {
     frames <- d[4]
@@ -207,13 +205,12 @@ number_time_series <- function(img, def, frames_per_set,
     thresh_atts <- list()
     tau_atts <- list()
     for (i in seq_len(n_ch)) {
-      if (!is.null(seed)) seed <- seed + i
-      out_i <- number_time_series(img[, , i, ], def = def,
+      out_i <- number_timeseries(img[, , i, ], def = def,
                                   frames_per_set = frames_per_set,
                                   tau = tau[[i]], thresh = thresh[[i]],
                                   filt = filt[[i]], offset = offset,
                                   readout_noise = readout_noise,
-                                  seed = seed + i, parallel = parallel)
+                                  parallel = parallel)
       out[, , i, ] <- out_i
       thresh_atts[[i]] <- attr(out_i, "thresh")
       tau_atts[[i]] <- attr(out_i, "tau")
@@ -226,7 +223,7 @@ number_time_series <- function(img, def, frames_per_set,
 number_file <- function(path, def, tau = NULL,
                         thresh = NULL, fail = NA, filt = NULL,
                         s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                        seed = NULL, parallel = FALSE) {
+                        parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   checkmate::assert_file_exists(path)
   need_to_change_dir <- stringr::str_detect(path, "/")
@@ -240,7 +237,7 @@ number_file <- function(path, def, tau = NULL,
   num <- number(path, def, tau = tau,
                 thresh = thresh, fail = fail, filt = filt,
                 s = s, offset = offset, readout_noise = readout_noise,
-                gamma = gamma, seed = seed, parallel = parallel)
+                gamma = gamma, parallel = parallel)
   num[abs(num) >= float_max()] <- NA
   suppressMessages(filesstrings::create_dir("number"))
   path %<>% filesstrings::before_last_dot() %>%
@@ -249,11 +246,11 @@ number_file <- function(path, def, tau = NULL,
   ijtiff::write_tif(num, path)
 }
 
-number_time_series_file <- function(path, def, frames_per_set,
+number_timeseries_file <- function(path, def, frames_per_set,
                                     tau = NULL, thresh = NULL, fail = NA,
                                     filt = NULL, s = 1, offset = 0,
                                     readout_noise = 0, gamma = 1,
-                                    parallel = FALSE, seed = NULL) {
+                                    parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   checkmate::assert_file_exists(path)
   need_to_change_dir <- stringr::str_detect(path, "/")
@@ -264,16 +261,16 @@ number_time_series_file <- function(path, def, frames_per_set,
     setwd(dir)
     path %<>% filesstrings::str_after_last("/")
   }
-  nts <- number_time_series(path, def, frames_per_set = frames_per_set,
+  nts <- number_timeseries(path, def, frames_per_set = frames_per_set,
                             tau = tau,
                             thresh = thresh, fail = fail, filt = filt,
                             s = s, offset = offset,
                             readout_noise = readout_noise, gamma = gamma,
-                            seed = seed, parallel = parallel)
+                            parallel = parallel)
   nts[abs(nts) >= float_max()] <- NA
-  suppressMessages(filesstrings::create_dir("number_time_series"))
+  suppressMessages(filesstrings::create_dir("number_timeseries"))
   path %<>% filesstrings::before_last_dot() %>%
-    paste0("number_time_series", "/", ., make_nb_filename_ending(nts)) %>%
+    paste0("number_timeseries", "/", ., make_nb_filename_ending(nts)) %>%
     deduplicate_nb_filename()
   ijtiff::write_tif(nts, path)
 }
@@ -305,7 +302,7 @@ number_time_series_file <- function(path, def, frames_per_set,
 number_folder <- function(folder_path = ".", def,
                           tau = NULL, thresh = NULL, fail = NA, filt = NULL,
                           s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                          seed = NULL, parallel = FALSE) {
+                          parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   init_dir <- getwd()
   on.exit(setwd(init_dir))
@@ -314,14 +311,14 @@ number_folder <- function(folder_path = ".", def,
   purrr::map(file_names, number_file, def = def, tau = tau,
              thresh = thresh, fail = fail, filt = filt, s = s, offset = offset,
              readout_noise = readout_noise, gamma = gamma,
-             seed = seed, parallel = parallel) %>%
+             parallel = parallel) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
     invisible()
 }
 
 #' Number time-series calculations for every image in a folder.
 #'
-#' Perform [number_time_series()] calculations on all tif images in a folder and
+#' Perform [number_timeseries()] calculations on all tif images in a folder and
 #' save the resulting number images to disk.
 #'
 #' @note Extreme number values (of magnitude greater than 3.40282e+38) will be
@@ -329,35 +326,35 @@ number_folder <- function(folder_path = ".", def,
 #'   numbers.
 #'
 #' @inheritParams number
-#' @inheritParams number_time_series
+#' @inheritParams number_timeseries
 #' @inheritParams number_folder
 #'
-#' @seealso [number_time_series()]
+#' @seealso [number_timeseries()]
 #'
 #' @examples
 #' setwd(tempdir())
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 #' ijtiff::write_tif(img, 'img1.tif')
 #' ijtiff::write_tif(img, 'img2.tif')
-#' number_time_series_folder(def = "n", tau = NA, thresh = "Huang",
+#' number_timeseries_folder(def = "n", tau = NA, thresh = "Huang",
 #'                           frames_per_set = 20, parallel = 2)
 #' suppressWarnings(file.remove(list.files()))  # cleanup
 #' @export
-number_time_series_folder <- function(folder_path = ".", def, frames_per_set,
+number_timeseries_folder <- function(folder_path = ".", def, frames_per_set,
                                       tau = NULL, thresh = NULL, fail = NA,
                                       filt = NULL, s = 1, offset = 0,
                                       readout_noise = 0, gamma = 1,
-                                      seed = NULL, parallel = FALSE) {
+                                      parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   init_dir <- getwd()
   on.exit(setwd(init_dir))
   setwd(folder_path)
   file_names <- list.files(pattern = "\\.tif")
-  purrr::map(file_names, number_time_series_file, def = def,
+  purrr::map(file_names, number_timeseries_file, def = def,
              frames_per_set = frames_per_set,
              tau = tau, thresh = thresh, fail = fail, filt = filt,
              s = s, offset = offset, readout_noise = readout_noise,
-             gamma = gamma, seed = seed, parallel = parallel) %>%
+             gamma = gamma, parallel = parallel) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
     invisible()
 }

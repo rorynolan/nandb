@@ -31,7 +31,7 @@
 brightness <- function(img, def, tau = NULL,
                        thresh = NULL, fail = NA, filt = NULL,
                        s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                       seed = NULL, parallel = FALSE) {
+                       parallel = FALSE) {
   checkmate::assert_string(def)
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
@@ -56,7 +56,8 @@ brightness <- function(img, def, tau = NULL,
       img <- img[, , 1, ]
     }
     if (!is.na(tau)) {
-      img %<>% detrendr::img_detrend_exp(tau, seed = seed, parallel = parallel)
+      img %<>% detrendr::img_detrend_exp(tau, parallel = parallel,
+                                         purpose = "FFS")
       tau_atts <- attr(img, "parameter")
       attr(tau_atts, "auto") <- attr(img, "auto")
       img <- img[, , 1, ]
@@ -77,11 +78,10 @@ brightness <- function(img, def, tau = NULL,
     thresh_atts <- list()
     tau_atts <- list()
     for (i in seq_len(n_ch)) {
-      if (!is.null(seed)) seed <- seed + i
       out_i <- brightness(img[, , i, ], def = def, tau = tau[[i]],
                           thresh = thresh[[i]], filt = filt[[i]],
                           s = s, offset = offset, readout_noise = readout_noise,
-                          gamma = gamma, seed = seed, parallel = parallel)
+                          gamma = gamma, parallel = parallel)
       out[, , i] <- out_i
       thresh_atts[[i]] <- attr(out_i, "thresh")
       tau_atts[[i]] <- attr(out_i, "tau")
@@ -120,14 +120,14 @@ brightness <- function(img, def, tau = NULL,
 #'
 #' @examples
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-#' bts <- brightness_time_series(img, "e", frames_per_set = 20,
+#' bts <- brightness_timeseries(img, "e", frames_per_set = 20,
 #'                               tau = NA, thresh = "Huang", parallel = 2)
 #' @export
-brightness_time_series <- function(img, def, frames_per_set,
+brightness_timeseries <- function(img, def, frames_per_set,
                                    tau = NULL, thresh = NULL, fail = NA,
                                    filt = NULL, s = 1, offset = 0,
                                    readout_noise = 0, gamma = 1,
-                                   parallel = FALSE, seed = NULL) {
+                                   parallel = FALSE) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
   img %<>% nb_get_img()
@@ -155,8 +155,8 @@ brightness_time_series <- function(img, def, frames_per_set,
       img <- img[, , 1, ]
     }
     if (!is.na(tau)) {
-      img %<>% detrendr::img_detrend_exp(tau = tau,
-                                         seed = seed, parallel = parallel)
+      img %<>% detrendr::img_detrend_exp(tau = tau, purpose = "FFS",
+                                         parallel = parallel)
       tau_atts <- attr(img, "parameter")
       attr(tau_atts, "auto") <- attr(img, "auto")
       img <- img[, , 1, ]
@@ -164,12 +164,11 @@ brightness_time_series <- function(img, def, frames_per_set,
     out <- img[, , seq_len(sets)]
     if (sets == 1) dim(out) %<>% c(1)
     for (i in seq_len(sets)) {
-      if (!is.null(seed)) seed <- seed + i
       indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
       out[, , i] <- brightness(img[, , indices_i], def = def, filt = filt,
                                s = s, offset = offset,
                                readout_noise = readout_noise, gamma = gamma,
-                               seed = seed, parallel = parallel)
+                               parallel = parallel)
     }
   } else {
     frames <- d[4]
@@ -179,13 +178,12 @@ brightness_time_series <- function(img, def, frames_per_set,
     thresh_atts <- list()
     tau_atts <- list()
     for (i in seq_len(n_ch)) {
-      if (!is.null(seed)) seed <- seed + i
-      out_i <- brightness_time_series(img[, , i, ], def = def,
+      out_i <- brightness_timeseries(img[, , i, ], def = def,
                                      frames_per_set = frames_per_set,
                                       tau = tau[[i]], thresh = thresh[[i]],
                                       filt = filt[[i]], offset = offset,
                                       readout_noise = readout_noise,
-                                      seed = seed + i, parallel = parallel)
+                                      parallel = parallel)
       out[, , i, ] <- out_i
       thresh_atts[[i]] <- attr(out_i, "thresh")
       tau_atts[[i]] <- attr(out_i, "tau")
@@ -198,7 +196,7 @@ brightness_time_series <- function(img, def, frames_per_set,
 brightness_file <- function(path, def, tau = NULL,
                             thresh = NULL, fail = NA, filt = NULL,
                             s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                            seed = NULL, parallel = FALSE) {
+                            parallel = FALSE) {
   checkmate::assert_file_exists(path)
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
@@ -211,7 +209,7 @@ brightness_file <- function(path, def, tau = NULL,
   b <- brightness(path, def, tau = tau,
                   thresh = thresh, fail = fail, filt = filt,
                   s = s, offset = offset, readout_noise = readout_noise,
-                  gamma = gamma, seed = seed, parallel = parallel)
+                  gamma = gamma, parallel = parallel)
   suppressMessages(filesstrings::create_dir("brightness"))
   path %<>% filesstrings::before_last_dot() %>%
     paste0("brightness", "/", ., make_nb_filename_ending(b)) %>%
@@ -219,11 +217,11 @@ brightness_file <- function(path, def, tau = NULL,
   ijtiff::write_tif(b, path)
 }
 
-brightness_time_series_file <- function(path, def, frames_per_set,
+brightness_timeseries_file <- function(path, def, frames_per_set,
                                         tau = NULL, thresh = NULL, fail = NA,
                                         filt = NULL, s = 1, offset = 0,
                                         readout_noise = 0, gamma = 1,
-                                        parallel = FALSE, seed = NULL) {
+                                        parallel = FALSE) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
   checkmate::assert_file_exists(path)
@@ -235,15 +233,15 @@ brightness_time_series_file <- function(path, def, frames_per_set,
     setwd(dir)
     path %<>% filesstrings::str_after_last("/")
   }
-  bts <- brightness_time_series(path, def, frames_per_set = frames_per_set,
+  bts <- brightness_timeseries(path, def, frames_per_set = frames_per_set,
                                 tau = tau,
                                 thresh = thresh, fail = fail, filt = filt,
                                 s = s, offset = offset,
                                 readout_noise = readout_noise, gamma = gamma,
-                                seed = seed, parallel = parallel)
-  suppressMessages(filesstrings::create_dir("brightness_time_series"))
+                                parallel = parallel)
+  suppressMessages(filesstrings::create_dir("brightness_timeseries"))
   path %<>% filesstrings::before_last_dot() %>%
-    paste0("brightness_time_series", "/", ., make_nb_filename_ending(bts)) %>%
+    paste0("brightness_timeseries", "/", ., make_nb_filename_ending(bts)) %>%
     deduplicate_nb_filename()
   ijtiff::write_tif(bts, path)
 }
@@ -271,7 +269,7 @@ brightness_time_series_file <- function(path, def, frames_per_set,
 brightness_folder <- function(folder_path = ".", def,
                               tau = NULL, thresh = NULL, fail = NA, filt = NULL,
                               s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                              seed = NULL, parallel = FALSE) {
+                              parallel = FALSE) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
   init_dir <- getwd()
@@ -281,51 +279,50 @@ brightness_folder <- function(folder_path = ".", def,
   purrr::map(file_names, brightness_file, def = def, tau = tau,
              thresh = thresh, fail = fail, filt = filt, s = s, offset = offset,
              readout_noise = readout_noise, gamma = gamma,
-             seed = seed, parallel = parallel) %>%
+             parallel = parallel) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
     invisible()
 }
 
 #' Brightness time-series calculations for every image in a folder.
 #'
-#' Perform [brightness_time_series()] calculations on all tif images in a folder
+#' Perform [brightness_timeseries()] calculations on all tif images in a folder
 #' and save the resulting number images to disk.
 #'
 #' @inheritParams brightness
-#' @inheritParams brightness_time_series
+#' @inheritParams brightness_timeseries
 #' @inheritParams brightness_folder
 #' @inheritParams number
-#' @inheritParams number_time_series
+#' @inheritParams number_timeseries
 #' @inheritParams number_folder
 #'
-#' @seealso [brightness_time_series()]
+#' @seealso [brightness_timeseries()]
 #'
 #' @examples
 #' setwd(tempdir())
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 #' ijtiff::write_tif(img, 'img1.tif')
 #' ijtiff::write_tif(img, 'img2.tif')
-#' brightness_time_series_folder(def = "e", tau = NA, thresh = "Huang",
+#' brightness_timeseries_folder(def = "e", tau = NA, thresh = "Huang",
 #'                               frames_per_set = 20, parallel = 2)
 #' suppressWarnings(file.remove(list.files()))  # cleanup
 #' @export
-brightness_time_series_folder <- function(folder_path = ".", def,
+brightness_timeseries_folder <- function(folder_path = ".", def,
                                           frames_per_set, tau = NULL,
                                           thresh = NULL, fail = NA, filt = NULL,
                                           s = 1, offset = 0, readout_noise = 0,
-                                          gamma = 1, seed = NULL,
-                                          parallel = FALSE) {
+                                          gamma = 1, parallel = FALSE) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
   init_dir <- getwd()
   on.exit(setwd(init_dir))
   setwd(folder_path)
   file_names <- list.files(pattern = "\\.tif")
-  purrr::map(file_names, brightness_time_series_file, def = def,
+  purrr::map(file_names, brightness_timeseries_file, def = def,
              frames_per_set = frames_per_set,
              tau = tau, thresh = thresh, fail = fail, filt = filt,
              s = s, offset = offset, readout_noise = readout_noise,
-             gamma = gamma, seed = seed, parallel = parallel) %>%
+             gamma = gamma, parallel = parallel) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
     invisible()
 }

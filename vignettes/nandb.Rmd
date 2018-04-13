@@ -16,9 +16,9 @@ set.seed(1)
 
 ### Loading the libraries
 
-```{r load library, results='hide', message=FALSE}
-required <- c("nandb", "tidyverse", "matrixStats")
-sapply(required, library, character.only = TRUE)
+```{r load library, include=FALSE}
+required <- c("nandb", "tidyverse")
+lapply(required, library, character.only = TRUE)
 ```
 
 ### Reading and Displaying Images
@@ -73,7 +73,7 @@ ggplot(db, aes(x, y)) + geom_line() +
 and we can compare it to the distribution of brightnesses from immobile particles:
 ```{r immobile plot, fig.width=7, fig.height=7}
 immobile_brightnesses <- matrix(rpois(50 * 10^6, 50), nrow = 10^6) %>% 
-  {rowVars(.) / rowMeans(.) - 1}
+  {apply(., 1, var) / rowMeans(.) - 1}
 di <- density(immobile_brightnesses) %>% {data.frame(x = .$x, y = .$y)}
 rbind(mutate(db, mobility = "mobile"), mutate(di, mobility = "immobile")) %>%      mutate(mobility = factor(mobility)) %>% 
   ggplot(aes(x, y)) + geom_line(aes(colour = mobility)) + 

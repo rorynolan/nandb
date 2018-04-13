@@ -5,8 +5,7 @@
 \title{Calculate brightness from image series.}
 \usage{
 brightness(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-  s = 1, offset = 0, readout_noise = 0, gamma = 1, seed = NULL,
-  parallel = FALSE)
+  s = 1, offset = 0, readout_noise = 0, gamma = 1, parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array in the style of an
@@ -51,10 +50,6 @@ profile. The default (\code{gamma = 1}) has no effect. Changing gamma will have
 the effect of dividing the result by \code{gamma}, so the result with \code{gamma = 0.5} is two times the result with \code{gamma = 1}. For a Gaussian illumination
 profile, use \code{gamma = 0.3536}; for a Gaussian-Lorentzian illumination
 profile, use \code{gamma = 0.0760}.}
-
-\item{seed}{Random numbers may be generated during the detrending process.
-For reproducibility, you can set a seed for this random number generation
-here.}
 
 \item{parallel}{Would you like to use multiple cores to speed up this
 function? If so, set the number of cores here, or to use all available
