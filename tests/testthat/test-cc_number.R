@@ -1,7 +1,7 @@
 context("cc_number()")
 test_that("cc_number() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   set.seed(1)
   cc_n <- cc_number(img, tau = "auto", thresh = "Huang", filt = "median")
   expect_equal(median(cc_n, na.rm = TRUE), 24, tolerance = 25)
@@ -17,8 +17,8 @@ test_that("cc_number() works", {
 
 context("cc_number_timeseries()")
 test_that("cc_number_timeseries() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   set.seed(1)
   cc_n_ts <- cc_number_timeseries(img, 10, thresh = "Huang",
                                    filt = "median", parallel = 2)
@@ -40,8 +40,8 @@ test_that("cc_number_timeseries() works", {
 
 context("cc_number_folder()")
 test_that("cc_number_folder() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
@@ -66,8 +66,8 @@ test_that("cc_number_folder() works", {
 
 context("cc_number_timeseries_folder()")
 test_that("cc_number_timeseries_folder() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())

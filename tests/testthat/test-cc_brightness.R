@@ -1,7 +1,7 @@
 context("cc_brightness()")
 test_that("cc_brightness() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   set.seed(1)
   cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang", filt = "median")
   expect_equal(median(cc_b, na.rm = TRUE), 0.01, tolerance = 0.001)
@@ -17,8 +17,8 @@ test_that("cc_brightness() works", {
 
 context("cc_brightness_timeseries()")
 test_that("cc_brightness_timeseries() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   set.seed(1)
   cc_b_ts <- cc_brightness_timeseries(img, 10, thresh = "Huang", tau = "auto",
                                        filt = "median", parallel = 2)
@@ -40,8 +40,8 @@ test_that("cc_brightness_timeseries() works", {
 
 context("cc_brightness_folder()")
 test_that("cc_brightness_folder() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
@@ -66,8 +66,8 @@ test_that("cc_brightness_folder() works", {
 
 context("cc_brightness_timeseries_folder()")
 test_that("cc_brightness_timeseries_folder() works", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())

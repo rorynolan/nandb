@@ -36,8 +36,8 @@
 #' @return A numeric matrix, the cross-correlated number image.
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-#'                                     package = "ccnandb"))
+#' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+#'                                     package = "nandb"))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 1, ]))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
 #' n <- nandb::number(img, def = "n", thresh = "Huang", filt = "median")
@@ -137,10 +137,10 @@ cc_number <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
 #' @seealso [nandb::number()].
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', 'ccnandb_eg.tif',
-#'                         package = 'ccnandb'))
+#' img <- ijtiff::read_tif(system.file('extdata', 'two_ch.tif',
+#'                                     package = 'nandb'))
 #' cc_nts <- cc_number_timeseries(img, 10, thresh = "Huang",
-#'                                     filt = 'median', parallel = 2)
+#'                                filt = 'median', parallel = 2)
 #' ijtiff::display(cc_nts[, , 1, 1])
 #' @export
 cc_number_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
@@ -325,7 +325,7 @@ cc_number_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
 #' ijtiff::write_tif(img, 'ab.tif')
 #' cc_number_timeseries_folder(frames_per_set = 25)
 #' list.files()
-#' file.remove(list.files())  # cleanup}
+#' }
 #'
 #' @export
 cc_number_timeseries_folder <- function(folder_path = ".", frames_per_set,

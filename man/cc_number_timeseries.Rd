@@ -64,10 +64,10 @@ them to create the next and so on to get a time-series of cross-correlated
 number images.
 }
 \examples{
-img <- ijtiff::read_tif(system.file('extdata', 'ccnandb_eg.tif',
-                        package = 'ccnandb'))
+img <- ijtiff::read_tif(system.file('extdata', 'two_ch.tif',
+                                    package = 'nandb'))
 cc_nts <- cc_number_timeseries(img, 10, thresh = "Huang",
-                                    filt = 'median', parallel = 2)
+                               filt = 'median', parallel = 2)
 ijtiff::display(cc_nts[, , 1, 1])
 }
 \seealso{
