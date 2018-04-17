@@ -79,8 +79,8 @@ test_that("deduplicate_cc_nb_filename() works correctly", {
 })
 
 test_that("make_cc_nb_filename_ending() edge cases work correctly", {
-  img <- ijtiff::read_tif(system.file("extdata", "ccnandb_eg.tif",
-                                      package = "ccnandb"))
+  img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+                                      package = "nandb"))
   cc_b1 <- cc_brightness(img, tau = 9, thresh = "Huang")
   cc_b2 <- cc_b1
   attr(cc_b1, "thresh") <- c(1, 1)
