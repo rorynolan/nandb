@@ -25,6 +25,10 @@
 #'   smooth/median filter the number image in a different way, first calculate
 #'   the numbers without filtering (`filt = NULL`) using this function and then
 #'   perform your desired filtering routine on the result.
+#' @param correct Apply the number/brightness correction detailed in equation 7
+#'   of Hur et al. (2014). This is another correction for the effects of
+#'   bleaching and is needed in addition to the more conventional correction
+#'   controlled by the `tau` parameter.
 #' @param offset,readout_noise Microscope acquisition parameters. See reference
 #'   Dalal et al.
 #' @param s A number. The \eqn{S}-factor of microscope acquisition.
@@ -47,6 +51,10 @@
 #'   confocal microscope operating in the analog mode. Microsc. Res. Tech., 71,
 #'   1:69-81. \doi{10.1002/jemt.20526}.
 #'
+#'   Hur K-H, Macdonald PJ, Berk S, Angert CI, Chen Y, Mueller JD (2014)
+#'   Quantitative Measurement of Brightness from Living Cells in the Presence of
+#'   Photodepletion. PLoS ONE 9(5): e97440. \doi{10.1371/journal.pone.0097440}.
+#'
 #' @examples
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 #' ijtiff::display(img[, , 1, 1])
@@ -54,8 +62,8 @@
 #' num <- number(img, "n", tau = 10, thresh = "tri")
 #' @export
 number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-                   s = 1, offset = 0, readout_noise = 0, gamma = 1,
-                   parallel = FALSE) {
+                   correct = TRUE, s = 1, offset = 0, readout_noise = 0,
+                   gamma = 1, parallel = FALSE) {
   checkmate::assert_string(def)
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
   img %<>% nb_get_img()
@@ -83,15 +91,17 @@ number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
       attr(tau_atts, "auto") <- attr(img, "auto")
       img <- img[, , 1, ]
     }
+    epsilon <- brightness(img, def = "e", s = s, offset = offset,
+                          readout_noise = readout_noise,
+                          correct = correct)
+    pillar_means <- detrendr::mean_pillars(img, parallel = parallel)
+    out <- (pillar_means - offset) / (s * epsilon)
     if (def == "N") {
-      out <- (detrendr::mean_pillars(img, parallel = parallel) - offset) ^ 2 /
-        (detrendr::var_pillars(img, parallel = parallel) - readout_noise)
+      out %<>% {(epsilon * .) / (1 + epsilon)}
     } else {
-      out <- (detrendr::mean_pillars(img, parallel = parallel) - offset) %>% {
-        . ^ 2 / (detrendr::var_pillars(img, parallel = parallel) -
-                   readout_noise - s * .)
-      } / gamma
+      out %<>% {. / gamma}
     }
+    if (length(dim(out)) > 2) dim(out) %<>% {.[1:2]}
     if (!is.na(filt)) {
       checkmate::assert_string(filt)
       if (filt == "median") {
@@ -108,6 +118,7 @@ number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
       for (i in seq_len(n_ch)) {
         out_i <- number(img[, , i, ], def = def, tau = tau[[i]],
                         thresh = thresh[[i]], filt = filt[[i]],
+                        correct = correct,
                         s = s, offset = offset, readout_noise = readout_noise,
                         gamma = gamma, parallel = parallel)
         out[, , i] <- out_i
@@ -153,7 +164,7 @@ number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
 #' @export
 number_timeseries <- function(img, def, frames_per_set,
                                tau = NULL, thresh = NULL, fail = NA,
-                               filt = NULL, s = 1, offset = 0,
+                               filt = NULL, correct = TRUE, s = 1, offset = 0,
                                readout_noise = 0, gamma = 1,
                                parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")

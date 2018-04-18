@@ -33,7 +33,7 @@ then these two thresholds will be applied to channels 1 and 2 respectively.
 A value of \code{NA} for either channel gives no thresholding for that channel.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the cross-correlated number image using
-\code{\link[nandb:smooth_filter]{nandb::smooth_filter()}} or \code{\link[nandb:median_filter]{nandb::median_filter()}} respectively? If
+\code{\link[=smooth_filter]{smooth_filter()}} or \code{\link[=median_filter]{median_filter()}} respectively? If
 selected, these are invoked here with a filter radius of 1 and with the
 option \code{na_count = TRUE}. A value of \code{NA} for either channel gives no
 thresholding for that channel. If you want to smooth/median filter the
@@ -57,7 +57,7 @@ img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
                                     package = "nandb"))
 ijtiff::display(detrendr::mean_pillars(img[, , 1, ]))
 ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
-n <- nandb::number(img, def = "n", thresh = "Huang", filt = "median")
+n <- number(img, def = "n", thresh = "Huang", filt = "median")
 ijtiff::display(n[, , 1, 1])
 ijtiff::display(n[, , 2, 1])
 cc_n <- cc_number(img, tau = "auto", thresh = "Huang")

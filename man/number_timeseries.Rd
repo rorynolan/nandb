@@ -5,8 +5,8 @@
 \title{Create a number time-series.}
 \usage{
 number_timeseries(img, def, frames_per_set, tau = NULL, thresh = NULL,
-  fail = NA, filt = NULL, s = 1, offset = 0, readout_noise = 0,
-  gamma = 1, parallel = FALSE)
+  fail = NA, filt = NULL, correct = TRUE, s = 1, offset = 0,
+  readout_noise = 0, gamma = 1, parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
@@ -37,6 +37,11 @@ filter radius of 1 (with corners included, so each median is the median of
 smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
 perform your desired filtering routine on the result.}
+
+\item{correct}{Apply the number/brightness correction detailed in equation 7
+of Hur et al. (2014). This is another correction for the effects of
+bleaching and is needed in addition to the more conventional correction
+controlled by the \code{tau} parameter.}
 
 \item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
 

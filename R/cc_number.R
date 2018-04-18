@@ -24,7 +24,7 @@
 #'   A value of `NA` for either channel gives no thresholding for that channel.
 #' @param filt Do you want to smooth (`filt = 'smooth'`) or median (`filt =
 #'   'median'`) filter the cross-correlated number image using
-#'   [nandb::smooth_filter()] or [nandb::median_filter()] respectively? If
+#'   [smooth_filter()] or [median_filter()] respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
 #'   option `na_count = TRUE`. A value of `NA` for either channel gives no
 #'   thresholding for that channel. If you want to smooth/median filter the
@@ -40,7 +40,7 @@
 #'                                     package = "nandb"))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 1, ]))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
-#' n <- nandb::number(img, def = "n", thresh = "Huang", filt = "median")
+#' n <- number(img, def = "n", thresh = "Huang", filt = "median")
 #' ijtiff::display(n[, , 1, 1])
 #' ijtiff::display(n[, , 2, 1])
 #' cc_n <- cc_number(img, tau = "auto", thresh = "Huang")
@@ -99,14 +99,14 @@ cc_number <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
   }
   if (length(dim(ch1)) == 4) ch1 <- ch1[, , 1, ]
   if (length(dim(ch2)) == 4) ch2 <- ch2[, , 1, ]
-  cc_n <- (detrendr::mean_pillars(ch1, parallel = parallel) *
-             detrendr::mean_pillars(ch2, parallel = parallel)) /
+  cc_n <- ((detrendr::mean_pillars(ch1, parallel = parallel) *
+              detrendr::mean_pillars(ch2, parallel = parallel))[, , 1, 1]) /
     cross_var_pillars(ch1, ch2)
   if (!is.na(filt)) {
     if (filt == "median") {
-      cc_n %<>% nandb::median_filter(na_count = TRUE)
+      cc_n %<>% median_filter(na_count = TRUE)
     } else {
-      cc_n %<>% nandb::smooth_filter(na_count = TRUE)
+      cc_n %<>% smooth_filter(na_count = TRUE)
     }
   }
   tau %<>% unlist()
@@ -134,7 +134,7 @@ cc_number <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th cross-correlated
 #'   number image.
-#' @seealso [nandb::number()].
+#' @seealso [number()].
 #'
 #' @examples
 #' img <- ijtiff::read_tif(system.file('extdata', 'two_ch.tif',
@@ -207,18 +207,19 @@ cc_number_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
     indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
     ch1_i <- ch1[, , indices_i]
     ch2_i <- ch2[, , indices_i]
-    cc_n_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
-      (sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
-              detrendr::mean_pillars(ch2_i, parallel = parallel)))
+    cc_n_ts[, , i] <-
+      ((detrendr::mean_pillars(ch1_i, parallel = parallel) *
+          detrendr::mean_pillars(ch2_i, parallel = parallel))[, , 1, 1]) /
+        cross_var_pillars(ch1_i, ch2_i)
   }
   if (!is.na(filt)) {
     if (filt == "median") {
       for (i in seq_len(n_sets)) {
-        cc_n_ts[, , i] %<>% nandb::median_filter(na_count = TRUE)
+        cc_n_ts[, , i] %<>% median_filter(na_count = TRUE)
       }
     } else {
       for (i in seq_len(n_sets)) {
-        cc_n_ts[, , i] %<>% nandb::smooth_filter(na_count = TRUE)
+        cc_n_ts[, , i] %<>% smooth_filter(na_count = TRUE)
       }
     }
   }

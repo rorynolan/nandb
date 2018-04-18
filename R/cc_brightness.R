@@ -24,7 +24,7 @@
 #'   A value of `NA` for either channel gives no thresholding for that channel.
 #' @param filt Do you want to smooth (`filt = 'smooth'`) or median (`filt =
 #'   'median'`) filter the cross-correlated brightness image using
-#'   [nandb::smooth_filter()] or [nandb::median_filter()] respectively? If
+#'   [smooth_filter()] or [median_filter()] respectively? If
 #'   selected, these are invoked here with a filter radius of 1 and with the
 #'   option `na_count = TRUE`. A value of `NA` for either channel gives no
 #'   thresholding for that channel. If you want to smooth/median filter the
@@ -40,7 +40,7 @@
 #'                                     package = "nandb"))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 1, ]))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
-#' b <- nandb::brightness(img, def = "e", thresh = "Huang", filt = "median")
+#' b <- brightness(img, def = "e", thresh = "Huang", filt = "median")
 #' ijtiff::display(b[, , 1, 1])
 #' ijtiff::display(b[, , 2, 1])
 #' cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang")
@@ -100,13 +100,13 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
   if (length(dim(ch1)) == 4) ch1 <- ch1[, , 1, ]
   if (length(dim(ch2)) == 4) ch2 <- ch2[, , 1, ]
   cc_b <- cross_var_pillars(ch1, ch2) /
-    (sqrt(detrendr::mean_pillars(ch1, parallel = parallel) *
-            detrendr::mean_pillars(ch2, parallel = parallel)))
+    ((sqrt(detrendr::mean_pillars(ch1, parallel = parallel) *
+             detrendr::mean_pillars(ch2, parallel = parallel)))[, , 1, 1])
   if (!is.na(filt)) {
     if (filt == "median") {
-      cc_b %<>% nandb::median_filter(na_count = TRUE)
+      cc_b %<>% median_filter(na_count = TRUE)
     } else {
-      cc_b %<>% nandb::smooth_filter(na_count = TRUE)
+      cc_b %<>% smooth_filter(na_count = TRUE)
     }
   }
   tau %<>% unlist()
@@ -134,7 +134,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th cross-correlated
 #'   brightness image.
-#' @seealso [nandb::brightness()].
+#' @seealso [brightness()].
 #'
 #' @examples
 #' img <- ijtiff::read_tif(system.file('extdata', 'two_ch.tif',
@@ -208,17 +208,17 @@ cc_brightness_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
     ch1_i <- ch1[, , indices_i]
     ch2_i <- ch2[, , indices_i]
     cc_b_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
-      (sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
-              detrendr::mean_pillars(ch2_i, parallel = parallel)))
+      ((sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
+               detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
   }
   if (!is.na(filt)) {
     if (filt == "median") {
       for (i in seq_len(n_sets)) {
-        cc_b_ts[, , i] %<>% nandb::median_filter(na_count = TRUE)
+        cc_b_ts[, , i] %<>% median_filter(na_count = TRUE)
       }
     } else {
       for (i in seq_len(n_sets)) {
-        cc_b_ts[, , i] %<>% nandb::smooth_filter(na_count = TRUE)
+        cc_b_ts[, , i] %<>% smooth_filter(na_count = TRUE)
       }
     }
   }

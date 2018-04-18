@@ -4,10 +4,10 @@ test_that("brightness works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   brightness <- brightness(img, "e", tau = 'auto', thresh = 'Huang',
                            filt = 'median', parallel = 2)
-  expect_equal(round(mean(brightness, na.rm = TRUE), 3), 0.024)
+  expect_equal(mean(brightness, na.rm = TRUE), 0.029, tolerance = 0.001)
   brightness <- brightness(img, "B", tau = 1000, thresh = 'Huang',
                            filt = 'mean')
-  expect_equal(round(mean(brightness, na.rm = TRUE), 3), 1.043)
+  expect_equal(mean(brightness, na.rm = TRUE), 1.048, tolerance = 0.001)
   expect_error(brightness(img, "e", tau = "abc"), "If `tau` is a string")
   expect_error(brightness(img, "B", tau = FALSE),
                "`tau` must be specified as a positive number or")
@@ -55,10 +55,10 @@ test_that("brightness_timeseries works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   bts <- brightness_timeseries(img, "e", 20, tau = 100, thresh = 'Huang',
                                 filt = 'median', parallel = 2)
-  expect_equal(round(mean(bts, na.rm = TRUE), 2), -0.02)
+  expect_equal(mean(bts, na.rm = TRUE), -0.013, tolerance = 0.001)
   bts <- brightness_timeseries(img, "B", 30, tau = NA, thresh = 'tri',
                                 filt = 'median', parallel = 2)
-  expect_equal(round(mean(bts, na.rm = TRUE), 3), 1.008)
+  expect_equal(mean(bts, na.rm = TRUE), 1.012, tolerance = 0.001)
   expect_error(brightness_timeseries(img, "b", 51),
                paste("You have selected 51 frames per set,",
                      "but there are only 50 frames in total"))

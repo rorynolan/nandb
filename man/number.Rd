@@ -5,7 +5,8 @@
 \title{Calculate number from image series.}
 \usage{
 number(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-  s = 1, offset = 0, readout_noise = 0, gamma = 1, parallel = FALSE)
+  correct = TRUE, s = 1, offset = 0, readout_noise = 0, gamma = 1,
+  parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
@@ -33,6 +34,11 @@ filter radius of 1 (with corners included, so each median is the median of
 smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
 perform your desired filtering routine on the result.}
+
+\item{correct}{Apply the number/brightness correction detailed in equation 7
+of Hur et al. (2014). This is another correction for the effects of
+bleaching and is needed in addition to the more conventional correction
+controlled by the \code{tau} parameter.}
 
 \item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
 
@@ -71,4 +77,8 @@ Dalal, RB, Digman, MA, Horwitz, AF, Vetri, V, Gratton, E (2008).
 Determination of particle number and brightness using a laser scanning
 confocal microscope operating in the analog mode. Microsc. Res. Tech., 71,
 1:69-81. \doi{10.1002/jemt.20526}.
+
+Hur K-H, Macdonald PJ, Berk S, Angert CI, Chen Y, Mueller JD (2014)
+Quantitative Measurement of Brightness from Living Cells in the Presence of
+Photodepletion. PLoS ONE 9(5): e97440. \doi{10.1371/journal.pone.0097440}.
 }

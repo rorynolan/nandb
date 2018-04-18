@@ -4,10 +4,10 @@ test_that("number works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   number <- number(img, "n", tau = 'auto', thresh = 'Huang',
                            filt = 'median', parallel = 2)
-  expect_equal(round(median(number, na.rm = TRUE), 3), -31.781)
+  expect_equal(median(number, na.rm = TRUE), 0.91, tolerance = 0.01)
   number <- number(img, "N", tau = 1000, thresh = 'Huang',
                    filt = 'mean')
-  expect_equal(round(mean(number, na.rm = TRUE), 1), 17.5)
+  expect_equal(mean(number, na.rm = TRUE), 17.4, tolerance = 0.01)
   expect_error(number(img, "n", tau = "abc"), "If `tau` is a string")
   expect_error(number(img, "n", tau = FALSE),
                "`tau` must be specified as a positive number or")
@@ -59,7 +59,7 @@ test_that("number_timeseries works", {
   expect_equal(round(mean(nts, na.rm = TRUE)), 18)
   nts <- number_timeseries(img, "n", 30, tau = NA, thresh = 'tri',
                             filt = 'median', parallel = 2)
-  expect_equal(round(median(nts, na.rm = TRUE), 3), -3.693)
+  expect_equal(median(nts, na.rm = TRUE), -2.14, tolerance = 0.01)
   expect_error(number_timeseries(img, "n", 51),
                paste("You have selected 51 frames per set,",
                      "but there are only 50 frames in total"))

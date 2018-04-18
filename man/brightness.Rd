@@ -5,7 +5,8 @@
 \title{Calculate brightness from image series.}
 \usage{
 brightness(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-  s = 1, offset = 0, readout_noise = 0, gamma = 1, parallel = FALSE)
+  correct = TRUE, s = 1, offset = 0, readout_noise = 0,
+  parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array in the style of an
@@ -37,6 +38,11 @@ smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
 perform your desired filtering routine on the result.}
 
+\item{correct}{Apply the number/brightness correction detailed in equation 7
+of Hur et al. (2014). This is another correction for the effects of
+bleaching and is needed in addition to the more conventional correction
+controlled by the \code{tau} parameter.}
+
 \item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
 
 \item{offset}{Microscope acquisition parameters. See reference
@@ -44,12 +50,6 @@ Dalal et al.}
 
 \item{readout_noise}{Microscope acquisition parameters. See reference
 Dalal et al.}
-
-\item{gamma}{Factor for correction of number \eqn{n} due to the illumination
-profile. The default (\code{gamma = 1}) has no effect. Changing gamma will have
-the effect of dividing the result by \code{gamma}, so the result with \code{gamma = 0.5} is two times the result with \code{gamma = 1}. For a Gaussian illumination
-profile, use \code{gamma = 0.3536}; for a Gaussian-Lorentzian illumination
-profile, use \code{gamma = 0.0760}.}
 
 \item{parallel}{Would you like to use multiple cores to speed up this
 function? If so, set the number of cores here, or to use all available
@@ -77,4 +77,8 @@ Dalal, RB, Digman, MA, Horwitz, AF, Vetri, V, Gratton, E (2008).
 Determination of particle number and brightness using a laser scanning
 confocal microscope operating in the analog mode. Microsc. Res. Tech., 71,
 1:69-81. \doi{10.1002/jemt.20526}.
+
+Hur K-H, Macdonald PJ, Berk S, Angert CI, Chen Y, Mueller JD (2014)
+Quantitative Measurement of Brightness from Living Cells in the Presence of
+Photodepletion. PLoS ONE 9(5): e97440. \doi{10.1371/journal.pone.0097440}.
 }

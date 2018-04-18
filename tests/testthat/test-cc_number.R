@@ -22,10 +22,10 @@ test_that("cc_number_timeseries() works", {
   set.seed(1)
   cc_n_ts <- cc_number_timeseries(img, 10, thresh = "Huang",
                                    filt = "median", parallel = 2)
-  expect_equal(median(cc_n_ts, na.rm = TRUE), -8.89e-18, tolerance = 0.001)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 0.01)
   cc_n_ts <- cc_number_timeseries(img, 10, thresh = "Huang", tau = "auto",
                                       filt = "smooth", parallel = 2)
-  expect_equal(median(cc_n_ts, na.rm = TRUE), 0.0032, tolerance = 0.001)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), 0, tolerance = 0.2)
   expect_error(cc_number_timeseries(img, 9999),
                paste("You have selected 9999 frames per set,",
                      "but there are only 100 frames in total."))
@@ -77,7 +77,7 @@ test_that("cc_number_timeseries_folder() works", {
                                filt = "median", parallel = 2)
   cc_n_ts <- dir(pattern = "cc_number_timeseries", recursive = TRUE) %>%
     ijtiff::read_tif()
-  expect_equal(median(cc_n_ts, na.rm = TRUE), -8.89e-18, tolerance = 0.001)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 0.01)
   filesstrings::dir.remove("cc_number_timeseries")
   dir.create("dir")
   ijtiff::write_tif(img, 'dir/a.tif')
@@ -87,7 +87,7 @@ test_that("cc_number_timeseries_folder() works", {
                                 filt = "median", parallel = 2)
   cc_n_ts <- dir(pattern = "cc_number_timeseries", recursive = TRUE) %>%
     ijtiff::read_tif()
-  expect_equal(median(cc_n_ts, na.rm = TRUE), 0, tolerance = 0.001)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 0.01)
   filesstrings::dir.remove("dir")
   file.remove("a.tif")
   setwd(cwd)

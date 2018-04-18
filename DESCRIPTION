@@ -27,7 +27,9 @@ Imports:
     checkmate,
     detrendr (>= 0.4.0),
     ijtiff (>= 1.0.0),
-    rlang
+    rlang,
+    stats,
+    MASS
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: knitr,
