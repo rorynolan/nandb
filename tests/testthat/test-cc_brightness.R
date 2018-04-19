@@ -4,9 +4,9 @@ test_that("cc_brightness() works", {
                                       package = "nandb"))
   set.seed(1)
   cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang", filt = "median")
-  expect_equal(median(cc_b, na.rm = TRUE), 0.01, tolerance = 0.001)
+  expect_equal(median(cc_b, na.rm = TRUE), 0.01, tolerance = 0.006)
   cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang", filt = "smooth")
-  expect_equal(median(cc_b, na.rm = TRUE), 0.014, tolerance = 0.001)
+  expect_equal(median(cc_b, na.rm = TRUE), 0.014, tolerance = 0.008)
   expect_error(cc_brightness(img, tau = "wrong", thresh = "Huang"),
                paste("If an element of `tau` is a string, is must be.*auto.*",
                      "Element 1 of your `tau` is.*wrong"))
@@ -25,7 +25,7 @@ test_that("cc_brightness_timeseries() works", {
   expect_equal(median(cc_b_ts, na.rm = TRUE), 0, tolerance = 0.001)
   cc_b_ts <- cc_brightness_timeseries(img, 10, thresh = "Huang", tau = "auto",
                                        filt = "smooth", parallel = 2)
-  expect_equal(median(cc_b_ts, na.rm = TRUE), 0.0013, tolerance = 0.001)
+  expect_equal(median(cc_b_ts, na.rm = TRUE), 0.0013, tolerance = 0.002)
   expect_error(cc_brightness_timeseries(img, 9999),
                paste("You have selected 9999 frames per set,",
                      "but there are only 100 frames in total."))

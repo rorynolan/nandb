@@ -4,7 +4,7 @@ test_that("number works", {
   img <- system.file('extdata', '50.tif', package = 'nandb')
   number <- number(img, "n", tau = 'auto', thresh = 'Huang',
                            filt = 'median', parallel = 2)
-  expect_equal(median(number, na.rm = TRUE), 0.91, tolerance = 0.01)
+  expect_equal(median(number, na.rm = TRUE), 0, tolerance = 20)
   number <- number(img, "N", tau = 1000, thresh = 'Huang',
                    filt = 'mean')
   expect_equal(mean(number, na.rm = TRUE), 17.4, tolerance = 0.01)
