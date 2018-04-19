@@ -87,7 +87,7 @@ test_that("cc_number_timeseries_folder() works", {
                                 filt = "median", parallel = 2)
   cc_n_ts <- dir(pattern = "cc_number_timeseries", recursive = TRUE) %>%
     ijtiff::read_tif()
-  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 0.01)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 2)
   filesstrings::dir.remove("dir")
   file.remove("a.tif")
   setwd(cwd)
