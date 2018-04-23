@@ -4,7 +4,7 @@ test_that("cc_brightness() works", {
                                       package = "nandb"))
   set.seed(1)
   cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang", filt = "median")
-  expect_equal(median(cc_b, na.rm = TRUE), 0.01, tolerance = 0.006)
+  expect_equal(median(cc_b, na.rm = TRUE), 0.014, tolerance = 0.01)
   cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang", filt = "smooth")
   expect_equal(median(cc_b, na.rm = TRUE), 0.014, tolerance = 0.008)
   expect_error(cc_brightness(img, tau = "wrong", thresh = "Huang"),
