@@ -34,7 +34,7 @@ An object of class \code{cc_number_img} or \code{cc_brightness_img}.
 }
 \description{
 The \code{cc_number_img} and \code{cc_brightness_img} classes are designed to hold
-objects which are images calculated from the \emph{corss-correlated number and
+objects which are images calculated from the \emph{cross-correlated number and
 brightness} technique.
 }
 \details{

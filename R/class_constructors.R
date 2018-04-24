@@ -188,7 +188,7 @@ brightness_ts_img <- function(img, def, frames_per_set,
 #' Cross-correlated number and brightness image classes.
 #'
 #' The `cc_number_img` and `cc_brightness_img` classes are designed to hold
-#' objects which are images calculated from the *corss-correlated number and
+#' objects which are images calculated from the *cross-correlated number and
 #' brightness* technique.
 #'
 #' An object of class `cc_number_img` or `cc_brightness_img` is a 4-dimensional
