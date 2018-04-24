@@ -291,7 +291,7 @@ cc_brightness_timeseries_file <- function(path, frames_per_set,
 #' ijtiff::write_tif(img, 'ab.tif')
 #' cc_brightness_folder()
 #' list.files()
-#' file.remove(list.files())  # cleanup}
+#' }
 #' @export
 cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
                                  tau = NULL, thresh = NULL,
@@ -326,7 +326,7 @@ cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
 #' ijtiff::write_tif(img, 'ab.tif')
 #' cc_brightness_timeseries_folder(frames_per_set = 25)
 #' list.files()
-#' file.remove(list.files())  # cleanup}
+#' }
 #'
 #' @export
 cc_brightness_timeseries_folder <- function(folder_path = ".", frames_per_set,

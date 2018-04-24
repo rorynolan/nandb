@@ -5,7 +5,7 @@
 \title{Brightness calculations for every image in a folder.}
 \usage{
 brightness_folder(folder_path = ".", def, tau = NULL, thresh = NULL,
-  fail = NA, filt = NULL, s = 1, offset = 0, readout_noise = 0,
+  filt = NULL, correct = FALSE, s = 1, offset = 0, readout_noise = 0,
   parallel = FALSE)
 }
 \arguments{
@@ -25,9 +25,6 @@ channel by specifying \code{tau} as a vector or list.}
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
 detrending and brightness calculations.}
 
-\item{fail}{If thresholding is done, to which value should pixels not
-exceeding the threshold be set?}
-
 \item{filt}{Do you want to smooth (\code{filt = 'mean'}) or median (\code{filt = 'median'}) filter the number image using \code{\link[=smooth_filter]{smooth_filter()}} or
 \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with a
 filter radius of 1 (with corners included, so each median is the median of
@@ -35,6 +32,11 @@ filter radius of 1 (with corners included, so each median is the median of
 smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
 perform your desired filtering routine on the result.}
+
+\item{correct}{Apply the number/brightness correction detailed in equation 7
+of Hur et al. (2014). This is another correction for the effects of
+bleaching and is needed in addition to the more conventional correction
+controlled by the \code{tau} parameter.}
 
 \item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
 
@@ -53,12 +55,13 @@ Perform \code{\link[=brightness]{brightness()}} calculations on all tif images i
 resulting brightness images to disk.
 }
 \examples{
+\dontrun{
 setwd(tempdir())
 img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 ijtiff::write_tif(img, 'img1.tif')
 ijtiff::write_tif(img, 'img2.tif')
 brightness_folder(def = "B", tau = NA, thresh = "Huang", parallel = 2)
-suppressWarnings(file.remove(list.files()))  # cleanup
+}
 }
 \seealso{
 \code{\link[=number]{number()}}

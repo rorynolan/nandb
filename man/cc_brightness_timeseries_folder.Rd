@@ -63,7 +63,7 @@ ijtiff::write_tif(img, 'a.tif')
 ijtiff::write_tif(img, 'ab.tif')
 cc_brightness_timeseries_folder(frames_per_set = 25)
 list.files()
-file.remove(list.files())  # cleanup}
+}
 
 }
 \seealso{

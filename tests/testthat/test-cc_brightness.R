@@ -22,7 +22,7 @@ test_that("cc_brightness_timeseries() works", {
   set.seed(1)
   cc_b_ts <- cc_brightness_timeseries(img, 10, thresh = "Huang", tau = "auto",
                                        filt = "median", parallel = 2)
-  expect_equal(median(cc_b_ts, na.rm = TRUE), 0, tolerance = 0.001)
+  expect_equal(median(cc_b_ts, na.rm = TRUE), 0, tolerance = 0.01)
   cc_b_ts <- cc_brightness_timeseries(img, 10, thresh = "Huang", tau = "auto",
                                        filt = "smooth", parallel = 2)
   expect_equal(median(cc_b_ts, na.rm = TRUE), 0.0013, tolerance = 0.002)

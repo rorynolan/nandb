@@ -4,8 +4,8 @@
 \alias{brightness}
 \title{Calculate brightness from image series.}
 \usage{
-brightness(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-  correct = TRUE, s = 1, offset = 0, readout_noise = 0,
+brightness(img, def, tau = NULL, thresh = NULL, filt = NULL,
+  correct = FALSE, s = 1, offset = 0, readout_noise = 0,
   parallel = FALSE)
 }
 \arguments{
@@ -26,9 +26,6 @@ channel by specifying \code{tau} as a vector or list.}
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
 detrending and brightness calculations.}
-
-\item{fail}{If thresholding is done, to which value should pixels not
-exceeding the threshold be set?}
 
 \item{filt}{Do you want to smooth (\code{filt = 'mean'}) or median (\code{filt = 'median'}) filter the number image using \code{\link[=smooth_filter]{smooth_filter()}} or
 \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with a

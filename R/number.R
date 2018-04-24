@@ -15,8 +15,6 @@
 #' @param tau The exponential detrending parameter to be passed to
 #'   [detrendr::img_detrend_exp()]. This can be a positive number or `"auto"`.
 #'   Default is no detrending.
-#' @param fail If thresholding is done, to which value should pixels not
-#'   exceeding the threshold be set?
 #' @param filt Do you want to smooth (`filt = 'mean'`) or median (`filt =
 #'   'median'`) filter the number image using [smooth_filter()] or
 #'   [median_filter()] respectively? If selected, these are invoked here with a
@@ -61,8 +59,8 @@
 #' num <- number(img, "N", tau = NA, thresh = "Huang")
 #' num <- number(img, "n", tau = 10, thresh = "tri")
 #' @export
-number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
-                   correct = TRUE, s = 1, offset = 0, readout_noise = 0,
+number <- function(img, def, tau = NULL, thresh = NULL, filt = NULL,
+                   correct = FALSE, s = 1, offset = 0, readout_noise = 0,
                    gamma = 1, parallel = FALSE) {
   checkmate::assert_string(def)
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
@@ -79,7 +77,7 @@ number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
   thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     if (!is.na(thresh)) {
-      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail,
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh,
                                                  ignore_na = TRUE)
       thresh_atts <- attr(img, "thresh")
       img <- img[, , 1, ]
@@ -163,8 +161,8 @@ number <- function(img, def, tau = NULL, thresh = NULL, fail = NA, filt = NULL,
 #'                           tau = NA, thresh = "Huang", parallel = 2)
 #' @export
 number_timeseries <- function(img, def, frames_per_set,
-                               tau = NULL, thresh = NULL, fail = NA,
-                               filt = NULL, correct = TRUE, s = 1, offset = 0,
+                               tau = NULL, thresh = NULL,
+                               filt = NULL, correct = FALSE, s = 1, offset = 0,
                                readout_noise = 0, gamma = 1,
                                parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
@@ -187,7 +185,7 @@ number_timeseries <- function(img, def, frames_per_set,
     }
     sets <- frames %/% frames_per_set
     if (!is.na(thresh)) {
-      img %<>% autothresholdr::mean_stack_thresh(method = thresh, fail = fail,
+      img %<>% autothresholdr::mean_stack_thresh(method = thresh,
                                                  ignore_na = TRUE)
       thresh_atts <- attr(img, "thresh")
       img <- img[, , 1, ]
@@ -232,7 +230,7 @@ number_timeseries <- function(img, def, frames_per_set,
 }
 
 number_file <- function(path, def, tau = NULL,
-                        thresh = NULL, fail = NA, filt = NULL,
+                        thresh = NULL, filt = NULL,
                         s = 1, offset = 0, readout_noise = 0, gamma = 1,
                         parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
@@ -246,7 +244,7 @@ number_file <- function(path, def, tau = NULL,
     path %<>% filesstrings::str_after_last("/")
   }
   num <- number(path, def, tau = tau,
-                thresh = thresh, fail = fail, filt = filt,
+                thresh = thresh, filt = filt,
                 s = s, offset = offset, readout_noise = readout_noise,
                 gamma = gamma, parallel = parallel)
   num[abs(num) >= float_max()] <- NA
@@ -258,7 +256,7 @@ number_file <- function(path, def, tau = NULL,
 }
 
 number_timeseries_file <- function(path, def, frames_per_set,
-                                    tau = NULL, thresh = NULL, fail = NA,
+                                    tau = NULL, thresh = NULL,
                                     filt = NULL, s = 1, offset = 0,
                                     readout_noise = 0, gamma = 1,
                                     parallel = FALSE) {
@@ -274,7 +272,7 @@ number_timeseries_file <- function(path, def, frames_per_set,
   }
   nts <- number_timeseries(path, def, frames_per_set = frames_per_set,
                             tau = tau,
-                            thresh = thresh, fail = fail, filt = filt,
+                            thresh = thresh, filt = filt,
                             s = s, offset = offset,
                             readout_noise = readout_noise, gamma = gamma,
                             parallel = parallel)
@@ -304,14 +302,15 @@ number_timeseries_file <- function(path, def, frames_per_set,
 #' @seealso [number()]
 #'
 #' @examples
+#' \dontrun{
 #' setwd(tempdir())
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 #' ijtiff::write_tif(img, 'img2.tif')
 #' number_folder(def = "n", tau = NA, thresh = "Huang", parallel = 2)
-#' suppressWarnings(file.remove(list.files()))  # cleanup
+#' }
 #' @export
 number_folder <- function(folder_path = ".", def,
-                          tau = NULL, thresh = NULL, fail = NA, filt = NULL,
+                          tau = NULL, thresh = NULL, filt = NULL,
                           s = 1, offset = 0, readout_noise = 0, gamma = 1,
                           parallel = FALSE) {
   if (! def %in% c("n", "N")) stop("'def' must be one of 'n' or 'N'.")
@@ -320,7 +319,7 @@ number_folder <- function(folder_path = ".", def,
   setwd(folder_path)
   file_names <- list.files(pattern = "\\.tif")
   purrr::map(file_names, number_file, def = def, tau = tau,
-             thresh = thresh, fail = fail, filt = filt, s = s, offset = offset,
+             thresh = thresh, filt = filt, s = s, offset = offset,
              readout_noise = readout_noise, gamma = gamma,
              parallel = parallel) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
@@ -343,16 +342,17 @@ number_folder <- function(folder_path = ".", def,
 #' @seealso [number_timeseries()]
 #'
 #' @examples
+#' \dontrun{
 #' setwd(tempdir())
 #' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 #' ijtiff::write_tif(img, 'img1.tif')
 #' ijtiff::write_tif(img, 'img2.tif')
 #' number_timeseries_folder(def = "n", tau = NA, thresh = "Huang",
 #'                           frames_per_set = 20, parallel = 2)
-#' suppressWarnings(file.remove(list.files()))  # cleanup
+#' }
 #' @export
 number_timeseries_folder <- function(folder_path = ".", def, frames_per_set,
-                                      tau = NULL, thresh = NULL, fail = NA,
+                                      tau = NULL, thresh = NULL,
                                       filt = NULL, s = 1, offset = 0,
                                       readout_noise = 0, gamma = 1,
                                       parallel = FALSE) {
@@ -363,7 +363,7 @@ number_timeseries_folder <- function(folder_path = ".", def, frames_per_set,
   file_names <- list.files(pattern = "\\.tif")
   purrr::map(file_names, number_timeseries_file, def = def,
              frames_per_set = frames_per_set,
-             tau = tau, thresh = thresh, fail = fail, filt = filt,
+             tau = tau, thresh = thresh, filt = filt,
              s = s, offset = offset, readout_noise = readout_noise,
              gamma = gamma, parallel = parallel) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%

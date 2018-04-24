@@ -54,5 +54,5 @@ ijtiff::write_tif(img, 'a.tif')
 ijtiff::write_tif(img, 'ab.tif')
 cc_brightness_folder()
 list.files()
-file.remove(list.files())  # cleanup}
+}
 }

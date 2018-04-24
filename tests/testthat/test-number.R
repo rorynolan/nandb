@@ -59,7 +59,7 @@ test_that("number_timeseries works", {
   expect_equal(round(mean(nts, na.rm = TRUE)), 18)
   nts <- number_timeseries(img, "n", 30, tau = NA, thresh = 'tri',
                             filt = 'median', parallel = 2)
-  expect_equal(median(nts, na.rm = TRUE), -2.14, tolerance = 0.01)
+  expect_equal(median(nts, na.rm = TRUE), -2, tolerance = 2)
   expect_error(number_timeseries(img, "n", 51),
                paste("You have selected 51 frames per set,",
                      "but there are only 50 frames in total"))

@@ -142,6 +142,7 @@ cc_number <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
 #' cc_nts <- cc_number_timeseries(img, 10, thresh = "Huang",
 #'                                filt = 'median', parallel = 2)
 #' ijtiff::display(cc_nts[, , 1, 1])
+#'
 #' @export
 cc_number_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
                                   tau = NA, thresh = NULL, filt = NULL,

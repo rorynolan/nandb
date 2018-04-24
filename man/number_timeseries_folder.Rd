@@ -5,8 +5,8 @@
 \title{Number time-series calculations for every image in a folder.}
 \usage{
 number_timeseries_folder(folder_path = ".", def, frames_per_set, tau = NULL,
-  thresh = NULL, fail = NA, filt = NULL, s = 1, offset = 0,
-  readout_noise = 0, gamma = 1, parallel = FALSE)
+  thresh = NULL, filt = NULL, s = 1, offset = 0, readout_noise = 0,
+  gamma = 1, parallel = FALSE)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to
@@ -25,9 +25,6 @@ Default is no detrending.}
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
 detrending and number calculations.}
-
-\item{fail}{If thresholding is done, to which value should pixels not
-exceeding the threshold be set?}
 
 \item{filt}{Do you want to smooth (\code{filt = 'mean'}) or median (\code{filt = 'median'}) filter the number image using \code{\link[=smooth_filter]{smooth_filter()}} or
 \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with a
@@ -65,13 +62,14 @@ written to the TIFF file as \code{NA}, since TIFF files cannot handle such huge
 numbers.
 }
 \examples{
+\dontrun{
 setwd(tempdir())
 img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 ijtiff::write_tif(img, 'img1.tif')
 ijtiff::write_tif(img, 'img2.tif')
 number_timeseries_folder(def = "n", tau = NA, thresh = "Huang",
                           frames_per_set = 20, parallel = 2)
-suppressWarnings(file.remove(list.files()))  # cleanup
+}
 }
 \seealso{
 \code{\link[=number_timeseries]{number_timeseries()}}
