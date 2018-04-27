@@ -26,4 +26,10 @@
 
 
 ## Archiving
+
 * This package was archived on CRAN. It took a long time to iron out the errors in the package but now it's done and the package is rewritten in a form that is more robust and can be better maintained.
+
+
+## Resubmission
+
+* I submitted this earlier today. I was told to change a CRAN URL. This is now done.

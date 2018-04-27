@@ -58,7 +58,7 @@ devtools::install_github("rorynolan/nandb")
 
 ## Use
 
-For the lowdown on how to use this package, you should read the package [vignette](https://cran.rstudio.com/web/packages/nandb/vignettes/nandb.html). Once you've installed the package, you can browse them using `vignette(package = "nandb")`.
+For the lowdown on how to use this package, you should read the package [vignette](https://cran.r-project.org/package=nandb/vignettes/nandb.html). Once you've installed the package, you can browse them using `vignette(package = "nandb")`.
 
 ## Contribution
 Contributions to this package are welcome. The preferred method of contribution is through a github pull request. Feel free to contact me by creating an issue. Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
