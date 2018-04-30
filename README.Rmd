@@ -1,7 +1,8 @@
 ---
-title: "nandb"
 output: github_document
 ---
+
+# `nandb`  <img src="junk/sticker.png" height="200" align="right">
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")

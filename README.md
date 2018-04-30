@@ -1,5 +1,5 @@
-nandb
-================
+
+# `nandb` <img src="junk/sticker.png" height="200" align="right">
 
 An R package for performing number and brightness analysis as in Digman
 et al. 2008.
