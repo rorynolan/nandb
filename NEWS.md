@@ -1,3 +1,9 @@
+### 1.0.1
+
+#### BUG FIXES
+* Fix issues on CRAN linux devel clang.
+
+
 ## 1.0.0
 
 #### NEW FEATURES
