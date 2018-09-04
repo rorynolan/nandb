@@ -5,8 +5,8 @@
 \title{Calculate number from image series.}
 \usage{
 number(img, def, tau = NULL, thresh = NULL, filt = NULL,
-  correct = FALSE, s = 1, offset = 0, readout_noise = 0, gamma = 1,
-  parallel = FALSE)
+  correct = FALSE, s = 1, offset = 0, readout_noise = 0,
+  gamma = 1, parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the

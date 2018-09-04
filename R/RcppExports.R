@@ -18,17 +18,17 @@ float_max <- function() {
 #' These are alternatives to
 #' `EBImage::filter2()` and `EBImage::medianFilter()` for
 #' smooth and median filtering respectively. These functions have many options
-#' for dealing with \code{NA} values which \code{EBImage}'s functions lack.
+#' for dealing with `NA` values which `EBImage`'s functions lack.
 #'
 #' The behavior at image boundaries is such as the source image has been padded
 #' with pixels whose values equal the nearest border pixel value.
 #'
 #' @param mat A matrix (representing an image).
 #' @param size An integer; the median filter radius.
-#' @param na_rm Should \code{NA}s be ignored?
+#' @param na_rm Should `NA`s be ignored?
 #' @param na_count If this is TRUE, in each median calculation, if the majority
-#' of arguments are \code{NA}s, \code{NA} is returned but if the \code{NA}s are
-#' in the minority, they are ignored as in \code{median(x, na.rm = TRUE)}.
+#' of arguments are `NA`s, `NA` is returned but if the `NA`s are
+#' in the minority, they are ignored as in `median(x, na.rm = TRUE)`.
 #'
 #' @return A matrix (the median filtered image).
 #'
@@ -55,5 +55,13 @@ median_filter <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
 #' @export
 smooth_filter <- function(mat, size = 1L, na_rm = FALSE, na_count = FALSE) {
     .Call(`_nandb_smooth_filter`, mat, size, na_rm, na_count)
+}
+
+which_interval_ <- function(numbers, ranges) {
+    .Call(`_nandb_which_interval_`, numbers, ranges)
+}
+
+spread_specific_helper <- function(interval_lengths, interval_pops, m) {
+    .Call(`_nandb_spread_specific_helper`, interval_lengths, interval_pops, m)
 }
 

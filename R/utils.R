@@ -304,3 +304,53 @@ deduplicate_cc_nb_filename <- function(path) {
   path
 }
 
+#' Construct the bullet point bits for `custom_stop()`.
+#'
+#' @param string The message for the bullet point.
+#'
+#' @return A string with the bullet-pointed message nicely formatted for the
+#'   console.
+#'
+#' @noRd
+custom_stop_bullet <- function(string) {
+  checkmate::assert_string(string)
+  string %<>% strwrap(width = 57)
+  string[1] %<>% {
+    glue::glue("    * {.}")
+  }
+  if (length(string) > 1) {
+    string[-1] %<>% {
+      glue::glue("      {.}")
+    }
+  }
+  glue::glue_collapse(string, sep = "\n")
+}
+
+#' Nicely formatted error message.
+#'
+#' Format an error message with bullet-pointed sub-messages with nice
+#' line-breaks.
+#'
+#' Arguments should be entered as `glue`-style strings.
+#'
+#' @param main_message The main error message.
+#' @param ... Bullet-pointed sub-messages.
+#'
+#' @noRd
+custom_stop <- function(main_message, ..., .envir = parent.frame()) {
+  checkmate::assert_string(main_message)
+  main_message %<>% glue::glue(.envir = .envir)
+  out <- strwrap(main_message, width = 63)
+  dots <- unlist(list(...))
+  if (length(dots)) {
+    if (!is.character(dots)) {
+      stop("\nThe arguments in ... must all be of character type.")
+    }
+    dots %<>% purrr::map_chr(glue::glue, .envir = .envir) %>%
+      purrr::map_chr(custom_stop_bullet)
+    out %<>% {
+      glue::glue_collapse(c(., dots), sep = "\n")
+    }
+  }
+  rlang::abort(glue::glue("{out}"))
+}

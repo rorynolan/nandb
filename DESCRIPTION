@@ -18,9 +18,9 @@ LazyData: TRUE
 LinkingTo: Rcpp
 Imports:
     Rcpp,
-    filesstrings (>= 2.2.0),
+    filesstrings (>= 2.5.0),
     magrittr,
-    autothresholdr (>= 1.2.0),
+    autothresholdr (>= 1.2.1),
     dplyr,
     stringr,
     purrr,
@@ -29,13 +29,19 @@ Imports:
     ijtiff (>= 1.1.0),
     rlang,
     stats,
-    MASS
-RoxygenNote: 6.0.1
+    MASS,
+    reshape2,
+    viridis,
+    glue,
+    BBmisc,
+    ggplot2
+RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
-Suggests: knitr,
+Suggests: 
+    knitr,
     rmarkdown,
     covr,
     testthat,
-    tidyverse,
     abind
 VignetteBuilder: knitr
+Encoding: UTF-8

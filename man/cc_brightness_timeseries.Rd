@@ -4,8 +4,8 @@
 \alias{cc_brightness_timeseries}
 \title{Create a cross-correlated brightness time-series.}
 \usage{
-cc_brightness_timeseries(img, frames_per_set, ch1 = 1, ch2 = 2, tau = NA,
-  thresh = NULL, filt = NULL, parallel = FALSE)
+cc_brightness_timeseries(img, frames_per_set, ch1 = 1, ch2 = 2,
+  tau = NA, thresh = NULL, filt = NULL, parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array in the style of an

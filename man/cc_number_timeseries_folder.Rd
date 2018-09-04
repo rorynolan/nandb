@@ -6,7 +6,8 @@
 folder.}
 \usage{
 cc_number_timeseries_folder(folder_path = ".", frames_per_set, ch1 = 1,
-  ch2 = 2, tau = NULL, thresh = NULL, filt = NULL, parallel = FALSE)
+  ch2 = 2, tau = NULL, thresh = NULL, filt = NULL,
+  parallel = FALSE)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to

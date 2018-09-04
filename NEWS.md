@@ -1,3 +1,9 @@
+### 1.1.0
+
+#### NEW FEATURES
+* `matrix_raster_plot()` is back. I thought it didn't really fit but a user said they missed when it was gone so it's back now.
+
+
 ### 1.0.1
 
 #### BUG FIXES

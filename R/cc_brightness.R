@@ -14,7 +14,7 @@
 #'   `tau`. If this is set to `'auto'`, then the value of `tau` is calculated
 #'   automatically via [detrendr::best_tau()]. If specified with length 1, that
 #'   parameter is used to detrend both channels. If specified with length 2,
-#'   \code{tau[[1]]} is used to detrend `ch1` and \code{tau[[2]]} is used to
+#'   `tau[[1]]` is used to detrend `ch1` and `tau[[2]]` is used to
 #'   detrend `ch2`.
 #' @param thresh Do you want to apply an intensity threshold prior to
 #'   calculating `cc_brightness` (via [autothresholdr::mean_stack_thresh()])? If

@@ -17,7 +17,7 @@ set.seed(1)
 ### Loading the libraries
 
 ```{r load library, include=FALSE}
-required <- c("nandb", "tidyverse")
+required <- c("nandb", "dplyr", "ggplot2")
 lapply(required, library, character.only = TRUE)
 ```
 
