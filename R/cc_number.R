@@ -145,6 +145,7 @@ cc_number <- function(img, ch1 = 1, ch2 = 2,
 #'
 #' @inheritParams cc_number
 #' @inheritParams number
+#' @inheritParams number_timeseries
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th cross-correlated
 #'   number image.
@@ -376,6 +377,7 @@ cc_number_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
 #' @inheritParams cc_number
 #' @inheritParams cc_number_timeseries
 #' @inheritParams number_folder
+#' @inheritParams number_timeseries
 #'
 #' @seealso [cc_number_timeseries()]
 #'

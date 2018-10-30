@@ -144,7 +144,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
 #' the sectioning is done for calculation of cross-correlated brightnesses.
 #'
 #' @inheritParams cc_brightness
-#' @inheritParams detrendr::img_detrend_exp
+#' @inheritParams number_timeseries
 #'
 #' @return An array where the \eqn{i}th slice is the \eqn{i}th cross-correlated
 #'   brightness image.
@@ -380,6 +380,7 @@ cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
 #' @inheritParams cc_brightness
 #' @inheritParams cc_brightness_timeseries
 #' @inheritParams number_folder
+#' @inheritParams number_timeseries
 #'
 #' @seealso [cc_brightness_timeseries()]
 #'

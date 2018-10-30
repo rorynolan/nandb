@@ -21,6 +21,12 @@ This may discard some images, for example if 175 frames are in the input and
 thresholding are selected, they are performed on the whole image stack before
 the sectioning is done for calculation of cross-correlated brightnesses.}
 
+\item{overlap}{A boolean. If \code{TRUE}, the windows used to calculate brightness
+are overlapped, if \code{FALSE}, they are not. For example, for a 20-frame image
+series with 5 frames per set, if the windows are not overlapped, then the
+frame sets used are 1-5, 6-10, 11-15 and 16-20; whereas if they are
+overlapped, the frame sets are 1-5, 2-6, 3-7, 4-8 and so on up to 16-20.}
+
 \item{ch1}{A natural number. The index of the first channel to use.}
 
 \item{ch2}{A natural number. The index of the second channel to use.}

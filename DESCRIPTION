@@ -54,6 +54,7 @@ Suggests:
     tidyr,
     mgcv,
     gridExtra,
-    pacman
+    pacman,
+    matrixStats
 VignetteBuilder: knitr
 Encoding: UTF-8
