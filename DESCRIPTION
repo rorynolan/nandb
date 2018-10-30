@@ -53,6 +53,7 @@ Suggests:
     styler,
     tidyr,
     mgcv,
-    gridExtra
+    gridExtra,
+    pacman
 VignetteBuilder: knitr
 Encoding: UTF-8
