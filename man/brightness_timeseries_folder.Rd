@@ -5,8 +5,9 @@
 \title{Brightness time-series calculations for every image in a folder.}
 \usage{
 brightness_timeseries_folder(folder_path = ".", def, frames_per_set,
-  tau = NULL, thresh = NULL, filt = NULL, correct = FALSE, s = 1,
-  offset = 0, readout_noise = 0, parallel = FALSE)
+  overlap = FALSE, thresh = NULL, detrend = FALSE, quick = FALSE,
+  filt = NULL, s = 1, offset = 0, readout_noise = 0,
+  parallel = FALSE)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to
@@ -16,22 +17,27 @@ process.}
 \code{"B"} or \code{"epsilon"}?}
 
 \item{frames_per_set}{The number of frames with which to calculate the
-successive brightnesses.
+successive brightnesses.}
 
-This may discard some images, for example if 175 frames are in the input and
-\code{frames_per_set = 50}, then the last 25 are discarded. If bleaching
-correction is selected, it is performed on the whole image stack before the
-sectioning is done for calculation of numbers.}
-
-\item{tau}{The \eqn{tau} parameter for \emph{exponential filtering} detrending.
-This must be a positive number. Set this to "auto" to use Nolan's algorithm
-to automatically find a suitable value for this parameter (recommended).
-For multi-channel images, it is possible to have a different \code{tau} for each
-channel by specifying \code{tau} as a vector or list.}
+\item{overlap}{A boolean. If \code{TRUE}, the windows used to calculate number are
+overlapped, if \code{FALSE}, they are not. For example, for a 20-frame image
+series with 5 frames per set, if the windows are not overlapped, then the
+frame sets used are 1-5, 6-10, 11-15 and 16-20; whereas if they are
+overlapped, the frame sets are 1-5, 2-6, 3-7, 4-8 and so on up to 16-20.}
 
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
 detrending and brightness calculations.}
+
+\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+the best known detrending method for brightness analysis. For more
+fine-grained control over your detrending, use the \code{detrendr} package. If
+there are many channels, this may be specified as a vector, one element for
+each channel.}
+
+\item{quick}{If \code{FALSE} (the default), the swap finding routine is run
+several times to get a consensus for the best parameter. If \code{TRUE}, the
+swap finding routine is run only once.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'mean'}) or median (\code{filt = 'median'}) filter the number image using \code{\link[=smooth_filter]{smooth_filter()}} or
 \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with a
@@ -39,14 +45,10 @@ filter radius of 1 (with corners included, so each median is the median of
 9 elements) and with the option \code{na_count = TRUE}. If you want to
 smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
-perform your desired filtering routine on the result.}
+perform your desired filtering routine on the result. If there are many
+channels, this may be specified as a vector, one element for each channel.}
 
-\item{correct}{Apply the number/brightness correction detailed in equation 7
-of Hur et al. (2014). This is another correction for the effects of
-bleaching and is needed in addition to the more conventional correction
-controlled by the \code{tau} parameter.}
-
-\item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
+\item{s}{A positive number. The \eqn{S}-factor of microscope acquisition.}
 
 \item{offset}{Microscope acquisition parameters. See reference
 Dalal et al.}
@@ -68,8 +70,7 @@ setwd(tempdir())
 img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 ijtiff::write_tif(img, 'img1.tif')
 ijtiff::write_tif(img, 'img2.tif')
-brightness_timeseries_folder(def = "e", tau = NA, thresh = "Huang",
-                              frames_per_set = 20, parallel = 2)
+brightness_timeseries_folder(def = "e", thresh = "tri", frames_per_set = 20)
 }
 }
 \seealso{

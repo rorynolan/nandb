@@ -6,9 +6,9 @@
 \alias{brightness_img}
 \title{Number and brightness image classes.}
 \usage{
-number_img(img, def, thresh, tau, filt)
+number_img(img, def, thresh, swaps, filt)
 
-brightness_img(img, def, thresh, tau, filt)
+brightness_img(img, def, thresh, swaps, filt)
 }
 \arguments{
 \item{img}{The calculated number or brightness image.}
@@ -21,10 +21,10 @@ thresholds, this argument may be specified as a vector or list (of positive
 integers, possibly objects of class \link[autothresholdr:th]{autothresholdr::th}), one element for
 each channel.}
 
-\item{tau}{A positive number with an attribute \code{auto}. If the different
-channels of the image had different \code{tau}s, this argument may be specified
-as a list (of positive numbers with attributes \code{auto}), one element for
-each channel.}
+\item{swaps}{A non-negative integer with an attribute \code{auto}. If the
+different channels of the image had different \code{swaps}, this argument may be
+specified as a list (of non-negative integers with attributes \code{auto}), one
+element for each channel. For undetrended images, set \code{swaps = NA}.}
 
 \item{filt}{A string, the filtering method used. Must be either \code{"mean"} or
 \code{"median"}, or \code{NA} for no filtering. If the different channels of the
@@ -46,9 +46,9 @@ we using the \code{"N"} or \code{"n"} definition of number, or the \code{"B"} or
 definition of brightness?} \item{\code{thresh}}{A positive integer, possibly an
 object of class \link[autothresholdr:th]{autothresholdr::th} detailing which threshold and
 thresholding method was used in preprocessing (in the multi-channel case, one
-threshold per channel is given).} \item{\code{tau}}{A positive number indicating
-the tau parameter used for detrending with an attribute \code{auto} which is a
-logical indicating whether or not the tau parameter was chosen
-automatically.}\item{\code{filt}}{Was mean or median filtering used in
-postprocessing?}}
+threshold per channel is given).} \item{\code{swaps}}{A non-negative integer
+indicating the number of swaps Robin Hood detrending, with an attribute \code{auto}
+which is a logical indicating whether or not the parameter was chosen
+automatically (in the multi-channel case, one threshold per channel is
+given).}\item{\code{filt}}{Was mean or median filtering used in postprocessing?}}
 }

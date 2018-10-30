@@ -6,9 +6,10 @@
 \alias{brightness_ts_img}
 \title{Number and brightness time series image classes.}
 \usage{
-number_ts_img(img, def, frames_per_set, thresh, tau, filt)
+number_ts_img(img, def, frames_per_set, overlapped, thresh, swaps, filt)
 
-brightness_ts_img(img, def, frames_per_set, thresh, tau, filt)
+brightness_ts_img(img, def, frames_per_set, overlapped, thresh, swaps,
+  filt)
 }
 \arguments{
 \item{img}{The calculated number or brightness time series image series.}
@@ -18,16 +19,20 @@ brightness_ts_img(img, def, frames_per_set, thresh, tau, filt)
 \item{frames_per_set}{The number of frames used in the calculation of each
 point in the number or brightness time series.}
 
+\item{overlapped}{A boolean. \code{TRUE} indicates that the windows used to
+calculate consecutive brightnesses over time were overlapped, \code{FALSE}
+indicates that they were not.}
+
 \item{thresh}{A positive integer, possibly an object of class
 \link[autothresholdr:th]{autothresholdr::th}. If the different channels of the image had different
 thresholds, this argument may be specified as a vector or list (of positive
 integers, possibly objects of class \link[autothresholdr:th]{autothresholdr::th}), one element for
 each channel.}
 
-\item{tau}{A positive number with an attribute \code{auto}. If the different
-channels of the image had different \code{tau}s, this argument may be specified
-as a list (of positive numbers with attributes \code{auto}), one element for
-each channel.}
+\item{swaps}{A non-negative integer with an attribute \code{auto}. If the
+different channels of the image had different \code{swaps}, this argument may be
+specified as a list (of non-negative integers with attributes \code{auto}), one
+element for each channel. For undetrended images, set \code{swaps = NA}.}
 
 \item{filt}{A string, the filtering method used. Must be either \code{"mean"} or
 \code{"median"}, or \code{NA} for no filtering. If the different channels of the
@@ -49,13 +54,15 @@ An object of class \code{number_ts_img} or \code{brightness_ts_img} is a 3- or
 or the \code{"B"} or \code{"epsilon"} definition of brightness?} \item{\code{thresh}}{A
 positive integer, possibly an object of class \link[autothresholdr:th]{autothresholdr::th} detailing
 which threshold and thresholding method was used in preprocessing (in the
-multi-channel case, one threshold per channel is given).} \item{\code{tau}}{A
-positive number indicating the tau parameter used for detrending with an
-attribute \code{auto} which is a logical indicating whether or not the tau
-parameter was chosen automatically (in the multi-channel case, one \code{tau} per
-channel is given).} \item{\code{frames_per_set}}{A positive integer detailing how
-many frames were used in the calculation of each point in the number or
-brightness time series.}}
+multi-channel case, one threshold per channel is given).} \item{\code{swaps}}{A
+non-negative integer indicating the number of swaps used for Robin Hood
+detrending, with an attribute \code{auto} which is a logical indicating whether or
+not the parameter was chosen automatically (in the multi-channel case, one
+\code{swaps} per channel is given).} \item{\code{frames_per_set}}{A positive integer
+detailing how many frames were used in the calculation of each point in the
+number or brightness time series.} \item{\code{overlapped}}{A boolean. \code{TRUE}
+indicates that the windows used to calculate consecutive brightnesses over
+time were overlapped, \code{FALSE} indicates that they were not.}}
 }
 \seealso{
 \code{\link[=number_timeseries]{number_timeseries()}}, \code{\link[=brightness_timeseries]{brightness_timeseries()}}.

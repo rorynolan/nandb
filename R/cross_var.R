@@ -21,9 +21,10 @@ cross_var <- function(x, y) {
   checkmate::assert_numeric(x)
   checkmate::assert_numeric(y)
   if (length(x) != length(y)) {
-    stop("`x` and `y` must have the same length. ", "\n",
-         "    * Your `x` is of length ", length(x),
-         " and your `y` is of length ", length(y), ".")
+    custom_stop(
+      "`x` and `y` must have the same length. ",
+      "Your `x` is of length {length(x)} and your `y` is of length {length(y)}."
+    )
   }
   cross_var_Cpp(x, y)
 }
@@ -50,9 +51,13 @@ cross_var_pillars <- function(x, y) {
   checkmate::assert_array(x, d = 3)
   checkmate::assert_array(y, d = 3)
   if (!filesstrings::all_equal(dim(x), dim(y))) {
-    stop("`x` and `y` must have the same dimensions. ", "\n",
-         "    * You have `x` with dimension [", toString(dim(x)), "] and ",
-         "`y` with dimension [", toString(dim(y)), "].")
+    custom_stop(
+      "`x` and `y` must have the same dimensions. ",
+      "
+      You have `x` with dimension `c({toString(dim(x))})` and
+      `y` with dimension `c({toString(dim(y))})`.
+      "
+    )
   }
   cross_var_pillars_Cpp(x, y)
 }

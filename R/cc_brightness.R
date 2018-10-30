@@ -3,35 +3,29 @@
 #' Given a time stack of images  and two channels, calculate the
 #' cross-correlated brightness of those two channels for each pixel.
 #'
-#' @param img A 4-dimensional array in the style of an
-#'   [ijtiff_img][ijtiff::ijtiff_img] (indexed by `img[y, x, channel, time]`).
-#'   To perform this on a file that has not yet been read in, set this argument
-#'   to the path to that file (a string).
+#' @inheritParams number
 #' @param ch1 A natural number. The index of the first channel to use.
 #' @param ch2 A natural number. The index of the second channel to use.
-#' @param tau A vector of length 1 or 2. If this is specified, bleaching
-#'   correction is performed with [detrendr::img_detrend_exp()] with parameter
-#'   `tau`. If this is set to `'auto'`, then the value of `tau` is calculated
-#'   automatically via [detrendr::best_tau()]. If specified with length 1, that
-#'   parameter is used to detrend both channels. If specified with length 2,
-#'   `tau[[1]]` is used to detrend `ch1` and `tau[[2]]` is used to
-#'   detrend `ch2`.
 #' @param thresh Do you want to apply an intensity threshold prior to
-#'   calculating `cc_brightness` (via [autothresholdr::mean_stack_thresh()])? If
-#'   so, set your thresholding method here. If this is a single value, that same
-#'   threshold will be applied to both channels. If this is a  length-2 vector,
-#'   then these two thresholds will be applied to channels 1 and 2 respectively.
-#'   A value of `NA` for either channel gives no thresholding for that channel.
+#'   calculating cross-correlated brightness (via
+#'   [autothresholdr::mean_stack_thresh()])? If so, set your thresholding method
+#'   here. If this is a single value, that same threshold will be applied to
+#'   both channels. If this is a length-2 vector or list, then these two
+#'   thresholds will be applied to channels 1 and 2 respectively. A value of
+#'   `NA` for either channel gives no thresholding for that channel.
+#' @param detrend Detrend your data with [detrendr::img_detrend_rh()]. This is
+#'   the best known detrending method for brightness analysis. For more
+#'   fine-grained control over your detrending, use the `detrendr` package. To
+#'   detrend one channel and not the other, specify this as a length 2 vector.
 #' @param filt Do you want to smooth (`filt = 'smooth'`) or median (`filt =
 #'   'median'`) filter the cross-correlated brightness image using
-#'   [smooth_filter()] or [median_filter()] respectively? If
-#'   selected, these are invoked here with a filter radius of 1 and with the
-#'   option `na_count = TRUE`. A value of `NA` for either channel gives no
-#'   thresholding for that channel. If you want to smooth/median filter the
-#'   cross-correlated brightness image in a different way, first calculate the
-#'   cross-correlated brightnesses without filtering (`filt = NULL`) using this
-#'   function and then perform your desired filtering routine on the result.
-#' @inheritParams detrendr::img_detrend_exp
+#'   [smooth_filter()] or [median_filter()] respectively? If selected, these are
+#'   invoked here with a filter radius of 1 and with the option `na_count =
+#'   TRUE`. A value of `NA` for either channel gives no thresholding for that
+#'   channel. If you want to smooth/median filter the cross-correlated
+#'   brightness image in a different way, first calculate the cross-correlated
+#'   brightnesses without filtering (`filt = NULL`) using this function and then
+#'   perform your desired filtering routine on the result.
 #'
 #' @return A numeric matrix, the cross-correlated brightness image.
 #'
@@ -43,21 +37,46 @@
 #' b <- brightness(img, def = "e", thresh = "Huang", filt = "median")
 #' ijtiff::display(b[, , 1, 1])
 #' ijtiff::display(b[, , 2, 1])
-#' cc_b <- cc_brightness(img, tau = "auto", thresh = "Huang")
+#' cc_b <- cc_brightness(img, thresh = "Huang")
 #' ijtiff::display(cc_b[, , 1, 1])
 #' @export
-cc_brightness <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
+cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
+                          detrend = FALSE, quick = FALSE,
                           filt = NULL, parallel = FALSE) {
   checkmate::assert_int(ch1, lower = 1)
   checkmate::assert_int(ch2, lower = 1)
-  tau %<>% prepare_tau()
+  checkmate::assert_logical(detrend, min.len = 1, max.len = 2)
+  if (length(detrend) == 1) detrend %<>% rep(2)
   thresh %<>% prepare_thresh()
   filt %<>% prepare_filt()
   img %<>% nb_get_img()
   checkmate::assert_array(img, d = 4)
+  for (i in c(ch1, ch2)) {
+    if (i > dim(img)[3]) {
+      s <- dplyr::if_else(dim(img)[3] == 1, "", "s")
+      custom_stop("
+                  You have requested to use channel {i}, but your image has
+                  only {dim(img)[3]} channel{s} in total.
+                  ", "
+                  This is not possible. Please retry with valid channel numbers.
+                  ")
+    }
+    }
   ch1 <- img[, , ch1, ]
   ch2 <- img[, , ch2, ]
   thresh_atts <- as.list(rep(NA, 2))
+  swaps_atts <- extend_for_all_chs(
+    rlang::set_attrs(NA, auto = FALSE),
+    2
+  )
+  if (all(is.na(ch1))) {
+    custom_stop("The first channel is all NAs.",
+                "Can't compute on an array of all NAs.")
+  }
+  if (all(is.na(ch2))) {
+    custom_stop("The second channel is all NAs.",
+                "Can't compute on an array of all NAs.")
+  }
   if (!is.na(thresh[[1]])) {
     ch1 %<>% autothresholdr::mean_stack_thresh(thresh[[1]])
     thresh_atts[[1]] <- attr(ch1, "thresh")
@@ -66,36 +85,33 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
     ch2 %<>% autothresholdr::mean_stack_thresh(thresh[[2]])
     thresh_atts[[2]] <- attr(ch2, "thresh")
   }
-  if (all(is.na(ch1))) stop("After thresholding, the first channel is all NAs.")
-  if (all(is.na(ch2)))
-    stop("After thresholding, the second channel is all NAs.")
-  tau_auto <- rep(FALSE, 2)
-  if (is.character(tau)) tau_auto <- purrr::map_lgl(startsWith("auto", tau),
-                                                    isTRUE)
-  if (!all(is.na(unlist(tau)))) {
-    for (i in 1:2) {
-      if (is.character(tau[[i]])) {
-        tau[[i]] %<>% tolower()
-        if (startsWith("auto", tau[[i]])) {
-          tau[[i]] <- "auto"
-          if (i == 1) {
-            img_i <- ch1
-          } else {
-            img_i <- ch2
-          }
-          tau[[i]] <- detrendr::best_tau(img_i, purpose = "fcs",
-                                         parallel = parallel)
-          tau_auto[[i]] <- TRUE
-        }
-      } else if ((!is.numeric(tau[[i]])) && (!is.na(tau[[i]]))) {
-        stop("If `tau` is not numeric, then it must be NA or 'auto'.", "\n",
-             "    * You have `tau = ", tau[[i]], "`.")
-      }
-    }
-    ch1 %<>% detrendr::img_detrend_exp(tau[[1]], purpose = "ffs",
-                                       parallel = parallel)
-    ch2 %<>% detrendr::img_detrend_exp(tau[[2]], purpose = "ffs",
-                                       parallel = parallel)
+  if (all(is.na(ch1))) {
+    custom_stop("
+                After thresholding, the first channel is all NAs.
+                ", "
+                Can't compute on an array of all NAs.
+                ", "
+                You need to choose a less severe threshold for this channel.
+                ")
+  }
+  if (all(is.na(ch2))) {
+    custom_stop("
+                After thresholding, the second channel is all NAs.
+                ", "
+                Can't compute on an array of all NAs.
+                ", "
+                You need to choose a less severe threshold for this channel.
+                ")
+  }
+  if (detrend[[1]]) {
+    ch1 %<>% detrendr::img_detrend_rh(quick = quick)
+    swaps_atts[[1]] <- attr(ch1, "parameter")
+    attr(swaps_atts[[1]], "auto") <- attr(ch1, "auto")
+  }
+  if (detrend[[2]]) {
+    ch2 %<>% detrendr::img_detrend_rh(quick = quick)
+    swaps_atts[[2]] <- attr(ch2, "parameter")
+    attr(swaps_atts[[2]], "auto") <- attr(ch2, "auto")
   }
   if (length(dim(ch1)) == 4) ch1 <- ch1[, , 1, ]
   if (length(dim(ch2)) == 4) ch2 <- ch2[, , 1, ]
@@ -109,9 +125,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
       cc_b %<>% smooth_filter(na_count = TRUE)
     }
   }
-  tau %<>% unlist()
-  attr(tau, "auto") <- tau_auto
-  cc_brightness_img(cc_b, thresh = thresh_atts, tau = tau, filt = filt)
+  cc_brightness_img(cc_b, thresh = thresh_atts, swaps = swaps_atts, filt = filt)
 }
 
 #' Create a cross-correlated brightness time-series.
@@ -143,23 +157,47 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
 #'                                     filt = 'median', parallel = 2)
 #' ijtiff::display(cc_bts[, , 1, 1])
 #' @export
-cc_brightness_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
-                                      tau = NA, thresh = NULL, filt = NULL,
-                                      parallel = FALSE) {
+cc_brightness_timeseries <- function(img, frames_per_set,
+                                     overlap = FALSE,
+                                     ch1 = 1, ch2 = 2,
+                                     thresh = NULL,
+                                     detrend = FALSE, quick = FALSE,
+                                     filt = NULL,
+                                     parallel = FALSE) {
+
   checkmate::assert_int(ch1, lower = 1)
   checkmate::assert_int(ch2, lower = 1)
-  tau %<>% prepare_tau()
+  checkmate::assert_logical(detrend, min.len = 1, max.len = 2)
+  checkmate::assert_flag(overlap)
+  if (length(detrend) == 1) detrend %<>% rep(2)
   thresh %<>% prepare_thresh()
   filt %<>% prepare_filt()
-  img %<>% nb_get_img()
+  if (is.character(img)) img %<>% ijtiff::read_tif()
   checkmate::assert_array(img, d = 4)
   if (dim(img)[4] < frames_per_set) {
-    stop("You have selected ", frames_per_set, " frames per set, but there ",
-         "are only ", dim(img)[4], " frames in total.")
+    custom_stop("
+        You have selected {frames_per_set} frames per set,
+                but there are only {dim(img)[4]}, frames in total.
+                ", "
+                Please select less than {dim(img)[4]} frames per set.
+                "
+    )
   }
   ch1 <- img[, , ch1, ]
   ch2 <- img[, , ch2, ]
   thresh_atts <- as.list(rep(NA, 2))
+  swaps_atts <- extend_for_all_chs(
+    rlang::set_attrs(NA, auto = FALSE),
+    2
+  )
+  if (all(is.na(ch1))) {
+    custom_stop("The first channel is all NAs.",
+                "Can't compute on an array of all NAs.")
+  }
+  if (all(is.na(ch2))) {
+    custom_stop("The second channel is all NAs.",
+                "Can't compute on an array of all NAs.")
+  }
   if (!is.na(thresh[[1]])) {
     ch1 %<>% autothresholdr::mean_stack_thresh(thresh[[1]])
     thresh_atts[[1]] <- attr(ch1, "thresh")
@@ -168,48 +206,58 @@ cc_brightness_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
     ch2 %<>% autothresholdr::mean_stack_thresh(thresh[[2]])
     thresh_atts[[2]] <- attr(ch2, "thresh")
   }
-  if (all(is.na(ch1))) stop("After thresholding, the first channel is all NAs.")
-  if (all(is.na(ch2)))
-    stop("After thresholding, the second channel is all NAs.")
-  tau_auto <- rep(FALSE, 2)
-  if (is.character(tau)) tau_auto <- purrr::map_lgl(startsWith("auto", tau),
-                                                    isTRUE)
-  if (!all(is.na(unlist(tau)))) {
-    for (i in 1:2) {
-      if (is.character(tau[[i]])) {
-        tau[[i]] %<>% tolower()
-        if (startsWith("auto", tau[[i]])) {
-          tau[[i]] <- "auto"
-          if (i == 1) {
-            img_i <- ch1
-          } else {
-            img_i <- ch2
-          }
-          tau[[i]] <- detrendr::best_tau(img_i, purpose = "ffs",
-                                         parallel = parallel)
-          tau_auto[[i]] <- TRUE
-        }
-      } else if ((!is.numeric(tau[[i]])) && (!is.na(tau[[i]]))) {
-        stop("If `tau` is not numeric, then it must be NA or 'auto'.", "\n",
-             "    * You have `tau = ", tau[[i]], "`.")
-      }
-    }
-    ch1 %<>% detrendr::img_detrend_exp(tau[[1]], purpose = "ffs",
-                                       parallel = parallel)
-    ch2 %<>% detrendr::img_detrend_exp(tau[[2]], purpose = "ffs",
-                                       parallel = parallel)
+  if (all(is.na(ch1))) {
+    custom_stop("
+                After thresholding, the first channel is all NAs.
+                ", "
+                Can't compute on an array of all NAs.
+                ", "
+                You need to choose a less severe threshold for this channel.
+                ")
+  }
+  if (all(is.na(ch2))) {
+    custom_stop("
+                After thresholding, the second channel is all NAs.
+                ", "
+                Can't compute on an array of all NAs.
+                ", "
+                You need to choose a less severe threshold for this channel.
+                ")
+  }
+  if (detrend[[1]]) {
+    ch1 %<>% detrendr::img_detrend_rh(quick = quick)
+    swaps_atts[[1]] <- attr(ch1, "parameter")
+    attr(swaps_atts[[1]], "auto") <- attr(ch1, "auto")
+  }
+  if (detrend[[2]]) {
+    ch2 %<>% detrendr::img_detrend_rh(quick = quick)
+    swaps_atts[[2]] <- attr(ch2, "parameter")
+    attr(swaps_atts[[2]], "auto") <- attr(ch2, "auto")
   }
   if (length(dim(ch1)) == 4) ch1 <- ch1[, , 1, ]
   if (length(dim(ch2)) == 4) ch2 <- ch2[, , 1, ]
-  n_sets <- dim(ch1)[3] %/% frames_per_set
-  cc_b_ts <- array(0, dim = c(dim(ch1)[1:2], n_sets))
-  for (i in seq_len(n_sets)) {
-    indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
-    ch1_i <- ch1[, , indices_i]
-    ch2_i <- ch2[, , indices_i]
-    cc_b_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
-      ((sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
-               detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
+  if (overlap) {
+    n_sets <- dim(ch1)[3] - frames_per_set + 1
+    cc_b_ts <- array(0, dim = c(dim(ch1)[1:2], n_sets))
+    for (i in seq_len(n_sets)) {
+      indices_i <- seq(i, i + frames_per_set - 1)
+      ch1_i <- ch1[, , indices_i]
+      ch2_i <- ch2[, , indices_i]
+      cc_b_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
+        ((sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
+                 detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
+    }
+  } else {
+    n_sets <- dim(ch1)[3] %/% frames_per_set
+    cc_b_ts <- array(0, dim = c(dim(ch1)[1:2], n_sets))
+    for (i in seq_len(n_sets)) {
+      indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
+      ch1_i <- ch1[, , indices_i]
+      ch2_i <- ch2[, , indices_i]
+      cc_b_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
+        ((sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
+                 detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
+    }
   }
   if (!is.na(filt)) {
     if (filt == "median") {
@@ -222,14 +270,16 @@ cc_brightness_timeseries <- function(img, frames_per_set, ch1 = 1, ch2 = 2,
       }
     }
   }
-  tau %<>% unlist()
-  attr(tau, "auto") <- tau_auto
-  cc_brightness_ts_img(cc_b_ts, frames_per_set = frames_per_set,
-                       thresh = thresh_atts, tau = tau, filt = filt)
+  cc_brightness_ts_img(cc_b_ts,
+    frames_per_set = frames_per_set, overlapped = overlap,
+    thresh = thresh_atts, swaps = swaps_atts, filt = filt
+  )
 }
 
 cc_brightness_file <- function(path, ch1 = 1, ch2 = 2,
-                               tau = NULL, thresh = NULL, filt = NULL,
+                               thresh = NULL,
+                               detrend = FALSE, quick = FALSE,
+                               filt = NULL,
                                parallel = FALSE) {
   checkmate::assert_file_exists(path)
   need_to_change_dir <- stringr::str_detect(path, "/")
@@ -240,9 +290,11 @@ cc_brightness_file <- function(path, ch1 = 1, ch2 = 2,
     setwd(dir)
     path %<>% filesstrings::str_after_last("/")
   }
-  cc_b <- cc_brightness(path, ch1 = ch1, ch2 = ch2, tau = tau,
-                        thresh = thresh, filt = filt,
-                        parallel = parallel)
+  cc_b <- cc_brightness(path,
+    ch1 = ch1, ch2 = ch2,
+    thresh = thresh, detrend = detrend, quick = quick, filt = filt,
+    parallel = parallel
+  )
   suppressMessages(filesstrings::create_dir("cc_brightness"))
   path %<>% filesstrings::before_last_dot() %>%
     paste0("cc_brightness", "/", ., make_cc_nb_filename_ending(cc_b)) %>%
@@ -251,9 +303,11 @@ cc_brightness_file <- function(path, ch1 = 1, ch2 = 2,
 }
 
 cc_brightness_timeseries_file <- function(path, frames_per_set,
-                                           ch1 = 1, ch2 = 2,
-                                           tau = NULL, thresh = NULL,
-                                           filt = NULL, parallel = FALSE) {
+                                          overlap = FALSE,
+                                          ch1 = 1, ch2 = 2,
+                                          thresh = NULL,
+                                          detrend = detrend, quick = quick,
+                                          filt = NULL, parallel = FALSE) {
   checkmate::assert_file_exists(path)
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
@@ -263,14 +317,20 @@ cc_brightness_timeseries_file <- function(path, frames_per_set,
     setwd(dir)
     path %<>% filesstrings::str_after_last("/")
   }
-  cc_b_ts <- cc_brightness_timeseries(path, ch1 = ch1, ch2 = ch2,
-                                       frames_per_set = frames_per_set,
-                                       tau = tau, thresh = thresh, filt = filt,
-                                       parallel = parallel)
+  cc_b_ts <- cc_brightness_timeseries(path,
+    ch1 = ch1, ch2 = ch2,
+    frames_per_set = frames_per_set, overlap = overlap,
+    thresh = thresh,
+    detrend = detrend, quick = quick,
+    filt = filt,
+    parallel = parallel
+  )
   suppressMessages(filesstrings::create_dir("cc_brightness_timeseries"))
   path %<>% filesstrings::before_last_dot() %>%
-    paste0("cc_brightness_timeseries", "/", .,
-           make_cc_nb_filename_ending(cc_b_ts)) %>%
+    paste0(
+      "cc_brightness_timeseries", "/", .,
+      make_cc_nb_filename_ending(cc_b_ts)
+    ) %>%
     deduplicate_cc_nb_filename()
   ijtiff::write_tif(cc_b_ts, path)
 }
@@ -294,15 +354,19 @@ cc_brightness_timeseries_file <- function(path, frames_per_set,
 #' }
 #' @export
 cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
-                                 tau = NULL, thresh = NULL,
+                                 thresh = NULL,
+                                 detrend = detrend, quick = quick,
                                  filt = NULL, parallel = FALSE) {
   init_dir <- getwd()
   on.exit(setwd(init_dir))
   setwd(folder_path)
   file_names <- dir(pattern = "\\.tiff*$")
-  purrr::map(file_names, cc_brightness_file, ch1 = ch1, ch2 = ch2,
-             tau = tau, thresh = thresh,
-             filt = filt, parallel = parallel) %>%
+  purrr::map(file_names, cc_brightness_file,
+    ch1 = ch1, ch2 = ch2,
+    thresh = thresh,
+    detrend = detrend, quick = quick,
+    filt = filt, parallel = parallel
+  ) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
     invisible()
 }
@@ -330,18 +394,22 @@ cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
 #'
 #' @export
 cc_brightness_timeseries_folder <- function(folder_path = ".", frames_per_set,
-                                             ch1 = 1, ch2 = 2,
-                                             tau = NULL, thresh = NULL,
-                                             filt = NULL,
-                                             parallel = FALSE) {
+                                            overlap = FALSE,
+                                            ch1 = 1, ch2 = 2,
+                                            thresh = NULL,
+                                            detrend = detrend, quick = quick,
+                                            filt = NULL,
+                                            parallel = FALSE) {
   init_dir <- getwd()
   on.exit(setwd(init_dir))
   setwd(folder_path)
   file_names <- dir(pattern = "\\.tiff*$")
-  purrr::map(file_names, cc_brightness_timeseries_file, ch1 = ch1, ch2 = ch2,
-             frames_per_set = frames_per_set, tau = tau, thresh = thresh,
-             filt = filt, parallel = parallel) %>%
+  purrr::map(file_names, cc_brightness_timeseries_file,
+    ch1 = ch1, ch2 = ch2,
+    frames_per_set = frames_per_set, overlap = overlap, thresh = thresh,
+    detrend = detrend, quick = quick,
+    filt = filt, parallel = parallel
+  ) %>%
     magrittr::set_names(filesstrings::before_last_dot(file_names)) %>%
     invisible()
 }
-

@@ -3,11 +3,18 @@
 language: R
 sudo: true
 cache: packages
+
+apt_packages:
+  - libtiff4-dev
+
+r_github_packages:
+  - rorynolan/strex
+  - rorynolan/filesstrings
+  - ropensci/ijtiff
+  - rorynolan/autothresholdr
+  - mllg/checkmate
+  - rorynolan/detrendr
+
 after_success:
   - travis_wait 30 Rscript -e 'covr::codecov(line_exclusions = "R/nandb.R")'
-apt_packages:
-  - libssl-dev
-  - libtiff4-dev
-  - libfftw3-dev
-  - libcurl4-openssl-dev
-  - libxml2-dev
+

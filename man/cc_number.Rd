@@ -4,42 +4,42 @@
 \alias{cc_number}
 \title{Cross-correlated number.}
 \usage{
-cc_number(img, ch1 = 1, ch2 = 2, tau = NULL, thresh = NULL,
-  filt = NULL, parallel = FALSE)
+cc_number(img, ch1 = 1, ch2 = 2, thresh = NULL, detrend = FALSE,
+  quick = FALSE, filt = NULL, parallel = FALSE)
 }
 \arguments{
-\item{img}{A 4-dimensional array in the style of an
-\link[ijtiff:ijtiff_img]{ijtiff_img} (indexed by \code{img[y, x, channel, time]}).
-To perform this on a file that has not yet been read in, set this argument
-to the path to that file (a string).}
+\item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
+calculation on. To perform this on a file that has not yet been read in,
+set this argument to the path to that file (a string).}
 
 \item{ch1}{A natural number. The index of the first channel to use.}
 
 \item{ch2}{A natural number. The index of the second channel to use.}
 
-\item{tau}{A vector of length 1 or 2. If this is specified, bleaching
-correction is performed with \code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}} with parameter
-\code{tau}. If this is set to \code{'auto'}, then the value of \code{tau} is calculated
-automatically via \code{\link[detrendr:best_tau]{detrendr::best_tau()}}. If specified with length 1, that
-parameter is used to detrend both channels. If specified with length 2,
-\code{tau[[1]]} is used to detrend \code{ch1} and \code{tau[[2]]} is used to
-detrend \code{ch2}.}
-
 \item{thresh}{Do you want to apply an intensity threshold prior to
-calculating \code{cc_number} (via \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so,
-set your thresholding method here. If this is a single value, that same
-threshold will be applied to both channels. If this is a  length-2 vector,
-then these two thresholds will be applied to channels 1 and 2 respectively.
-A value of \code{NA} for either channel gives no thresholding for that channel.}
+calculating cross-correlated number (via
+\code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}})? If so, set your thresholding method
+here. If this is a single value, that same threshold will be applied to
+both channels. If this is a length-2 vector or list, then these two
+thresholds will be applied to channels 1 and 2 respectively. A value of
+\code{NA} for either channel gives no thresholding for that channel.}
 
-\item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the cross-correlated number image using
-\code{\link[=smooth_filter]{smooth_filter()}} or \code{\link[=median_filter]{median_filter()}} respectively? If
-selected, these are invoked here with a filter radius of 1 and with the
-option \code{na_count = TRUE}. A value of \code{NA} for either channel gives no
-thresholding for that channel. If you want to smooth/median filter the
-cross-correlated number image in a different way, first calculate the
-cross-correlated numbers without filtering (\code{filt = NULL}) using this
-function and then perform your desired filtering routine on the result.}
+\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+the best known detrending method for brightness analysis. For more
+fine-grained control over your detrending, use the \code{detrendr} package. To
+detrend one channel and not the other, specify this as a length 2 vector.}
+
+\item{quick}{\code{FALSE} repeats the detrending procedure (which has some inherent
+randomness) a few times to hone in on the best detrend. \code{TRUE} is quicker,
+performing the routine only once. \code{FALSE} is better.}
+
+\item{filt}{Do you want to smooth (\code{filt = 'smooth'}) or median (\code{filt = 'median'}) filter the cross-correlated number image using \code{\link[=smooth_filter]{smooth_filter()}}
+or \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with
+a filter radius of 1 and with the option \code{na_count = TRUE}. A value of \code{NA}
+for either channel gives no thresholding for that channel. If you want to
+smooth/median filter the cross-correlated number image in a different way,
+first calculate the cross-correlated numbers without filtering (\code{filt = NULL}) using this function and then perform your desired filtering routine
+on the result.}
 
 \item{parallel}{Would you like to use multiple cores to speed up this
 function? If so, set the number of cores here, or to use all available
@@ -60,6 +60,6 @@ ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
 n <- number(img, def = "n", thresh = "Huang", filt = "median")
 ijtiff::display(n[, , 1, 1])
 ijtiff::display(n[, , 2, 1])
-cc_n <- cc_number(img, tau = "auto", thresh = "Huang")
+cc_n <- cc_number(img, thresh = "Huang")
 ijtiff::display(cc_n[, , 1, 1])
 }

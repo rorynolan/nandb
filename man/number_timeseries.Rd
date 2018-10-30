@@ -4,9 +4,10 @@
 \alias{number_timeseries}
 \title{Create a number time-series.}
 \usage{
-number_timeseries(img, def, frames_per_set, tau = NULL, thresh = NULL,
-  filt = NULL, correct = FALSE, s = 1, offset = 0,
-  readout_noise = 0, gamma = 1, parallel = FALSE)
+number_timeseries(img, def, frames_per_set, overlap = FALSE,
+  thresh = NULL, detrend = FALSE, quick = FALSE, filt = NULL,
+  s = 1, offset = 0, readout_noise = 0, gamma = 1,
+  parallel = FALSE)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
@@ -19,13 +20,26 @@ or \code{"N"}?}
 \item{frames_per_set}{The number of frames with which to calculate the
 successive numbers.}
 
-\item{tau}{The exponential detrending parameter to be passed to
-\code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.
-Default is no detrending.}
+\item{overlap}{A boolean. If \code{TRUE}, the windows used to calculate brightness
+are overlapped, if \code{FALSE}, they are not. For example, for a 20-frame image
+series with 5 frames per set, if the windows are not overlapped, then the
+frame sets used are 1-5, 6-10, 11-15 and 16-20; whereas if they are
+overlapped, the frame sets are 1-5, 2-6, 3-7, 4-8 and so on up to 16-20.}
 
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
-detrending and number calculations.}
+detrending and number calculations. If there are many channels, this may be
+specified as a vector or list, one element for each channel.}
+
+\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+the best known detrending method for brightness analysis. For more
+fine-grained control over your detrending, use the \code{detrendr} package. If
+there are many channels, this may be specified as a vector, one element for
+each channel.}
+
+\item{quick}{\code{FALSE} repeats the detrending procedure (which has some inherent
+randomness) a few times to hone in on the best detrend. \code{TRUE} is quicker,
+performing the routine only once. \code{FALSE} is better.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'mean'}) or median (\code{filt = 'median'}) filter the number image using \code{\link[=smooth_filter]{smooth_filter()}} or
 \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with a
@@ -33,14 +47,10 @@ filter radius of 1 (with corners included, so each median is the median of
 9 elements) and with the option \code{na_count = TRUE}. If you want to
 smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
-perform your desired filtering routine on the result.}
+perform your desired filtering routine on the result. If there are many
+channels, this may be specified as a vector, one element for each channel.}
 
-\item{correct}{Apply the number/brightness correction detailed in equation 7
-of Hur et al. (2014). This is another correction for the effects of
-bleaching and is needed in addition to the more conventional correction
-controlled by the \code{tau} parameter.}
-
-\item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
+\item{s}{A positive number. The \eqn{S}-factor of microscope acquisition.}
 
 \item{offset}{Microscope acquisition parameters. See reference
 Dalal et al.}
@@ -60,13 +70,6 @@ cores, use \code{parallel = TRUE}.}
 }
 \value{
 An object of class \link{number_ts_img}.
-
-\itemize{\item If \code{img} is 3-dimensional (i.e. 1-channel), a 3-dimensional
-array \code{arr} is returned with \code{arr[y, x, t]} being pixel \eqn{(x, y)} of the
-\eqn{t}th number image in the number time series. \item If  \code{img} is
-4-dimensional (i.e. 2-channel), a 4-dimensional array \code{arr} is returned
-with \code{arr[y, x, c, t]} being pixel \eqn{(x, y)} of the \eqn{c}th channel of
-the \eqn{t}th number image in the number time series.}
 }
 \description{
 Given a stack of images \code{img}, use the first \code{frames_per_set} of them to
@@ -75,14 +78,13 @@ number image and so on to get a time-series of number images.
 }
 \details{
 This may discard some images, for example if 175 frames are in the input and
-\code{frames_per_set = 50}, then the last 25 are discarded. If bleaching
-correction is selected, it is performed on the whole image stack before the
-sectioning is done for calculation of numbers.
+\code{frames_per_set = 50}, then the last 25 are discarded. If detrending is
+selected, it is performed on the whole image stack before the sectioning is
+done for calculation of numbers.
 }
 \examples{
-img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-nts <- number_timeseries(img, "n", frames_per_set = 20,
-                          tau = NA, thresh = "Huang", parallel = 2)
+img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = "nandb"))
+nts <- number_timeseries(img, "n", frames_per_set = 20, thresh = "Huang")
 }
 \seealso{
 \code{\link[=number]{number()}}.

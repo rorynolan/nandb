@@ -17,22 +17,19 @@ matrix_raster_plot(mat, scale_name = "scale", limits = NULL,
 plot.}
 
 \item{limits}{This gives the user the option to set all values outside a
-certain range to their nearest value within that range (if \code{clip =
-  TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
-values outside the range [1.5, 2.6) to \code{NA}, use \code{limits = c(1.5,
-  2.6), clip = FALSE}. The colour range will cover all values within these
+certain range to their nearest value within that range (if \code{clip = TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
+values outside the range [1.5, 2.6) to \code{NA}, use \code{limits = c(1.5, 2.6), clip = FALSE}. The colour range will cover all values within these
 specified limits.}
 
 \item{ranges}{A numeric vector. If you want specific ranges of values to have
 the same color, specify these ranges via an increasing numeric vector. For
-example, if you want the ranges 0.5-1.2 and 1.2-3, use \code{ranges =
-  c(0.5, 1.2, 3)}. If \code{ranges} is specified as a number (a numeric
+example, if you want the ranges 0.5-1.2 and 1.2-3, use \code{ranges = c(0.5, 1.2, 3)}. If \code{ranges} is specified as a number (a numeric
 vector of length 1) \code{n}, this is equivalent to setting ranges to be
 \code{n} equal-length intervals within the range of the matrix, i.e. it is
-equivalent to setting \code{ranges = seq(min(mat), max(mat), length.out = n
-  + 1)}. At most one of \code{ranges} and \code{limits} should be set. If
-ranges is set, the behaviour for values which are not in any of the ranges
-are set by the \code{clip} arguments as in the \code{limits} argument.}
+equivalent to setting `ranges = seq(min(mat), max(mat), length.out = n
+\itemize{
+\item 1)\code{. At most one of }ranges\code{and}limits\code{should be set. If   ranges is set, the behaviour for values which are not in any of the ranges   are set by the}clip\code{arguments as in the}limits` argument.
+}}
 
 \item{range_names}{A character vector. If your colour scale is discrete, here
 you can set the names which will label each range in the legend.}
@@ -64,8 +61,7 @@ equivalent to setting both \code{clip_low} and \code{clip_high} to
 limits/ranges to their nearest value within them, but all values falling
 above those limits/ranges will be set to \code{NA}.}
 
-\item{clip_high}{Setting this to \code{TRUE} (and leaving \code{clip =
-  FALSE}, \code{clip_low = FALSE}) will set all values falling above the
+\item{clip_high}{Setting this to \code{TRUE} (and leaving \code{clip = FALSE}, \code{clip_low = FALSE}) will set all values falling above the
 specified limits/ranges to their nearest value within them, but all values
 falling below those limits/ranges will be set to \code{NA}.}
 

@@ -208,7 +208,7 @@ matrix_raster_plot <- function(mat, scale_name = "scale", limits = NULL,
     if (is.null(breaks)) {
       if (log_trans) {
         if (min(limits) <= 0) {
-          stop(
+          custom_stop(
             "The `limits` range must be positive-valued.",
             "
              Your limits has a lower bound of {min(limits)},
@@ -282,7 +282,8 @@ which_interval <- function(numbers, interval_mat) {
       "
        `interval_mat` must be a two-column matrix where the rows are
        increasing, non-intersecting, half-open intervals on the real line.
-      ", problem)
+      ", problem
+    )
   }
   which_interval_(numbers, interval_mat)
 }
@@ -291,7 +292,7 @@ which_interval <- function(numbers, interval_mat) {
 #'
 #' Say we have an interval \eqn{[a, b]}  and we want to evenly spread \eqn{n}
 #' numbers in this interval, however \eqn{m} of these \eqn{n} numbers have been
-#' chosen beforehand, so we have to fithe the other \eqn{n - m} in around them
+#' chosen beforehand, so we have to fit the the other \eqn{n - m} in around them
 #' the best we can. Our goal is to maximize the minimum distance between
 #' adjacent elements.
 #'
@@ -339,11 +340,13 @@ spread_specific <- function(interval, specific, n, log = FALSE) {
     bad_index <- match(
       T, any(specific <= interval[1]) | any(specific >= interval[2])
     )
-    stop(
+    custom_stop(
       "All members of `specific` must fall in `interval`.",
-      "Element {bad_index} of your `specific` is {specific[bad_index]},
-          which does not fall in your `interval`, which is
-          c({glue::glue_collapse(interval, sep = ', ')})."
+      "
+      Element {bad_index} of your `specific` is {specific[bad_index]},
+      which does not fall in your `interval`, which is
+      c({glue::glue_collapse(interval, sep = ', ')}).
+      "
     )
   }
   specific %<>% unique() %>% sort()
@@ -355,7 +358,9 @@ spread_specific <- function(interval, specific, n, log = FALSE) {
   } else {
     interval_lengths <- diff(intervals)
   }
-  stopifnot(length(interval_lengths) == length(interval_pops_init))
+  assertthat::assert_that(
+    length(interval_lengths) == length(interval_pops_init)
+  )
   interval_pops_final <- spread_specific_helper(
     interval_lengths,
     interval_pops_init, n - lspec

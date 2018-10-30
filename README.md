@@ -1,81 +1,54 @@
 
-# `nandb` <img src="junk/sticker.png" height="200" align="right">
+# `nandb` <img src="man/figures/logo.png" align="right" height=140/>
 
-An R package for performing number and brightness analysis as in Digman
-et al. 2008.
+Calculation of molecular number and brightness from fluorescence
+microscopy image series. The software was published in a [2016
+paper](https://doi.org/10.1093/bioinformatics/btx434). The seminal paper
+for the technique is [Digman et
+al. 2008](https://doi.org/10.1529/biophysj.107.114645). A
+[review](https://doi.org/10.1016/j.ymeth.2017.12.001) of the technique
+was published in [2017](https://doi.org/10.1016/j.ymeth.2017.12.001).
 
 [![Travis-CI Build
 Status](https://travis-ci.org/rorynolan/nandb.svg?branch=master)](https://travis-ci.org/rorynolan/nandb)
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/rorynolan/nandb?branch=master&svg=true)](https://ci.appveyor.com/project/rorynolan/nandb)
-[![codecov](https://codecov.io/gh/rorynolan/nandb/branch/master/graph/badge.svg)](https://codecov.io/gh/rorynolan/nandb)
+[![Coverage
+Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](https://codecov.io/github/rorynolan/nandb?branch=master)
+
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
 ![RStudio CRAN
 downloads](http://cranlogs.r-pkg.org/badges/grand-total/nandb) ![RStudio
 CRAN monthly downloads](http://cranlogs.r-pkg.org/badges/nandb)
 [![Rdocumentation](http://www.rdocumentation.org/badges/version/nandb)](http://www.rdocumentation.org/packages/nandb)
-![Project Status: Active – The project has reached a stable, usable
+
+[![Project Status: Active – The project has reached a stable, usable
 state and is being actively
-developed.](http://www.repostatus.org/badges/latest/active.svg)
+developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 
 ## Installation
 
-### Linux
-
-1.  On **Ubuntu** (similarly for other debian **linux**), you need to
-    do:
-
-<!-- end list -->
-
-    sudo apt-get update
-    sudo apt-get install libssl-dev libtiff5-dev libfftw3-dev 
-    sudo apt-get install libcurl4-openssl-dev libxml2-dev 
-
-1.  In R, run
-
-<!-- end list -->
+You can install the release version of `nandb` from
+[CRAN](https://CRAN.R-project.org/package=nandb) with:
 
 ``` r
 install.packages("nandb")
 ```
 
-### Windows
-
-1.  Go to <https://cran.r-project.org/bin/windows/Rtools/> and install
-    the latest version of Rtools.
-
-2.  In R, run
-
-<!-- end list -->
-
-``` r
-install.packages("nandb")
-```
-
-### Mac
-
-In R, run
-
-``` r
-install.packages("nandb")
-```
-
-## Installing the development version
-
-The release version is recommended (and installed with
-`install.packages("nandb")` as above), but to install the development
-version, in R enter
+You can install the (unstable) development version of `nandb` from
+[GitHub](https://github.com/rorynolan/nandb/) with:
 
 ``` r
 devtools::install_github("rorynolan/nandb")
 ```
 
-## Use
+I highly recommend using the release version. The dev version is just
+for the ultra-curious and should be thought of as unreliable.
 
-For the lowdown on how to use this package, you should read the package
-[vignette](https://cran.r-project.org/package=nandb/vignettes/nandb.html).
-Once you’ve installed the package, you can browse them using
-`vignette(package = "nandb")`.
+## How to use the package
+
+See the package website at <https://rorynolan.github.io/nandb>.
 
 ## Contribution
 

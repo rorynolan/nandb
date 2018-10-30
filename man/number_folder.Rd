@@ -4,9 +4,9 @@
 \alias{number_folder}
 \title{Number calculations for every image in a folder.}
 \usage{
-number_folder(folder_path = ".", def, tau = NULL, thresh = NULL,
-  filt = NULL, s = 1, offset = 0, readout_noise = 0, gamma = 1,
-  parallel = FALSE)
+number_folder(folder_path = ".", def, thresh = NULL, detrend = FALSE,
+  quick = FALSE, filt = NULL, s = 1, offset = 0,
+  readout_noise = 0, gamma = 1, parallel = FALSE)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to
@@ -15,13 +15,20 @@ process.}
 \item{def}{A character. Which definition of number do you want to use, \code{"n"}
 or \code{"N"}?}
 
-\item{tau}{The exponential detrending parameter to be passed to
-\code{\link[detrendr:img_detrend_exp]{detrendr::img_detrend_exp()}}. This can be a positive number or \code{"auto"}.
-Default is no detrending.}
-
 \item{thresh}{The threshold or thresholding method (see
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
-detrending and number calculations.}
+detrending and number calculations. If there are many channels, this may be
+specified as a vector or list, one element for each channel.}
+
+\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+the best known detrending method for brightness analysis. For more
+fine-grained control over your detrending, use the \code{detrendr} package. If
+there are many channels, this may be specified as a vector, one element for
+each channel.}
+
+\item{quick}{\code{FALSE} repeats the detrending procedure (which has some inherent
+randomness) a few times to hone in on the best detrend. \code{TRUE} is quicker,
+performing the routine only once. \code{FALSE} is better.}
 
 \item{filt}{Do you want to smooth (\code{filt = 'mean'}) or median (\code{filt = 'median'}) filter the number image using \code{\link[=smooth_filter]{smooth_filter()}} or
 \code{\link[=median_filter]{median_filter()}} respectively? If selected, these are invoked here with a
@@ -29,9 +36,10 @@ filter radius of 1 (with corners included, so each median is the median of
 9 elements) and with the option \code{na_count = TRUE}. If you want to
 smooth/median filter the number image in a different way, first calculate
 the numbers without filtering (\code{filt = NULL}) using this function and then
-perform your desired filtering routine on the result.}
+perform your desired filtering routine on the result. If there are many
+channels, this may be specified as a vector, one element for each channel.}
 
-\item{s}{A number. The \eqn{S}-factor of microscope acquisition.}
+\item{s}{A positive number. The \eqn{S}-factor of microscope acquisition.}
 
 \item{offset}{Microscope acquisition parameters. See reference
 Dalal et al.}
@@ -63,7 +71,7 @@ numbers.
 setwd(tempdir())
 img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
 ijtiff::write_tif(img, 'img2.tif')
-number_folder(def = "n", tau = NA, thresh = "Huang", parallel = 2)
+number_folder(def = "n", thresh = "Huang", parallel = 2)
 }
 }
 \seealso{

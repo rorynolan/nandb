@@ -1,16 +1,26 @@
-### 1.1.0
+## `nandb` 2.0.0
+
+#### MAJOR CHANGES
+* Robin Hood detrending is now used instead of exponential smoothing detrending. This is a breaking change.
+
+#### NEW FEATURES
+* The `timeseries` functions now have the option to `overlap` for better time resolution.
+* A `pkgdown` website!
+
+
+## `nandb` 1.1.0
 
 #### NEW FEATURES
 * `matrix_raster_plot()` is back. I thought it didn't really fit but a user said they missed when it was gone so it's back now.
 
 
-### 1.0.1
+## `nandb` 1.0.1
 
 #### BUG FIXES
 * Fix issues on CRAN linux devel clang.
 
 
-## 1.0.0
+## `nandb` 1.0.0
 
 #### NEW FEATURES
 * The package is now peer-reviewed and published in the journal *Bioinformatics*. See `citation("nandb")`.
@@ -26,13 +36,13 @@
 * Kmer calculations are no longer possible. The way in which they were done was over-simple.
 
 
-### 0.2.1
+## `nandb` 0.2.1
 
 #### BUG FIXES
 * Compatible with `filesstrings` 1.1.0.
 
 
-## nandb 0.2.0
+## `nandb` 0.2.0
 
 * The first version that I consider CRAN-worthy.
 
