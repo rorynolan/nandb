@@ -17,14 +17,6 @@ before_script:
   - sleep 3
   - if [ "$TRAVIS_CLIP" == "xclip" ]; then uptime | xclip -i -sel p -f | xclip -i -sel c; xclip -o -sel clipboard; fi
 
-r_github_packages:
-  - rorynolan/strex
-  - rorynolan/filesstrings
-  - ropensci/ijtiff
-  - rorynolan/autothresholdr
-  - mllg/checkmate
-  - rorynolan/detrendr
-
 after_success:
   - travis_wait 30 Rscript -e 'covr::codecov(line_exclusions = "R/nandb.R")'
 
