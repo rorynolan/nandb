@@ -310,7 +310,8 @@ number_file <- function(path, def, detrend = FALSE, quick = FALSE,
 }
 
 number_timeseries_file <- function(path, def, frames_per_set, overlap = FALSE,
-                                   thresh = NULL, detrend = FALSE, quick = FALSE,
+                                   thresh = NULL,
+                                   detrend = FALSE, quick = FALSE,
                                    filt = NULL, s = 1, offset = 0,
                                    readout_noise = 0, gamma = 1,
                                    parallel = FALSE) {
