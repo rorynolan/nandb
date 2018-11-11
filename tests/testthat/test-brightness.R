@@ -129,7 +129,7 @@ test_that("brightness_timeseries works", {
     detrend = TRUE,
     thresh = "tri", filt = "median"
   )
-  expect_equal(mean(bts, na.rm = TRUE), 1.01, tolerance = 0.005)
+  expect_equal(mean(bts, na.rm = TRUE), 1.01, tolerance = 0.006)
   expect_error(
     brightness_timeseries(img, "b", 51),
     paste0(

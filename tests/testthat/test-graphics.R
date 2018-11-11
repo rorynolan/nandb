@@ -79,7 +79,7 @@ test_that("matrix_raster_plot is ggplot", {
 test_that("`which_interval()` errors correctly", {
   set.seed(1)
   numbers <- seq(0.25, 0.75, length.out = 6)
-  interval_mat <- tibble::tribble(
+  interval_mat <- dplyr::tribble(
     ~left, ~right,
     0, 0.1,
     0.1, 0.5,
