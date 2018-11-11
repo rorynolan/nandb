@@ -58,6 +58,8 @@ Suggests:
     mgcv,
     gridExtra,
     pacman,
-    matrixStats
+    matrixStats,
+    spelling
 VignetteBuilder: knitr
 Encoding: UTF-8
+Language: en-US
