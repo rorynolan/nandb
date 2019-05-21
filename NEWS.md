@@ -1,3 +1,9 @@
+## `nandb` 2.0.1
+
+#### BUG FIXES
+* Require necessary version of `glue`.
+
+
 ## `nandb` 2.0.0
 
 #### MAJOR CHANGES
