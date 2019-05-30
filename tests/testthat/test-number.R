@@ -194,22 +194,19 @@ test_that("number_timeseries works", {
     def = "n", thresh = "tri", frames_per_set = 20,
     detrend = TRUE
   )
-  expect_true(
-    all(
-      stringr::str_detect(
-        list.files("number_timeseries"),
-        paste0(
-          "50",
-          c(
-            "_number_n_contiguous_timeseries_",
-            "again_number_n_contiguous_timeseries_"
-          ),
-          c(
-            "frames_per_set=20_swaps=auto=.+_thresh=Triangle=0.68_filt=NA",
-            "frames_per_set=20_swaps=auto=.+_thresh=Triangle=0.68_filt=NA"
-          )
-        )
-      )
+  expect_equal(
+    list.files("number_timeseries"),
+    paste0(
+      "50",
+      c(
+        "_number_n_contiguous_timeseries_",
+        "again_number_n_contiguous_timeseries_"
+      ),
+      c(
+        "frames_per_set=20_swaps=auto=0_thresh=Triangle=0.68_filt=NA",
+        "frames_per_set=20_swaps=auto=5029_thresh=Triangle=0.68_filt=NA"
+      ),
+      ".tif"
     )
   )
   suppressWarnings(file.remove(list.files())) # cleanup

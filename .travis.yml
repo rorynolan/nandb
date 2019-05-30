@@ -15,7 +15,8 @@ matrix:
             - libtiff5-dev
             - libfftw3-dev
             - libmagick++-dev
-      r_build_args: --no-build-vignettes
+      r_build_args: --no-build-vignettes --no-manual
+      r_check_args: --no-build-vignettes --no-manual
       warnings_are_errors: false
       after_success: Rscript -e 'covr::codecov()'
       before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
