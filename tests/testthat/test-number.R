@@ -205,8 +205,8 @@ test_that("number_timeseries works", {
             "again_number_n_contiguous_timeseries_"
           ),
           c(
-            "frames_per_set=20_swaps=auto=\\d+_thresh=Triangle=0.68_filt=NA",
-            "frames_per_set=20_swaps=auto=\\d+_thresh=Triangle=0.68_filt=NA"
+            "frames_per_set=20_swaps=auto=.+_thresh=Triangle=0.68_filt=NA",
+            "frames_per_set=20_swaps=auto=.+_thresh=Triangle=0.68_filt=NA"
           )
         )
       )
