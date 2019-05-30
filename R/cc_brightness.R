@@ -66,7 +66,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
   ch2 <- img[, , ch2, ]
   thresh_atts <- as.list(rep(NA, 2))
   swaps_atts <- extend_for_all_chs(
-    rlang::set_attrs(NA, auto = FALSE),
+    structure(NA, auto = FALSE),
     2
   )
   if (all(is.na(ch1))) {
@@ -187,7 +187,7 @@ cc_brightness_timeseries <- function(img, frames_per_set,
   ch2 <- img[, , ch2, ]
   thresh_atts <- as.list(rep(NA, 2))
   swaps_atts <- extend_for_all_chs(
-    rlang::set_attrs(NA, auto = FALSE),
+    structure(NA, auto = FALSE),
     2
   )
   if (all(is.na(ch1))) {

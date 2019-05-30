@@ -1,14 +1,20 @@
 {
-  "@context": ["https://doi.org/10.5063/schema/codemeta-2.0", "http://schema.org"],
+  "@context": [
+    "https://doi.org/10.5063/schema/codemeta-2.0",
+    "http://schema.org"
+  ],
   "@type": "SoftwareSourceCode",
   "identifier": "nandb",
   "description": "Calculation of molecular number and brightness from \n    fluorescence microscopy image series. The software was published in a 2016\n    paper <doi:10.1093/bioinformatics/btx434>. The seminal paper for the \n    technique is Digman et al. 2008 <doi:10.1529/biophysj.107.114645>. A review\n    of the technique was published in 2017 <doi:10.1016/j.ymeth.2017.12.001>.",
   "name": "nandb: Number and Brightness Image Analysis",
   "codeRepository": "https://github.com/rorynolan/nandb",
-  "relatedLink": ["https://rorynolan.github.io/nandb", "https://CRAN.R-project.org/package=nandb"],
+  "relatedLink": [
+    "https://rorynolan.github.io/nandb",
+    "https://CRAN.R-project.org/package=nandb"
+  ],
   "issueTracker": "https://github.com/rorynolan/nandb/issues",
   "license": "https://spdx.org/licenses/BSD-3-Clause",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -313,7 +319,7 @@
       "@type": "SoftwareApplication",
       "identifier": "detrendr",
       "name": "detrendr",
-      "version": ">= 0.6.2",
+      "version": ">= 0.6.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -326,7 +332,7 @@
       "@type": "SoftwareApplication",
       "identifier": "ijtiff",
       "name": "ijtiff",
-      "version": ">= 1.5.0",
+      "version": ">= 1.5.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -429,8 +435,15 @@
   ],
   "releaseNotes": "https://github.com/rorynolan/nandb/blob/master/NEWS.md",
   "readme": "https://github.com/rorynolan/nandb/blob/master/README.md",
-  "contIntegration": ["https://travis-ci.org/rorynolan/nandb", "https://ci.appveyor.com/project/rorynolan/nandb", "https://codecov.io/github/rorynolan/nandb?branch=master"],
-  "developmentStatus": ["http://www.repostatus.org/#active", "https://www.tidyverse.org/lifecycle/#stable"],
+  "contIntegration": [
+    "https://travis-ci.org/rorynolan/nandb",
+    "https://ci.appveyor.com/project/rorynolan/nandb",
+    "https://codecov.io/github/rorynolan/nandb?branch=master"
+  ],
+  "developmentStatus": [
+    "http://www.repostatus.org/#active",
+    "https://www.tidyverse.org/lifecycle/#stable"
+  ],
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -490,5 +503,6 @@
         }
       }
     }
-  ]
+  ],
+  "fileSize": "555.69KB"
 }

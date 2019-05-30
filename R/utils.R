@@ -520,6 +520,7 @@ deduplicate_cc_nb_filename <- function(path) {
   path
 }
 
+
 #' Construct the bullet point bits for `custom_stop()`.
 #'
 #' @param string The message for the bullet point.
@@ -530,16 +531,10 @@ deduplicate_cc_nb_filename <- function(path) {
 #' @noRd
 custom_stop_bullet <- function(string) {
   checkmate::assert_string(string)
-  string %<>% strwrap(width = 57)
-  string[1] %<>% {
-    glue::glue("    * {.}")
-  }
-  if (length(string) > 1) {
-    string[-1] %<>% {
-      glue::glue("      {.}")
+  string %>%
+    stringr::str_replace_all("\\s+", " ") %>% {
+      glue::glue("    * {.}")
     }
-  }
-  glue::glue_collapse(string, sep = "\n")
 }
 
 #' Nicely formatted error message.
@@ -555,73 +550,21 @@ custom_stop_bullet <- function(string) {
 #' @noRd
 custom_stop <- function(main_message, ..., .envir = parent.frame()) {
   checkmate::assert_string(main_message)
-  main_message %<>% glue::glue(.envir = .envir)
-  out <- strwrap(main_message, width = 63)
+  main_message %<>%
+    stringr::str_replace_all("\\s+", " ") %>%
+    glue::glue(.envir = .envir)
+  out <- main_message
   dots <- unlist(list(...))
   if (length(dots)) {
     if (!is.character(dots)) {
       stop("\nThe arguments in ... must all be of character type.")
     }
-    dots %<>% purrr::map_chr(glue::glue, .envir = .envir) %>%
+    dots %<>%
+      purrr::map_chr(glue::glue, .envir = .envir) %>%
       purrr::map_chr(custom_stop_bullet)
     out %<>% {
       glue::glue_collapse(c(., dots), sep = "\n")
     }
   }
-  rlang::abort(glue::glue("{out}"))
-}
-
-#' Prepare a Test Error Messsage.
-#'
-#' Take the command copied to the clipboard and prepare the error message that
-#' it outputs for expectation with [testthat::expect_error].
-#'
-#' @return The string that was copied to the clipboard (invisibly).
-#'
-#' @noRd
-ptem <- function() {
-  out <- character(0)
-  if (all(c("ore", "clipr", "styler") %in%
-          rownames(utils::installed.packages()))) {
-    cmd <- clipr::read_clip() %>%
-      paste(collapse = " ") %>%
-      rlang::parse_expr()
-    out <- tryCatch(eval(cmd),
-                    error = function(e) {
-                      conditionMessage(e)
-                    }
-    )
-    ends_with_period <- out %>%
-      stringr::str_trim() %>%
-      filesstrings::str_elem(-1) %>%
-      filesstrings::all_equal(".")
-    out %<>%
-      stringr::str_replace_all("\\s+\\s+\\**\\s*", "heregoesdotplus") %>%
-      stringr::str_replace_all("[\\.\\n]+", "heregoesdotplus") %>%
-      ore::ore.escape() %>%
-      stringr::str_replace_all("heregoesdotplus", ".+") %>%
-      stringr::str_replace_all("(\\.\\+)+$", "") %>%
-      filesstrings::singleize(ore::ore.escape(".+")) %>%
-      stringr::str_replace("^Error: ", "") %>%
-      strwrap(width = 55)
-    if (ends_with_period) out[length(out)] %<>% paste0(".")
-    left <- rep("\"", length(out))
-    left[1] <- "paste0(\""
-    right <- rep("\\s?\",", length(out))
-    right[length(right)] <- "\")"
-    out %<>%
-      paste0(left, ., right) %>%
-      stringr::str_replace_all("\\\\", "\\\\\\\\") %>%
-      styler::style_text()
-    if (length(out) == 1) {
-      out %<>% stringr::str_sub(nchar("paste0(") + 1,
-                                nchar(.) - nchar(")"))
-    }
-    clipr::write_clip(out)
-  }
-  out
-}
-
-err_fun <- function() {
-  stop("An error message to give ptem() full coverage.")
+  rlang::abort(glue::glue_collapse(out, sep = "\n"))
 }

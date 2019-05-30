@@ -83,7 +83,7 @@ number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
   detrend %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
   filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
-  swaps_atts <- extend_for_all_chs(rlang::set_attrs(NA, auto = FALSE), n_ch)
+  swaps_atts <- extend_for_all_chs(structure(NA, auto = FALSE), n_ch)
   thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
     if (!is.na(thresh[[1]])) {
@@ -194,7 +194,7 @@ number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
   if (!is.null(filt)) filt %<>% fix_filt()
   filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
   swaps_atts <- extend_for_all_chs(
-    rlang::set_attrs(NA, auto = FALSE),
+    structure(NA, auto = FALSE),
     n_ch
   )
   thresh_atts <- extend_for_all_chs(NA, n_ch)

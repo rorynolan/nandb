@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Number and Brightness Image Analysis
-Version: 2.0.1
+Version: 2.0.2
 Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
                     role = c("aut", "cre", "cph"),
                     comment = c(ORCID = "0000-0002-5239-4043")),
@@ -31,8 +31,8 @@ Imports:
     stringr,
     purrr,
     checkmate (>= 1.9.1),
-    detrendr (>= 0.6.2),
-    ijtiff (>= 1.5.0),
+    detrendr (>= 0.6.1),
+    ijtiff (>= 1.5.1),
     rlang (>= 0.3.3),
     reshape2,
     viridis,
