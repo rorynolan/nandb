@@ -209,15 +209,17 @@ test_that("number_timeseries works", {
   ans1 <- stringr::str_replace(ans0, "5029", "5363")  # ubuntu
   ans2 <- stringr::str_replace(ans0, "5029", "862")  # windows
   ans3 <- stringr::str_replace(ans0, "5029", "3840")  # fedora
-  lfnts <- sort(list.files("number_timeseries"))
-  if (filesstrings::all_equal(lfnts, ans0)) {
-    expect_equal(lfnts, ans0)
-  } else if (filesstrings::all_equal(lfnts, ans1)) {
+  lfnts <- list.files("number_timeseries")
+  if (all(lfnts %in% ans0)) {
+    expect_true(all(lfnts %in% ans0))
+  } else if (all(lfnts %in% ans1)) {
     expect_equal(lfnts, ans1)
-  } else if (filesstrings::all_equal(lfnts, ans2)) {
-    expect_equal(lfnts, ans2)
+  } else if (all(lfnts %in% ans2)) {
+    expect_true(all(lfnts %in% ans2))
+  } else if (all(lfnts %in% ans3)) {
+    expect_true(all(lfnts %in% ans3))
   } else {
-    expect_equal(lfnts, ans0)
+    expect_equal(sort(lfnts), sort(ans0))
   }
   suppressWarnings(file.remove(list.files())) # cleanup
   filesstrings::dir.remove("number_timeseries", "tempwithintemp")
