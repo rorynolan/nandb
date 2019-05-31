@@ -307,7 +307,7 @@
       "@type": "SoftwareApplication",
       "identifier": "checkmate",
       "name": "checkmate",
-      "version": ">= 1.9.1",
+      "version": ">= 1.9.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -518,5 +518,5 @@
       }
     }
   ],
-  "fileSize": "555.712KB"
+  "fileSize": "555.677KB"
 }
