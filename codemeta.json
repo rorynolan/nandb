@@ -14,7 +14,7 @@
   ],
   "issueTracker": "https://github.com/rorynolan/nandb/issues",
   "license": "https://spdx.org/licenses/BSD-3-Clause",
-  "version": "2.0.2",
+  "version": "2.0.1",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -505,5 +505,5 @@
       }
     }
   ],
-  "fileSize": "555.726KB"
+  "fileSize": "555.783KB"
 }
