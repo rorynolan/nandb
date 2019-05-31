@@ -206,11 +206,14 @@ test_that("number_timeseries works", {
     ),
     ".tif"
   )
-  ans1 <- stringr::str_replace(ans0, "5029", "5363")  # ubuntu
+  ans1 <- stringr::str_replace(ans0, "5029", "5363")  # travis ubuntu
   ans2 <- stringr::str_replace(ans0, "5029", "862")  # windows
   ans3 <- stringr::str_replace(ans0,
-                               c("auto=0", "5029"),
-                               c("auto=1600", "3840"))  # fedora
+                               c("auto=0", "auto=5029"),
+                               c("auto=1600", "auto=3840"))  # rhub fedora
+  ans4 <- stringr::str_replace(ans0,
+                               c("auto=0", "auto=5029"),
+                               c("auto=5363", "auto=0"))  # rhub ubuntu
   lfnts <- list.files("number_timeseries")
   if (all(lfnts %in% ans0)) {
     expect_true(all(lfnts %in% ans0))
@@ -220,6 +223,8 @@ test_that("number_timeseries works", {
     expect_true(all(lfnts %in% ans2))
   } else if (all(lfnts %in% ans3)) {
     expect_true(all(lfnts %in% ans3))
+  } else if (all(lfnts %in% ans4)) {
+    expect_true(all(lfnts %in% ans4))
   } else {
     expect_equal(sort(lfnts), sort(ans0))
   }
