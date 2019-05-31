@@ -54,7 +54,8 @@ cross-correlated number of those two channels for each pixel.
 }
 \examples{
 img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
-                                    package = "nandb"))
+  package = "nandb"
+))
 ijtiff::display(detrendr::mean_pillars(img[, , 1, ]))
 ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
 n <- number(img, def = "n", thresh = "Huang", filt = "median")

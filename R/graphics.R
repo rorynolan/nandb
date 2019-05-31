@@ -65,32 +65,47 @@
 #'   represented as pixel colours, with a named scale bar.
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' ijtiff::display(img[, , 1, 1])
 #' matrix_raster_plot(img[, , 1, 1])
 #' b <- brightness(img, def = "B", detrend = FALSE, thresh = "Huang")
-#' matrix_raster_plot(b, scale_name = 'brightness')
-#' matrix_raster_plot(b, scale_name = 'brightness', log_trans = TRUE)
-#' matrix_raster_plot(b, scale_name = 'brightness', log_trans = TRUE,
-#'                    include_breaks = 1.35)
-#' matrix_raster_plot(b, scale_name = 'brightness', log_trans = TRUE,
-#'                    breaks = 1:3)
-#' matrix_raster_plot(b, scale_name = 'brightness',
-#'                    ranges = seq(0.5, 3, length.out = 6),
-#'                    range_names = paste0(1:5, 'mer'))
-#' matrix_raster_plot(b, scale_name = "brightness",
-#'                    ranges = seq(0.5, 3, length.out = 6),
-#'                    range_names = paste0(1:5, "mer"), log_trans = TRUE)
-#' matrix_raster_plot(b, scale_name = "brightness",
-#'                    include_breaks = 1.25, range_names = NULL,
-#'                    log_trans = FALSE)
-#' matrix_raster_plot(b, scale_name = "brightness",
-#'                    include_breaks = 1.25, log_trans = TRUE)
-#' matrix_raster_plot(b, scale_name = "brightness",
-#'                    limits = c(1, 1.25), clip = TRUE)
-#' matrix_raster_plot(b, scale_name = "brightness",
-#'                    include_breaks = 1.25)
-#'
+#' matrix_raster_plot(b, scale_name = "brightness")
+#' matrix_raster_plot(b, scale_name = "brightness", log_trans = TRUE)
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness", log_trans = TRUE,
+#'   include_breaks = 1.35
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness", log_trans = TRUE,
+#'   breaks = 1:3
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness",
+#'   ranges = seq(0.5, 3, length.out = 6),
+#'   range_names = paste0(1:5, "mer")
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness",
+#'   ranges = seq(0.5, 3, length.out = 6),
+#'   range_names = paste0(1:5, "mer"), log_trans = TRUE
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness",
+#'   include_breaks = 1.25, range_names = NULL,
+#'   log_trans = FALSE
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness",
+#'   include_breaks = 1.25, log_trans = TRUE
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness",
+#'   limits = c(1, 1.25), clip = TRUE
+#' )
+#' matrix_raster_plot(b,
+#'   scale_name = "brightness",
+#'   include_breaks = 1.25
+#' )
 #' @import ggplot2
 #' @export
 matrix_raster_plot <- function(mat, scale_name = "scale", limits = NULL,
@@ -318,7 +333,6 @@ which_interval <- function(numbers, interval_mat) {
 #'
 #' @examples
 #' spread_specific(c(0, 10), 1, 3)
-#'
 #' @noRd
 spread_specific <- function(interval, specific, n, log = FALSE) {
   checkmate::assert_numeric(interval, len = 2)
@@ -393,7 +407,9 @@ spread_specific <- function(interval, specific, n, log = FALSE) {
 }
 
 scale_breaks <- function(include_breaks = NULL, log = FALSE) {
-  if (is.null(include_breaks) && (!log)) return(waiver())
+  if (is.null(include_breaks) && (!log)) {
+    return(waiver())
+  }
   function(x) {
     if (is.null(include_breaks)) {
       if (log) {

@@ -23,7 +23,7 @@
 #'   1:69-81. \doi{10.1002/jemt.20526}.
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' ijtiff::display(img[, , 1, 1])
 #' b <- brightness(img, "e", thresh = "Huang")
 #' b <- brightness(img, "B", thresh = "tri")
@@ -36,8 +36,10 @@ brightness <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
   if (!def %in% c("epsilon", "B")) {
-    custom_stop("`def` must be one of 'B' or 'epsilon'.",
-                "You have used `def = '{def}'`.")
+    custom_stop(
+      "`def` must be one of 'B' or 'epsilon'.",
+      "You have used `def = '{def}'`."
+    )
   }
   img %<>% nb_get_img()
   d <- dim(img)
@@ -50,7 +52,9 @@ brightness <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
   thresh %<>% extend_for_all_chs(n_ch)
   detrend %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  filt %<>% extend_for_all_chs(n_ch) %>%
+    unlist() %>%
+    as.character()
   swaps_atts <- extend_for_all_chs(
     structure(NA, auto = FALSE),
     n_ch
@@ -107,8 +111,9 @@ brightness <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
     }
   }
   brightness_img(out,
-                 def = def,
-                 thresh = thresh_atts, swaps = swaps_atts, filt = filt)
+    def = def,
+    thresh = thresh_atts, swaps = swaps_atts, filt = filt
+  )
 }
 
 #' Create a brightness time-series.
@@ -145,7 +150,7 @@ brightness <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
 #' @seealso [brightness()].
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' bts <- brightness_timeseries(img, "e", frames_per_set = 20, thresh = "Huang")
 #' @export
 brightness_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
@@ -166,7 +171,9 @@ brightness_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
   thresh %<>% extend_for_all_chs(n_ch)
   detrend %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  filt %<>% extend_for_all_chs(n_ch) %>%
+    unlist() %>%
+    as.character()
   swaps_atts <- extend_for_all_chs(
     structure(NA, auto = FALSE),
     n_ch
@@ -180,8 +187,7 @@ brightness_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
         but there are only {frames}, frames in total.
         ", "
         Please select less than {frames} frames per set.
-        "
-      )
+        ")
     }
     if (!is.na(thresh[[1]])) {
       img %<>% autothresholdr::mean_stack_thresh(
@@ -204,10 +210,10 @@ brightness_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
       for (i in seq_len(sets)) {
         indices_i <- seq(i, i + frames_per_set - 1)
         out[, , i] <- brightness(img[, , indices_i],
-                                 def = def, detrend = FALSE, filt = filt,
-                                 s = s, offset = offset,
-                                 readout_noise = readout_noise,
-                                 parallel = parallel
+          def = def, detrend = FALSE, filt = filt,
+          s = s, offset = offset,
+          readout_noise = readout_noise,
+          parallel = parallel
         )
       }
     } else {
@@ -217,10 +223,10 @@ brightness_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
       for (i in seq_len(sets)) {
         indices_i <- seq((i - 1) * frames_per_set + 1, i * frames_per_set)
         out[, , i] <- brightness(img[, , indices_i],
-                                 def = def, detrend = FALSE, filt = filt,
-                                 s = s, offset = offset,
-                                 readout_noise = readout_noise,
-                                 parallel = parallel
+          def = def, detrend = FALSE, filt = filt,
+          s = s, offset = offset,
+          readout_noise = readout_noise,
+          parallel = parallel
         )
       }
     }
@@ -259,13 +265,13 @@ brightness_file <- function(path, def,
                             s = 1, offset = 0, readout_noise = 0,
                             parallel = FALSE) {
   checkmate::assert_file_exists(path)
+  if (endsWith(path, "/")) path %<>% filesstrings::before_last("/+$")
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
     dir <- filesstrings::str_before_last(path, "/")
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
     path %<>% filesstrings::str_after_last("/")
+    checkmate::assert_directory_exists(dir)
+    withr::local_dir(dir)
   }
   b <- brightness(path, def,
     thresh = thresh,
@@ -292,13 +298,13 @@ brightness_timeseries_file <- function(path, def, frames_per_set,
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
   checkmate::assert_file_exists(path)
+  if (endsWith(path, "/")) path %<>% filesstrings::before_last("/+$")
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
     dir <- filesstrings::str_before_last(path, "/")
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
     path %<>% filesstrings::str_after_last("/")
+    checkmate::assert_directory_exists(dir)
+    withr::local_dir(dir)
   }
   bts <- brightness_timeseries(path, def,
     frames_per_set = frames_per_set, overlap = overlap,
@@ -331,9 +337,9 @@ brightness_timeseries_file <- function(path, def, frames_per_set,
 #' @examples
 #' \dontrun{
 #' setwd(tempdir())
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-#' ijtiff::write_tif(img, 'img1.tif')
-#' ijtiff::write_tif(img, 'img2.tif')
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
+#' ijtiff::write_tif(img, "img1.tif")
+#' ijtiff::write_tif(img, "img2.tif")
 #' brightness_folder(def = "B", thresh = "Huang")
 #' }
 #' @export
@@ -345,9 +351,8 @@ brightness_folder <- function(folder_path = ".", def,
                               parallel = FALSE) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
-  init_dir <- getwd()
-  on.exit(setwd(init_dir))
-  setwd(folder_path)
+  checkmate::assert_directory_exists(folder_path)
+  withr::local_dir(folder_path)
   file_names <- list.files(pattern = "\\.tiff*$")
   purrr::map(file_names, brightness_file,
     def = def,
@@ -378,9 +383,9 @@ brightness_folder <- function(folder_path = ".", def,
 #' @examples
 #' \dontrun{
 #' setwd(tempdir())
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-#' ijtiff::write_tif(img, 'img1.tif')
-#' ijtiff::write_tif(img, 'img2.tif')
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
+#' ijtiff::write_tif(img, "img1.tif")
+#' ijtiff::write_tif(img, "img2.tif")
 #' brightness_timeseries_folder(def = "e", thresh = "tri", frames_per_set = 20)
 #' }
 #' @export
@@ -393,9 +398,8 @@ brightness_timeseries_folder <- function(folder_path = ".", def,
                                          parallel = FALSE) {
   if (startsWith("epsilon", tolower(def))) def <- "epsilon"
   if (def == "b") def <- "B"
-  init_dir <- getwd()
-  on.exit(setwd(init_dir))
-  setwd(folder_path)
+  checkmate::assert_directory_exists(folder_path)
+  withr::local_dir(folder_path)
   file_names <- list.files(pattern = "\\.tif")
   purrr::map(file_names, brightness_timeseries_file,
     def = def,

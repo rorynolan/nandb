@@ -57,9 +57,9 @@ resulting brightness images to disk.
 \examples{
 \dontrun{
 setwd(tempdir())
-img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-ijtiff::write_tif(img, 'img1.tif')
-ijtiff::write_tif(img, 'img2.tif')
+img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
+ijtiff::write_tif(img, "img1.tif")
+ijtiff::write_tif(img, "img2.tif")
 brightness_folder(def = "B", thresh = "Huang")
 }
 }

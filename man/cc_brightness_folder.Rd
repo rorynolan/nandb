@@ -52,8 +52,8 @@ save the resulting images to disk.
 \examples{
 \dontrun{
 setwd(tempdir())
-ijtiff::write_tif(img, 'a.tif')
-ijtiff::write_tif(img, 'ab.tif')
+ijtiff::write_tif(img, "a.tif")
+ijtiff::write_tif(img, "ab.tif")
 cc_brightness_folder()
 list.files()
 }

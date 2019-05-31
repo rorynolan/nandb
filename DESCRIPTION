@@ -40,6 +40,7 @@ Imports:
     BBmisc,
     ggplot2,
     assertthat,
+    withr (>= 2.1.0),
     utils
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)

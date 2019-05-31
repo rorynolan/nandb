@@ -67,8 +67,8 @@ folder and save the resulting images to disk.
 \examples{
 \dontrun{
 setwd(tempdir())
-ijtiff::write_tif(img, 'a.tif')
-ijtiff::write_tif(img, 'ab.tif')
+ijtiff::write_tif(img, "a.tif")
+ijtiff::write_tif(img, "ab.tif")
 cc_brightness_timeseries_folder(frames_per_set = 25)
 list.files()
 }

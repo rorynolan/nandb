@@ -19,7 +19,6 @@ The cross-variance function is defined in the reference.
 }
 \examples{
 cross_var(0:3, 2:5)
-
 }
 \references{
 Digman, MA, Wiseman, PW, Choi, C, Horwitz, AR, Gratton, E (2009).

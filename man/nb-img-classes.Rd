@@ -47,8 +47,8 @@ definition of brightness?} \item{\code{thresh}}{A positive integer, possibly an
 object of class \link[autothresholdr:th]{autothresholdr::th} detailing which threshold and
 thresholding method was used in preprocessing (in the multi-channel case, one
 threshold per channel is given).} \item{\code{swaps}}{A non-negative integer
-indicating the number of swaps Robin Hood detrending, with an attribute \code{auto}
-which is a logical indicating whether or not the parameter was chosen
+indicating the number of swaps Robin Hood detrending, with an attribute
+\code{auto} which is a logical indicating whether or not the parameter was chosen
 automatically (in the multi-channel case, one threshold per channel is
 given).}\item{\code{filt}}{Was mean or median filtering used in postprocessing?}}
 }

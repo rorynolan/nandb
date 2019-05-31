@@ -57,7 +57,7 @@
 #'   Photodepletion. PLoS ONE 9(5): e97440. \doi{10.1371/journal.pone.0097440}.
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' ijtiff::display(img[, , 1, 1])
 #' num <- number(img, "N", thresh = "Huang")
 #' num <- number(img, "n", thresh = "tri")
@@ -68,8 +68,10 @@ number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
   checkmate::assert_string(def)
   checkmate::assert_logical(detrend)
   if (!def %in% c("n", "N")) {
-    custom_stop("`def` must be one of 'N' or 'n.",
-                "You have used `def = '{def}'`.")
+    custom_stop(
+      "`def` must be one of 'N' or 'n.",
+      "You have used `def = '{def}'`."
+    )
   }
   img %<>% nb_get_img()
   d <- dim(img)
@@ -82,7 +84,9 @@ number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
   thresh %<>% extend_for_all_chs(n_ch)
   detrend %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  filt %<>% extend_for_all_chs(n_ch) %>%
+    unlist() %>%
+    as.character()
   swaps_atts <- extend_for_all_chs(structure(NA, auto = FALSE), n_ch)
   thresh_atts <- extend_for_all_chs(NA, n_ch)
   if (n_ch == 1) {
@@ -103,9 +107,9 @@ number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
     pillar_means <- detrendr::mean_pillars(img, parallel = parallel)
     pillar_vars <- detrendr::var_pillars(img, parallel = parallel)
     if (def == "N") {
-      out <- ((pillar_means - offset) ^ 2) / (pillar_vars - readout_noise)
+      out <- ((pillar_means - offset)^2) / (pillar_vars - readout_noise)
     } else {
-      out <- ((pillar_means - offset) ^ 2) /
+      out <- ((pillar_means - offset)^2) /
         (pillar_vars - readout_noise - s * (pillar_means - offset)) /
         gamma
     }
@@ -169,7 +173,7 @@ number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
 #' @seealso [number()].
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = "nandb"))
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' nts <- number_timeseries(img, "n", frames_per_set = 20, thresh = "Huang")
 #' @export
 number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
@@ -177,9 +181,13 @@ number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
                               detrend = FALSE, quick = FALSE, filt = NULL,
                               s = 1, offset = 0, readout_noise = 0, gamma = 1,
                               parallel = FALSE) {
-  if (!def %in% c("n", "N")) if (!def %in% c("n", "N")) {
-    custom_stop("`def` must be one of 'N' or 'n.",
-                "You have used `def = '{def}'`.")
+  if (!def %in% c("n", "N")) {
+    if (!def %in% c("n", "N")) {
+      custom_stop(
+        "`def` must be one of 'N' or 'n.",
+        "You have used `def = '{def}'`."
+      )
+    }
   }
   img %<>% nb_get_img()
   d <- dim(img)
@@ -192,7 +200,9 @@ number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
   thresh %<>% extend_for_all_chs(n_ch)
   detrend %<>% extend_for_all_chs(n_ch)
   if (!is.null(filt)) filt %<>% fix_filt()
-  filt %<>% extend_for_all_chs(n_ch) %>% unlist() %>% as.character()
+  filt %<>% extend_for_all_chs(n_ch) %>%
+    unlist() %>%
+    as.character()
   swaps_atts <- extend_for_all_chs(
     structure(NA, auto = FALSE),
     n_ch
@@ -206,8 +216,7 @@ number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
         but there are only {frames}, frames in total.
         ", "
         Please select less than {frames} frames per set.
-        "
-      )
+        ")
     }
     if (!is.na(thresh[[1]])) {
       img %<>% autothresholdr::mean_stack_thresh(
@@ -230,10 +239,10 @@ number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
       for (i in seq_len(sets)) {
         indices_i <- seq(i, i + frames_per_set - 1)
         out[, , i] <- number(img[, , indices_i],
-                             def = def, detrend = FALSE, filt = filt,
-                             s = s, offset = offset,
-                             readout_noise = readout_noise,
-                             parallel = parallel
+          def = def, detrend = FALSE, filt = filt,
+          s = s, offset = offset,
+          readout_noise = readout_noise,
+          parallel = parallel
         )
       }
     } else {
@@ -281,18 +290,22 @@ number_file <- function(path, def, detrend = FALSE, quick = FALSE,
                         thresh = NULL, filt = NULL,
                         s = 1, offset = 0, readout_noise = 0, gamma = 1,
                         parallel = FALSE) {
-  if (!def %in% c("n", "N")) if (!def %in% c("n", "N")) {
-    custom_stop("`def` must be one of 'N' or 'n.",
-                "You have used `def = '{def}'`.")
+  if (!def %in% c("n", "N")) {
+    if (!def %in% c("n", "N")) {
+      custom_stop(
+        "`def` must be one of 'N' or 'n.",
+        "You have used `def = '{def}'`."
+      )
+    }
   }
   checkmate::assert_file_exists(path)
+  if (endsWith(path, "/")) path %<>% filesstrings::before_last("/+$")
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
     dir <- filesstrings::str_before_last(path, "/")
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
     path %<>% filesstrings::str_after_last("/")
+    checkmate::assert_directory_exists(dir)
+    withr::local_dir(dir)
   }
   num <- number(path, def,
     detrend = detrend, quick = quick,
@@ -315,18 +328,22 @@ number_timeseries_file <- function(path, def, frames_per_set, overlap = FALSE,
                                    filt = NULL, s = 1, offset = 0,
                                    readout_noise = 0, gamma = 1,
                                    parallel = FALSE) {
-  if (!def %in% c("n", "N")) if (!def %in% c("n", "N")) {
-    custom_stop("`def` must be one of 'N' or 'n.",
-                "You have used `def = '{def}'`.")
+  if (!def %in% c("n", "N")) {
+    if (!def %in% c("n", "N")) {
+      custom_stop(
+        "`def` must be one of 'N' or 'n.",
+        "You have used `def = '{def}'`."
+      )
+    }
   }
   checkmate::assert_file_exists(path)
+  if (endsWith(path, "/")) path %<>% filesstrings::before_last("/+$")
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
     dir <- filesstrings::str_before_last(path, "/")
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
     path %<>% filesstrings::str_after_last("/")
+    checkmate::assert_directory_exists(dir)
+    withr::local_dir(dir)
   }
   nts <- number_timeseries(path, def,
     frames_per_set = frames_per_set, overlap = overlap,
@@ -363,8 +380,8 @@ number_timeseries_file <- function(path, def, frames_per_set, overlap = FALSE,
 #' @examples
 #' \dontrun{
 #' setwd(tempdir())
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-#' ijtiff::write_tif(img, 'img2.tif')
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
+#' ijtiff::write_tif(img, "img2.tif")
 #' number_folder(def = "n", thresh = "Huang", parallel = 2)
 #' }
 #' @export
@@ -374,12 +391,13 @@ number_folder <- function(folder_path = ".", def,
                           s = 1, offset = 0, readout_noise = 0, gamma = 1,
                           parallel = FALSE) {
   if (!def %in% c("n", "N")) {
-    custom_stop("`def` must be one of 'N' or 'n.",
-                "You have used `def = '{def}'`.")
+    custom_stop(
+      "`def` must be one of 'N' or 'n.",
+      "You have used `def = '{def}'`."
+    )
   }
-  init_dir <- getwd()
-  on.exit(setwd(init_dir))
-  setwd(folder_path)
+  checkmate::assert_directory_exists(folder_path)
+  withr::local_dir(folder_path)
   file_names <- list.files(pattern = "\\.tif")
   purrr::map(file_names, number_file,
     def = def, thresh = thresh, detrend = detrend, quick = quick,
@@ -409,9 +427,9 @@ number_folder <- function(folder_path = ".", def,
 #' @examples
 #' \dontrun{
 #' setwd(tempdir())
-#' img <- ijtiff::read_tif(system.file('extdata', '50.tif', package = 'nandb'))
-#' ijtiff::write_tif(img, 'img1.tif')
-#' ijtiff::write_tif(img, 'img2.tif')
+#' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
+#' ijtiff::write_tif(img, "img1.tif")
+#' ijtiff::write_tif(img, "img2.tif")
 #' number_timeseries_folder(def = "n", thresh = "Huang", frames_per_set = 20)
 #' }
 #' @export
@@ -422,12 +440,13 @@ number_timeseries_folder <- function(folder_path = ".", def, frames_per_set,
                                      readout_noise = 0, gamma = 1,
                                      parallel = FALSE) {
   if (!def %in% c("n", "N")) {
-    custom_stop("`def` must be one of 'N' or 'n.",
-                "You have used `def = '{def}'`.")
+    custom_stop(
+      "`def` must be one of 'N' or 'n.",
+      "You have used `def = '{def}'`."
+    )
   }
-  init_dir <- getwd()
-  on.exit(setwd(init_dir))
-  setwd(folder_path)
+  checkmate::assert_directory_exists(folder_path)
+  withr::local_dir(folder_path)
   file_names <- list.files(pattern = "\\.tif")
   purrr::map(file_names, number_timeseries_file,
     def = def, frames_per_set = frames_per_set, overlap = overlap,

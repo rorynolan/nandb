@@ -31,7 +31,8 @@
 #'
 #' @examples
 #' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
-#'                                     package = "nandb"))
+#'   package = "nandb"
+#' ))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 1, ]))
 #' ijtiff::display(detrendr::mean_pillars(img[, , 2, ]))
 #' b <- brightness(img, def = "e", thresh = "Huang", filt = "median")
@@ -61,7 +62,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
                   This is not possible. Please retry with valid channel numbers.
                   ")
     }
-    }
+  }
   ch1 <- img[, , ch1, ]
   ch2 <- img[, , ch2, ]
   thresh_atts <- as.list(rep(NA, 2))
@@ -70,12 +71,16 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
     2
   )
   if (all(is.na(ch1))) {
-    custom_stop("The first channel is all NAs.",
-                "Can't compute on an array of all NAs.")
+    custom_stop(
+      "The first channel is all NAs.",
+      "Can't compute on an array of all NAs."
+    )
   }
   if (all(is.na(ch2))) {
-    custom_stop("The second channel is all NAs.",
-                "Can't compute on an array of all NAs.")
+    custom_stop(
+      "The second channel is all NAs.",
+      "Can't compute on an array of all NAs."
+    )
   }
   if (!is.na(thresh[[1]])) {
     ch1 %<>% autothresholdr::mean_stack_thresh(thresh[[1]])
@@ -117,7 +122,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
   if (length(dim(ch2)) == 4) ch2 <- ch2[, , 1, ]
   cc_b <- cross_var_pillars(ch1, ch2) /
     ((sqrt(detrendr::mean_pillars(ch1, parallel = parallel) *
-             detrendr::mean_pillars(ch2, parallel = parallel)))[, , 1, 1])
+      detrendr::mean_pillars(ch2, parallel = parallel)))[, , 1, 1])
   if (!is.na(filt)) {
     if (filt == "median") {
       cc_b %<>% median_filter(na_count = TRUE)
@@ -151,10 +156,13 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
 #' @seealso [brightness()].
 #'
 #' @examples
-#' img <- ijtiff::read_tif(system.file('extdata', 'two_ch.tif',
-#'                         package = 'nandb'))
-#' cc_bts <- cc_brightness_timeseries(img, 10, thresh = "Huang",
-#'                                     filt = 'median', parallel = 2)
+#' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
+#'   package = "nandb"
+#' ))
+#' cc_bts <- cc_brightness_timeseries(img, 10,
+#'   thresh = "Huang",
+#'   filt = "median", parallel = 2
+#' )
 #' ijtiff::display(cc_bts[, , 1, 1])
 #' @export
 cc_brightness_timeseries <- function(img, frames_per_set,
@@ -164,7 +172,6 @@ cc_brightness_timeseries <- function(img, frames_per_set,
                                      detrend = FALSE, quick = FALSE,
                                      filt = NULL,
                                      parallel = FALSE) {
-
   checkmate::assert_int(ch1, lower = 1)
   checkmate::assert_int(ch2, lower = 1)
   checkmate::assert_logical(detrend, min.len = 1, max.len = 2)
@@ -180,8 +187,7 @@ cc_brightness_timeseries <- function(img, frames_per_set,
                 but there are only {dim(img)[4]}, frames in total.
                 ", "
                 Please select less than {dim(img)[4]} frames per set.
-                "
-    )
+                ")
   }
   ch1 <- img[, , ch1, ]
   ch2 <- img[, , ch2, ]
@@ -191,12 +197,16 @@ cc_brightness_timeseries <- function(img, frames_per_set,
     2
   )
   if (all(is.na(ch1))) {
-    custom_stop("The first channel is all NAs.",
-                "Can't compute on an array of all NAs.")
+    custom_stop(
+      "The first channel is all NAs.",
+      "Can't compute on an array of all NAs."
+    )
   }
   if (all(is.na(ch2))) {
-    custom_stop("The second channel is all NAs.",
-                "Can't compute on an array of all NAs.")
+    custom_stop(
+      "The second channel is all NAs.",
+      "Can't compute on an array of all NAs."
+    )
   }
   if (!is.na(thresh[[1]])) {
     ch1 %<>% autothresholdr::mean_stack_thresh(thresh[[1]])
@@ -245,7 +255,7 @@ cc_brightness_timeseries <- function(img, frames_per_set,
       ch2_i <- ch2[, , indices_i]
       cc_b_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
         ((sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
-                 detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
+          detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
     }
   } else {
     n_sets <- dim(ch1)[3] %/% frames_per_set
@@ -256,7 +266,7 @@ cc_brightness_timeseries <- function(img, frames_per_set,
       ch2_i <- ch2[, , indices_i]
       cc_b_ts[, , i] <- cross_var_pillars(ch1_i, ch2_i) /
         ((sqrt(detrendr::mean_pillars(ch1_i, parallel = parallel) *
-                 detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
+          detrendr::mean_pillars(ch2_i, parallel = parallel)))[, , 1, 1])
     }
   }
   if (!is.na(filt)) {
@@ -282,13 +292,13 @@ cc_brightness_file <- function(path, ch1 = 1, ch2 = 2,
                                filt = NULL,
                                parallel = FALSE) {
   checkmate::assert_file_exists(path)
+  if (endsWith(path, "/")) path %<>% filesstrings::before_last("/+$")
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
     dir <- filesstrings::str_before_last(path, "/")
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
     path %<>% filesstrings::str_after_last("/")
+    checkmate::assert_directory_exists(dir)
+    withr::local_dir(dir)
   }
   cc_b <- cc_brightness(path,
     ch1 = ch1, ch2 = ch2,
@@ -309,13 +319,13 @@ cc_brightness_timeseries_file <- function(path, frames_per_set,
                                           detrend = detrend, quick = quick,
                                           filt = NULL, parallel = FALSE) {
   checkmate::assert_file_exists(path)
+  if (endsWith(path, "/")) path %<>% filesstrings::before_last("/+$")
   need_to_change_dir <- stringr::str_detect(path, "/")
   if (need_to_change_dir) {
     dir <- filesstrings::str_before_last(path, "/")
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
     path %<>% filesstrings::str_after_last("/")
+    checkmate::assert_directory_exists(dir)
+    withr::local_dir(dir)
   }
   cc_b_ts <- cc_brightness_timeseries(path,
     ch1 = ch1, ch2 = ch2,
@@ -347,8 +357,8 @@ cc_brightness_timeseries_file <- function(path, frames_per_set,
 #' @examples
 #' \dontrun{
 #' setwd(tempdir())
-#' ijtiff::write_tif(img, 'a.tif')
-#' ijtiff::write_tif(img, 'ab.tif')
+#' ijtiff::write_tif(img, "a.tif")
+#' ijtiff::write_tif(img, "ab.tif")
 #' cc_brightness_folder()
 #' list.files()
 #' }
@@ -357,9 +367,8 @@ cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
                                  thresh = NULL,
                                  detrend = detrend, quick = quick,
                                  filt = NULL, parallel = FALSE) {
-  init_dir <- getwd()
-  on.exit(setwd(init_dir))
-  setwd(folder_path)
+  checkmate::assert_directory_exists(folder_path)
+  withr::local_dir(folder_path)
   file_names <- dir(pattern = "\\.tiff*$")
   purrr::map(file_names, cc_brightness_file,
     ch1 = ch1, ch2 = ch2,
@@ -387,8 +396,8 @@ cc_brightness_folder <- function(folder_path = ".", ch1 = 1, ch2 = 2,
 #' @examples
 #' \dontrun{
 #' setwd(tempdir())
-#' ijtiff::write_tif(img, 'a.tif')
-#' ijtiff::write_tif(img, 'ab.tif')
+#' ijtiff::write_tif(img, "a.tif")
+#' ijtiff::write_tif(img, "ab.tif")
 #' cc_brightness_timeseries_folder(frames_per_set = 25)
 #' list.files()
 #' }
@@ -401,9 +410,8 @@ cc_brightness_timeseries_folder <- function(folder_path = ".", frames_per_set,
                                             detrend = detrend, quick = quick,
                                             filt = NULL,
                                             parallel = FALSE) {
-  init_dir <- getwd()
-  on.exit(setwd(init_dir))
-  setwd(folder_path)
+  checkmate::assert_directory_exists(folder_path)
+  withr::local_dir(folder_path)
   file_names <- dir(pattern = "\\.tiff*$")
   purrr::map(file_names, cc_brightness_timeseries_file,
     ch1 = ch1, ch2 = ch2,

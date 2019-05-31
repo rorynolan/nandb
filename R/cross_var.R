@@ -9,7 +9,6 @@
 #'
 #' @examples
 #' cross_var(0:3, 2:5)
-#'
 #' @references Digman, MA, Wiseman, PW, Choi, C, Horwitz, AR, Gratton, E (2009).
 #' Stoichiometry of molecular complexes at adhesions in living cells. Proc.
 #' Natl. Acad. Sci. U.S.A., 106, 7:2170-5.

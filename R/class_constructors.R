@@ -11,8 +11,8 @@
 #' object of class [autothresholdr::th] detailing which threshold and
 #' thresholding method was used in preprocessing (in the multi-channel case, one
 #' threshold per channel is given).} \item{`swaps`}{A non-negative integer
-#' indicating the number of swaps Robin Hood detrending, with an attribute `auto`
-#' which is a logical indicating whether or not the parameter was chosen
+#' indicating the number of swaps Robin Hood detrending, with an attribute
+#' `auto` which is a logical indicating whether or not the parameter was chosen
 #' automatically (in the multi-channel case, one threshold per channel is
 #' given).}\item{`filt`}{Was mean or median filtering used in postprocessing?}}
 #'
@@ -58,8 +58,10 @@ number_img_common <- function(img, n_ch, def, thresh, swaps, filt) {
   checkmate::assert_string(def)
   for (i in seq_along(swaps)) checkmate::assert_count(swaps[[i]], na.ok = TRUE)
   if (!isTRUE(def %in% c("n", "N"))) {
-    custom_stop("Argument `def` must be one of 'n' or 'N'.",
-                "You have used `def = '{def}'`.")
+    custom_stop(
+      "Argument `def` must be one of 'n' or 'N'.",
+      "You have used `def = '{def}'`."
+    )
   }
   if (length(thresh) == 1 && n_ch > 1) {
     thresh %<>% {
@@ -87,8 +89,10 @@ number_img_common <- function(img, n_ch, def, thresh, swaps, filt) {
   }
   checkmate::assert_numeric(swaps, lower = 0)
   if (!"auto" %in% names(attributes(swaps))) {
-    custom_stop("If swaps is specified, it must have an attribute 'auto'.",
-                "Your `swaps` has no attribute 'auto'.")
+    custom_stop(
+      "If swaps is specified, it must have an attribute 'auto'.",
+      "Your `swaps` has no attribute 'auto'."
+    )
   } else if (length(swaps) != length(attr(swaps, "auto"))) {
     if (length(attr(swaps, "auto")) == 1) {
       attr(swaps, "auto") %<>% rep(length(swaps))
@@ -99,8 +103,7 @@ number_img_common <- function(img, n_ch, def, thresh, swaps, filt) {
         ", "
         Your `swaps` has length {length(swaps)} and its 'auto' attribute
         has length {length(attr(swaps, 'auto'))}.
-        "
-      )
+        ")
     }
   }
   checkmate::assert_logical(attr(swaps, "auto"))
@@ -113,8 +116,7 @@ number_img_common <- function(img, n_ch, def, thresh, swaps, filt) {
       which must be `TRUE` or `FALSE` and not NA.
       ", "
       Element {i} of `swaps` has an 'auto' attribute which is NA.
-      "
-    )
+      ")
   }
   if (!filesstrings::all_equal(c(
     length(thresh), length(swaps),
@@ -154,8 +156,10 @@ brightness_img <- function(img, def, thresh, swaps, filt) {
     def <- "epsilon"
   } else {
     if (!def %in% c("epsilon", "B")) {
-      custom_stop("`def` must be one of 'B' or 'epsilon'.",
-                  "You have used `def = '{def}'`.")
+      custom_stop(
+        "`def` must be one of 'B' or 'epsilon'.",
+        "You have used `def = '{def}'`."
+      )
     }
   }
   out <- number_img(img, "n", thresh, swaps, filt)
@@ -233,8 +237,10 @@ brightness_ts_img <- function(img, def, frames_per_set, overlapped,
     def <- "epsilon"
   } else {
     if (!def %in% c("epsilon", "B")) {
-      custom_stop("`def` must be one of 'B' or 'epsilon'.",
-                  "You have used `def = '{def}'`.")
+      custom_stop(
+        "`def` must be one of 'B' or 'epsilon'.",
+        "You have used `def = '{def}'`."
+      )
     }
   }
   out <- number_ts_img(img, "n",
@@ -376,8 +382,10 @@ cc_number_img_common <- function(img, thresh, swaps, filt) {
   }
   checkmate::assert_numeric(swaps, lower = 0)
   if (!"auto" %in% names(attributes(swaps))) {
-    custom_stop("If swaps is specified, it must have an attribute 'auto'.",
-                "Your `swaps` has no attribute 'auto'.")
+    custom_stop(
+      "If swaps is specified, it must have an attribute 'auto'.",
+      "Your `swaps` has no attribute 'auto'."
+    )
   } else if (length(swaps) != length(attr(swaps, "auto"))) {
     if (length(attr(swaps, "auto")) == 1) {
       attr(swaps, "auto") %<>% rep(length(swaps))
@@ -388,13 +396,13 @@ cc_number_img_common <- function(img, thresh, swaps, filt) {
         ", "
         Your `swaps` has length {length(swaps)} and its 'auto' attribute
         has length {length(attr(swaps, 'auto'))}.
-        "
-      )
+        ")
     }
   }
   checkmate::assert_logical(attr(swaps, "auto"))
   if ((!all(is.na(swaps))) && anyNA(attr(swaps, "auto"))) {
-    custom_stop("
+    custom_stop(
+      "
       Each element of `swaps` must have an associated attribute 'auto'
       which must be `TRUE` or `FALSE` and not NA.
       ",

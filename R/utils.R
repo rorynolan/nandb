@@ -15,7 +15,9 @@ extend_for_all_chs <- function(x, n_ch) {
 
 empty_char_vec_to_empty_string <- function(x) {
   checkmate::assert_character(x)
-  if (length(x) == 0) return("")
+  if (length(x) == 0) {
+    return("")
+  }
   x
 }
 
@@ -73,14 +75,22 @@ make_nb_filename_ending <- function(nb_img) {
       "The 'auto' attribute of the 'swaps' attribute has length {length(auto)}."
     )
   }
-  swaps_part <- purrr::map2_chr(auto, swaps,
-    ~glue::glue(dplyr::if_else(.x, "auto=", ""), "{.y},")) %>%
+  swaps_part <- purrr::map2_chr(
+    auto, swaps,
+    ~ glue::glue(dplyr::if_else(.x, "auto=", ""), "{.y},")
+  ) %>%
     glue::glue_collapse() %>%
     stringr::str_sub(1, -2)
-  thresh_part <- purrr::map2_chr(thresh_method, thresh,
-    ~glue::glue(dplyr::if_else(is.na(.x),
-                               glue::as_glue(""), glue::glue("{.x}=")),
-                "{.y},")) %>%
+  thresh_part <- purrr::map2_chr(
+    thresh_method, thresh,
+    ~ glue::glue(
+      dplyr::if_else(
+        is.na(.x),
+        glue::as_glue(""), glue::glue("{.x}=")
+      ),
+      "{.y},"
+    )
+  ) %>%
     glue::glue_collapse() %>%
     stringr::str_sub(1, -2)
   out <- glue::glue(
@@ -100,8 +110,10 @@ make_nb_filename_ending <- function(nb_img) {
     overlapped <- attr(nb_img, "overlapped")
     out %<>% stringr::str_replace(
       "timeseries",
-      dplyr::if_else(overlapped,
-                     "overlapped_timeseries", "contiguous_timeseries")
+      dplyr::if_else(
+        overlapped,
+        "overlapped_timeseries", "contiguous_timeseries"
+      )
     )
   }
   out
@@ -141,14 +153,22 @@ make_cc_nb_filename_ending <- function(cc_nb_img) {
   checkmate::assert_numeric(swaps, len = 2)
   checkmate::assert_logical(auto, len = 2)
   checkmate::assert_string(filt, na.ok = TRUE)
-  swaps_part <- purrr::map2_chr(auto, swaps,
-    ~glue::glue(dplyr::if_else(.x, "auto=", ""), "{.y},")) %>%
+  swaps_part <- purrr::map2_chr(
+    auto, swaps,
+    ~ glue::glue(dplyr::if_else(.x, "auto=", ""), "{.y},")
+  ) %>%
     glue::glue_collapse() %>%
     stringr::str_sub(1, -2)
-  thresh_part <- purrr::map2_chr(thresh_method, thresh,
-    ~glue::glue(dplyr::if_else(is.na(.x),
-                               glue::as_glue(""), glue::glue("{.x}=")),
-                "{.y},")) %>%
+  thresh_part <- purrr::map2_chr(
+    thresh_method, thresh,
+    ~ glue::glue(
+      dplyr::if_else(
+        is.na(.x),
+        glue::as_glue(""), glue::glue("{.x}=")
+      ),
+      "{.y},"
+    )
+  ) %>%
     glue::glue_collapse() %>%
     stringr::str_sub(1, -2)
   out <- glue::glue(
@@ -170,8 +190,10 @@ make_cc_nb_filename_ending <- function(cc_nb_img) {
     overlapped <- attr(cc_nb_img, "overlapped")
     out %<>% stringr::str_replace(
       "timeseries",
-      dplyr::if_else(overlapped,
-                     "overlapped_timeseries", "contiguous_timeseries")
+      dplyr::if_else(
+        overlapped,
+        "overlapped_timeseries", "contiguous_timeseries"
+      )
     )
   }
   out
@@ -342,7 +364,8 @@ fix_filt <- function(filt) {
       "
       The offending element is element {bad_index} which is
       '{filt[bad_index]}'.
-      ")
+      "
+    )
   }
   filt
 }
@@ -373,11 +396,13 @@ nb_get_img <- function(img) {
     }
   }
   if (dim(img)[4] == 1) {
-    custom_stop("Your image only has one frame.",
-                "
+    custom_stop(
+      "Your image only has one frame.",
+      "
                  Images to be used for number and brightness analysis must
                  have more than one frame.
-                ")
+                "
+    )
   }
   img
 }
@@ -386,7 +411,7 @@ c_list_attr_na <- function(x) {
   l <- length(x)
   if (is.list(x)) {
     x_attr_names <- x %>%
-      purrr::map(~names(attributes(.))) %>%
+      purrr::map(~ names(attributes(.))) %>%
       unlist() %>%
       unique()
     for (i in seq_along(x)) {
@@ -398,13 +423,13 @@ c_list_attr_na <- function(x) {
       }
     }
     atts <- x %>%
-      purrr::map(~attributes(.)) %>%
+      purrr::map(~ attributes(.)) %>%
       dplyr::bind_rows()
     atts$class <- NULL
     x %<>% purrr::reduce(c)
     attributes(x) <- atts
   }
-  assertthat::assert_that(length(x) == l)  # should never trigger
+  assertthat::assert_that(length(x) == l) # should never trigger
   x
 }
 
@@ -426,12 +451,14 @@ prepare_thresh <- function(thresh) {
   if (is.null(thresh)) thresh <- as.character(rep(NA, 2))
   if (all(is.na(thresh))) thresh <- as.character(rep(NA, 2))
   if (length(thresh) == 1) thresh <- as.character(rep(thresh[[1]], 2))
-  purrr::map(thresh, ~ifelse(can_be_numeric(.), as.numeric(.), .))
+  purrr::map(thresh, ~ ifelse(can_be_numeric(.), as.numeric(.), .))
 }
 
 prepare_filt <- function(filt) {
   if (is.null(filt)) filt <- NA
-  if (is.na(filt)) return(NA_character_)
+  if (is.na(filt)) {
+    return(NA_character_)
+  }
   checkmate::assert_string(filt)
   if (!all(startsWith("smooth", filt) | startsWith("median", filt))) {
     filt %<>% glue::glue_collapse(sep = "', '")
@@ -532,7 +559,8 @@ deduplicate_cc_nb_filename <- function(path) {
 custom_stop_bullet <- function(string) {
   checkmate::assert_string(string)
   string %>%
-    stringr::str_replace_all("\\s+", " ") %>% {
+    stringr::str_replace_all("\\s+", " ") %>%
+    {
       glue::glue("    * {.}")
     }
 }
