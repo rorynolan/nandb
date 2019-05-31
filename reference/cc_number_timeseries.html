@@ -239,7 +239,7 @@ number image.</p>
     <pre class="examples"><div class='input'><span class='no'>img</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ijtiff</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/ijtiff/topics/read_tif'>read_tif</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"two_ch.tif"</span>,
   <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"nandb"</span>
 ))</div><div class='output co'>#&gt; <span class='message'>Reading two_ch.tif: an 8-bit, 30x28 pixel image of unsigned</span>
-#&gt; <span class='message'>integer type with 2 channels and 100 frames . . .</span></div><div class='output co'>#&gt; <span class='message'> Done.</span></div><div class='input'><span class='no'>cc_nts</span> <span class='kw'>&lt;-</span> <span class='fu'>cc_number_timeseries</span>(<span class='no'>img</span>, <span class='fl'>10</span>,
+#&gt; <span class='message'>integer type. Reading 2 channels and 100 frames . . .</span></div><div class='output co'>#&gt; <span class='message'> Done.</span></div><div class='input'><span class='no'>cc_nts</span> <span class='kw'>&lt;-</span> <span class='fu'>cc_number_timeseries</span>(<span class='no'>img</span>, <span class='fl'>10</span>,
   <span class='kw'>thresh</span> <span class='kw'>=</span> <span class='st'>"Huang"</span>,
   <span class='kw'>filt</span> <span class='kw'>=</span> <span class='st'>"median"</span>, <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>2</span>
 )
