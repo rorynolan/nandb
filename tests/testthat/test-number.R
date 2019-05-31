@@ -208,7 +208,9 @@ test_that("number_timeseries works", {
   )
   ans1 <- stringr::str_replace(ans0, "5029", "5363")  # ubuntu
   ans2 <- stringr::str_replace(ans0, "5029", "862")  # windows
-  ans3 <- stringr::str_replace(ans0, "5029", "3840")  # fedora
+  ans3 <- stringr::str_replace(ans0,
+                               c("auto=0", "5029"),
+                               c("auto=1600", "3840"))  # fedora
   lfnts <- list.files("number_timeseries")
   if (all(lfnts %in% ans0)) {
     expect_true(all(lfnts %in% ans0))
