@@ -220,6 +220,12 @@
   "softwareRequirements": [
     {
       "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 3.1"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "Rcpp",
       "name": "Rcpp",
       "version": ">= 1.0.1",
@@ -522,5 +528,5 @@
       }
     }
   ],
-  "fileSize": "555.646KB"
+  "fileSize": "555.764KB"
 }
