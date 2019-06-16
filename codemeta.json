@@ -195,6 +195,7 @@
       "@type": "SoftwareApplication",
       "identifier": "matrixStats",
       "name": "matrixStats",
+      "version": ">= 0.50.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -521,5 +522,5 @@
       }
     }
   ],
-  "fileSize": "555.7KB"
+  "fileSize": "555.646KB"
 }
