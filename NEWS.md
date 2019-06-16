@@ -1,3 +1,9 @@
+# `nandb` 2.0.2
+
+## BUG FIXES
+* Insist on new `filesstrings`. Old `filesstrings` was wreaking havock on `nandb` due to its incompatibility with older versions of `strex`. See https://github.com/rorynolan/strex/issues/2.
+
+
 # `nandb` 2.0.1
 
 ## BUG FIXES

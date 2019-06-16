@@ -1,7 +1,7 @@
 Package: nandb
 Type: Package
 Title: Number and Brightness Image Analysis
-Version: 2.0.1
+Version: 2.0.2
 Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
                     role = c("aut", "cre", "cph"),
                     comment = c(ORCID = "0000-0002-5239-4043")),
@@ -23,12 +23,12 @@ License: BSD_3_clause + file LICENSE
 LazyData: TRUE
 LinkingTo: Rcpp
 Imports:
-    Rcpp,
+    Rcpp (>= 1.0.1),
     filesstrings (>= 3.1.3),
-    magrittr,
+    magrittr (>= 1.5),
     autothresholdr (>= 1.3.3),
     dplyr,
-    stringr,
+    stringr (>= 1.2.0),
     purrr,
     checkmate (>= 1.9.3),
     detrendr (>= 0.6.2),
