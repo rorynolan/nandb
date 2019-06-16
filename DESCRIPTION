@@ -42,7 +42,6 @@ Imports:
     assertthat,
     withr (>= 2.1.0),
     utils
-Remotes: rorynolan/strex, rorynolan/filesstrings, ropensci/ijtiff, rorynolan/autothresholdr, rorynolan/detrendr
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
