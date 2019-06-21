@@ -1,3 +1,9 @@
+# `nandb` 2.0.3
+
+## BUG FIXES
+* Fix tests on CRAN Solaris and Windows oldrel.
+
+
 # `nandb` 2.0.2
 
 ## BUG FIXES
