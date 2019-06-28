@@ -15,6 +15,5 @@
 ^README\.Rmd$
 ^LICENSE\.md$
 ^CONDUCT\.md$
-^README\.md$
 ^codemeta\.json$
 ^pkgdown$

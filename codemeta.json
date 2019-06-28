@@ -241,7 +241,7 @@
       "@type": "SoftwareApplication",
       "identifier": "filesstrings",
       "name": "filesstrings",
-      "version": ">= 3.1.3",
+      "version": ">= 3.1.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -528,5 +528,5 @@
       }
     }
   ],
-  "fileSize": "555.862KB"
+  "fileSize": "555.869KB"
 }
