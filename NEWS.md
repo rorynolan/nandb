@@ -1,3 +1,9 @@
+# `nandb` 2.0.4
+
+## BUG FIXES
+* Exclude a test on CRAN oldrel.
+
+
 # `nandb` 2.0.3
 
 ## BUG FIXES
