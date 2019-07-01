@@ -250,7 +250,7 @@ test_that("number_timeseries works", {
     expect_true(all(lfnts %in% ans5))
   } else if (all(lfnts %in% ans6)) {
     expect_true(all(lfnts %in% ans6))
-  } else {
+  } else if (getRversion() >= "3.6") {
     expect_equal(sort(lfnts), sort(ans0))
   }
   suppressWarnings(file.remove(list.files(pattern = "\\.tiff*"))) # cleanup
