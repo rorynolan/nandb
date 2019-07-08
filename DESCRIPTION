@@ -33,7 +33,7 @@ Imports:
     purrr,
     checkmate (>= 1.9.3),
     detrendr (>= 0.6.2),
-    ijtiff (>= 2.0.0),
+    ijtiff (>= 2.0.2),
     rlang (>= 0.3.3),
     reshape2,
     viridis,

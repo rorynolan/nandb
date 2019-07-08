@@ -343,7 +343,7 @@
       "@type": "SoftwareApplication",
       "identifier": "ijtiff",
       "name": "ijtiff",
-      "version": ">= 2.0.0",
+      "version": ">= 2.0.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -528,5 +528,5 @@
       }
     }
   ],
-  "fileSize": "556.947KB"
+  "fileSize": "556.919KB"
 }

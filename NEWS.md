@@ -2,6 +2,7 @@
 
 ## BUG FIXES
 * Exclude a test on CRAN oldrel.
+* Insist on latest, bug-fixed `ijtiff` v2.0.2.
 
 
 # `nandb` 2.0.3
