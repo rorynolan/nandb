@@ -1,5 +1,6 @@
-repos: - repo: https://github.com/lorenzwalthert/pre-commit-hooks
-    rev: v0.0.0.9008
+repos:
+  - repo: https://github.com/lorenzwalthert/pre-commit-hooks
+    rev: v0.0.0.9015
     hooks:
     - id: style-files
     - id: parsable-R
@@ -7,4 +8,3 @@ repos: - repo: https://github.com/lorenzwalthert/pre-commit-hooks
     - id: readme-rmd-rendered
     - id: roxygenize
     - id: use-tidy-description
-    - id: lintr

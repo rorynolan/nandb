@@ -4,6 +4,8 @@ language: R
 sudo: true
 cache: packages
 
+env: NOT_CRAN: true
+
 matrix:
   include:
     - os: linux
