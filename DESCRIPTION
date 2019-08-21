@@ -1,61 +1,73 @@
-Package: nandb
 Type: Package
+Package: nandb
 Title: Number and Brightness Image Analysis
-Version: 2.0.4
-Authors@R: c(person("Rory", "Nolan", email = "rorynoolan@gmail.com", 
-                    role = c("aut", "cre", "cph"),
-                    comment = c(ORCID = "0000-0002-5239-4043")),
-             person("Luis", "Alvarez", email = "lalvarez@well.ox.ac.uk",
-                    role = c("ctb", "cph"), 
-                    comment = c(ORCID = "0000-0003-1316-1906")),
-             person("Sergi", "Padilla-Parra", email = "spadilla@well.ox.ac.uk",
-                    role = c("ctb", "ths", "cph"),
-                    comment = c(ORCID = "0000-0002-8010-9481")))
+Version: 2.0.5
+Authors@R: 
+    c(person(given = "Rory",
+             family = "Nolan",
+             role = c("aut", "cre", "cph"),
+             email = "rorynoolan@gmail.com",
+             comment = c(ORCID = "0000-0002-5239-4043")),
+      person(given = "Luis",
+             family = "Alvarez",
+             role = c("ctb", "cph"),
+             email = "lalvarez@well.ox.ac.uk",
+             comment = c(ORCID = "0000-0003-1316-1906")),
+      person(given = "Sergi",
+             family = "Padilla-Parra",
+             role = c("ctb", "ths", "cph"),
+             email = "spadilla@well.ox.ac.uk",
+             comment = c(ORCID = "0000-0002-8010-9481")))
 Maintainer: Rory Nolan <rorynoolan@gmail.com>
-URL: https://rorynolan.github.io/nandb, https://github.com/rorynolan/nandb
-BugReports: https://github.com/rorynolan/nandb/issues
-Description: Calculation of molecular number and brightness from 
-    fluorescence microscopy image series. The software was published in a 2016
-    paper <doi:10.1093/bioinformatics/btx434>. The seminal paper for the 
-    technique is Digman et al. 2008 <doi:10.1529/biophysj.107.114645>. A review
-    of the technique was published in 2017 <doi:10.1016/j.ymeth.2017.12.001>.
+Description: Calculation of molecular number and brightness from
+    fluorescence microscopy image series. The software was published in a
+    2016 paper <doi:10.1093/bioinformatics/btx434>. The seminal paper for
+    the technique is Digman et al. 2008 <doi:10.1529/biophysj.107.114645>.
+    A review of the technique was published in 2017
+    <doi:10.1016/j.ymeth.2017.12.001>.
 License: BSD_3_clause + file LICENSE
-LazyData: TRUE
-LinkingTo: Rcpp (>= 1.0.1)
-Depends: R (>= 3.1)
+URL: https://rorynolan.github.io/nandb,
+    https://github.com/rorynolan/nandb
+BugReports: https://github.com/rorynolan/nandb/issues
+Depends: 
+    R (>= 3.1)
 Imports:
-    Rcpp (>= 1.0.1),
-    filesstrings (>= 3.1.5),
-    magrittr (>= 1.5),
+    assertthat,
     autothresholdr (>= 1.3.3),
-    dplyr,
-    stringr (>= 1.2.0),
-    purrr,
+    BBmisc,
     checkmate (>= 1.9.3),
     detrendr (>= 0.6.2),
-    ijtiff (>= 2.0.2),
-    rlang (>= 0.3.3),
-    reshape2,
-    viridis,
-    glue (>= 1.3.0),
-    BBmisc,
+    dplyr,
+    filesstrings (>= 3.1.5),
     ggplot2,
-    assertthat,
-    withr (>= 2.1.0),
-    utils
-RoxygenNote: 6.1.1
-Roxygen: list(markdown = TRUE)
+    glue (>= 1.3.0),
+    ijtiff (>= 2.0.2),
+    magrittr (>= 1.5),
+    purrr,
+    Rcpp (>= 1.0.1),
+    reshape2,
+    rlang (>= 0.3.3),
+    stringr (>= 1.2.0),
+    utils,
+    viridis,
+    withr (>= 2.1.0)
 Suggests: 
-    knitr,
-    rmarkdown,
-    covr,
-    testthat (>= 2.1.0),
     abind,
-    tidyr,
+    covr,
     gridExtra,
-    pacman,
+    knitr,
     matrixStats (>= 0.50.0),
-    spelling
-VignetteBuilder: knitr
+    pacman,
+    rmarkdown,
+    spelling,
+    testthat (>= 2.1.0),
+    tidyr
+LinkingTo: 
+    Rcpp (>= 1.0.1)
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 Language: en-US
+LazyData: TRUE
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
