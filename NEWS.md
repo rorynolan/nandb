@@ -1,3 +1,9 @@
+# `nandb` 2.0.5
+
+## BUG FIXES
+* `skip_on_cran()` tests that allow for different C++ `<random>` implementations (doing these on Travis, AppVeyor and R-hub is enough).
+
+
 # `nandb` 2.0.4
 
 ## BUG FIXES
