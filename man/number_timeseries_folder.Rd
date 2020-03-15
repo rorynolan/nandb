@@ -4,10 +4,21 @@
 \alias{number_timeseries_folder}
 \title{Number time-series calculations for every image in a folder.}
 \usage{
-number_timeseries_folder(folder_path = ".", def, frames_per_set,
-  overlap = FALSE, thresh = NULL, detrend = FALSE, quick = FALSE,
-  filt = NULL, s = 1, offset = 0, readout_noise = 0, gamma = 1,
-  parallel = FALSE)
+number_timeseries_folder(
+  folder_path = ".",
+  def,
+  frames_per_set,
+  overlap = FALSE,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  s = 1,
+  offset = 0,
+  readout_noise = 0,
+  gamma = 1,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to

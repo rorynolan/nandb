@@ -4,9 +4,20 @@
 \alias{brightness_timeseries}
 \title{Create a brightness time-series.}
 \usage{
-brightness_timeseries(img, def, frames_per_set, overlap = FALSE,
-  thresh = NULL, detrend = FALSE, quick = FALSE, filt = NULL,
-  s = 1, offset = 0, readout_noise = 0, parallel = FALSE)
+brightness_timeseries(
+  img,
+  def,
+  frames_per_set,
+  overlap = FALSE,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  s = 1,
+  offset = 0,
+  readout_noise = 0,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{img}{A 4-dimensional array in the style of an

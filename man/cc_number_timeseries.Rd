@@ -4,9 +4,18 @@
 \alias{cc_number_timeseries}
 \title{Create a cross-correlated number time-series.}
 \usage{
-cc_number_timeseries(img, frames_per_set, overlap = FALSE, ch1 = 1,
-  ch2 = 2, thresh = NULL, detrend = FALSE, quick = FALSE,
-  filt = NULL, parallel = FALSE)
+cc_number_timeseries(
+  img,
+  frames_per_set,
+  overlap = FALSE,
+  ch1 = 1,
+  ch2 = 2,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the

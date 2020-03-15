@@ -4,11 +4,21 @@
 \alias{matrix_raster_plot}
 \title{Make a raster plot of a matrix.}
 \usage{
-matrix_raster_plot(mat, scale_name = "scale", limits = NULL,
-  ranges = NULL, range_names = NULL, colours = NULL,
-  na_colour = "black", clip = FALSE, clip_low = FALSE,
-  clip_high = FALSE, log_trans = FALSE, breaks = NULL,
-  include_breaks = NULL)
+matrix_raster_plot(
+  mat,
+  scale_name = "scale",
+  limits = NULL,
+  ranges = NULL,
+  range_names = NULL,
+  colours = NULL,
+  na_colour = "black",
+  clip = FALSE,
+  clip_low = FALSE,
+  clip_high = FALSE,
+  log_trans = FALSE,
+  breaks = NULL,
+  include_breaks = NULL
+)
 }
 \arguments{
 \item{mat}{The matrix you wish to plot.}
@@ -18,7 +28,7 @@ plot.}
 
 \item{limits}{This gives the user the option to set all values outside a
 certain range to their nearest value within that range (if \code{clip = TRUE}) or to \code{NA} (if \code{clip = FALSE}. For example, to set all
-values outside the range [1.5, 2.6) to \code{NA}, use \code{limits = c(1.5, 2.6), clip = FALSE}. The colour range will cover all values within these
+values outside the range [1.5, 2.6) to \code{NA}, use \verb{limits = c(1.5, 2.6), clip = FALSE}. The colour range will cover all values within these
 specified limits.}
 
 \item{ranges}{A numeric vector. If you want specific ranges of values to have
@@ -28,7 +38,7 @@ vector of length 1) \code{n}, this is equivalent to setting ranges to be
 \code{n} equal-length intervals within the range of the matrix, i.e. it is
 equivalent to setting `ranges = seq(min(mat), max(mat), length.out = n
 \itemize{
-\item 1)\code{. At most one of }ranges\code{and}limits\code{should be set. If   ranges is set, the behaviour for values which are not in any of the ranges   are set by the}clip\code{arguments as in the}limits` argument.
+\item 1)\verb{. At most one of }ranges\code{and}limits\verb{should be set. If   ranges is set, the behaviour for values which are not in any of the ranges   are set by the}clip\verb{arguments as in the}limits` argument.
 }}
 
 \item{range_names}{A character vector. If your colour scale is discrete, here

@@ -4,8 +4,16 @@
 \alias{cc_brightness}
 \title{Cross-correlated brightness.}
 \usage{
-cc_brightness(img, ch1 = 1, ch2 = 2, thresh = NULL,
-  detrend = FALSE, quick = FALSE, filt = NULL, parallel = FALSE)
+cc_brightness(
+  img,
+  ch1 = 1,
+  ch2 = 2,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the

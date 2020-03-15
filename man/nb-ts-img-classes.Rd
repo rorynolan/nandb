@@ -8,8 +8,7 @@
 \usage{
 number_ts_img(img, def, frames_per_set, overlapped, thresh, swaps, filt)
 
-brightness_ts_img(img, def, frames_per_set, overlapped, thresh, swaps,
-  filt)
+brightness_ts_img(img, def, frames_per_set, overlapped, thresh, swaps, filt)
 }
 \arguments{
 \item{img}{The calculated number or brightness time series image series.}

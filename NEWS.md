@@ -1,3 +1,9 @@
+# `nandb` 2.0.6
+
+## BUG FIXES
+* Fix a failing unit test.
+
+
 # `nandb` 2.0.5
 
 ## BUG FIXES

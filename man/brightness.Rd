@@ -4,9 +4,18 @@
 \alias{brightness}
 \title{Calculate brightness from image series.}
 \usage{
-brightness(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
-  filt = NULL, s = 1, offset = 0, readout_noise = 0,
-  parallel = FALSE)
+brightness(
+  img,
+  def,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  s = 1,
+  offset = 0,
+  readout_noise = 0,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{img}{A 4-dimensional array in the style of an

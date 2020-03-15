@@ -18,7 +18,7 @@ A matrix.
 The cross-variance function is defined in the reference.
 }
 \details{
-Pillar \code{i, j} of the 3-dimensional array \code{arr} is \code{arr[i, j, ]}.
+Pillar \verb{i, j} of the 3-dimensional array \code{arr} is \code{arr[i, j, ]}.
 }
 \examples{
 x <- array(1:27, dim = rep(3, 3))

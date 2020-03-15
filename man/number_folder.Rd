@@ -4,9 +4,19 @@
 \alias{number_folder}
 \title{Number calculations for every image in a folder.}
 \usage{
-number_folder(folder_path = ".", def, thresh = NULL, detrend = FALSE,
-  quick = FALSE, filt = NULL, s = 1, offset = 0,
-  readout_noise = 0, gamma = 1, parallel = FALSE)
+number_folder(
+  folder_path = ".",
+  def,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  s = 1,
+  offset = 0,
+  readout_noise = 0,
+  gamma = 1,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{folder_path}{The path (relative or absolute) to the folder you wish to

@@ -4,10 +4,21 @@
 \alias{number_timeseries}
 \title{Create a number time-series.}
 \usage{
-number_timeseries(img, def, frames_per_set, overlap = FALSE,
-  thresh = NULL, detrend = FALSE, quick = FALSE, filt = NULL,
-  s = 1, offset = 0, readout_noise = 0, gamma = 1,
-  parallel = FALSE)
+number_timeseries(
+  img,
+  def,
+  frames_per_set,
+  overlap = FALSE,
+  thresh = NULL,
+  detrend = FALSE,
+  quick = FALSE,
+  filt = NULL,
+  s = 1,
+  offset = 0,
+  readout_noise = 0,
+  gamma = 1,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{img}{A 4-dimensional array of images indexed by \code{img[y, x, channel, frame]} (an object of class \link[ijtiff:ijtiff_img]{ijtiff::ijtiff_img}). The image to perform the
