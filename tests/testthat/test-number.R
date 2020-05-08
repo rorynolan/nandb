@@ -237,10 +237,6 @@ test_that("number_timeseries works", {
     expect_true(all(lfnts %in% ans3))
   } else if (all(lfnts %in% ans4)) {
     expect_true(all(lfnts %in% ans4))
-  } else if (all(lfnts %in% ans5)) {
-    expect_true(all(lfnts %in% ans5))
-  } else if (all(lfnts %in% ans6)) {
-    expect_true(all(lfnts %in% ans6))
   } else if (getRversion() >= "3.6") {
     expect_equal(sort(lfnts), sort(ans0))
   }
