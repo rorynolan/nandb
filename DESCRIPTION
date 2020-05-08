@@ -1,7 +1,7 @@
 Type: Package
 Package: nandb
 Title: Number and Brightness Image Analysis
-Version: 2.0.6
+Version: 2.0.7
 Authors@R: 
     c(person(given = "Rory",
              family = "Nolan",
@@ -70,4 +70,4 @@ Encoding: UTF-8
 Language: en-US
 LazyData: TRUE
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

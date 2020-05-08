@@ -23,10 +23,12 @@
 #'   1:69-81. \doi{10.1002/jemt.20526}.
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' ijtiff::display(img[, , 1, 1])
 #' b <- brightness(img, "e", thresh = "Huang")
 #' b <- brightness(img, "B", thresh = "tri")
+#' }
 #' @export
 brightness <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
                        filt = NULL,
@@ -150,8 +152,10 @@ brightness <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
 #' @seealso [brightness()].
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' bts <- brightness_timeseries(img, "e", frames_per_set = 20, thresh = "Huang")
+#' }
 #' @export
 brightness_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
                                   thresh = NULL, detrend = FALSE, quick = FALSE,

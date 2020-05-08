@@ -69,10 +69,12 @@ Given a time stack of images, \code{brightness()} performs a calculation of the
 brightness for each pixel.
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 ijtiff::display(img[, , 1, 1])
 b <- brightness(img, "e", thresh = "Huang")
 b <- brightness(img, "B", thresh = "tri")
+}
 }
 \references{
 Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of

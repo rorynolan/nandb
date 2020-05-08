@@ -80,6 +80,7 @@ them to create the next and so on to get a time-series of cross-correlated
 brightness images.
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
   package = "nandb"
 ))
@@ -88,6 +89,7 @@ cc_bts <- cc_brightness_timeseries(img, 10,
   filt = "median", parallel = 2
 )
 ijtiff::display(cc_bts[, , 1, 1])
+}
 }
 \seealso{
 \code{\link[=brightness]{brightness()}}.

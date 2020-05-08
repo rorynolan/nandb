@@ -596,3 +596,31 @@ custom_stop <- function(main_message, ..., .envir = parent.frame()) {
   }
   rlang::abort(glue::glue_collapse(out, sep = "\n"))
 }
+
+
+get_os <- function() {
+  sysinf <- Sys.info()
+  if (!is.null(sysinf)) {
+    os <- sysinf["sysname"]
+    if (os == "Darwin") {
+      os <- "osx"
+    }
+  } else { ## mystery machine
+    os <- .Platform$OS.type
+    if (grepl("^darwin", R.version$os)) {
+      os <- "osx"
+    }
+    if (grepl("linux-gnu", R.version$os)) {
+      os <- "linux"
+    }
+  }
+  if (os == "osx") os <- "mac"
+  tolower(os)
+}
+
+win32bit <- function() {
+  sys_info <- tolower(Sys.info())
+  windows <- get_os() == "windows"
+  bit64 <- stringr::str_detect(sys_info[["machine"]], stringr::coll("64"))
+  windows && (!bit64)
+}

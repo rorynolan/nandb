@@ -30,6 +30,7 @@
 #' @return A numeric matrix, the cross-correlated brightness image.
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
 #'   package = "nandb"
 #' ))
@@ -40,6 +41,7 @@
 #' ijtiff::display(b[, , 2, 1])
 #' cc_b <- cc_brightness(img, thresh = "Huang")
 #' ijtiff::display(cc_b[, , 1, 1])
+#' }
 #' @export
 cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
                           detrend = FALSE, quick = FALSE,
@@ -156,6 +158,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
 #' @seealso [brightness()].
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
 #'   package = "nandb"
 #' ))
@@ -164,6 +167,7 @@ cc_brightness <- function(img, ch1 = 1, ch2 = 2, thresh = NULL,
 #'   filt = "median", parallel = 2
 #' )
 #' ijtiff::display(cc_bts[, , 1, 1])
+#' }
 #' @export
 cc_brightness_timeseries <- function(img, frames_per_set,
                                      overlap = FALSE,

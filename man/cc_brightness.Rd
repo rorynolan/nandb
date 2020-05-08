@@ -61,6 +61,7 @@ Given a time stack of images  and two channels, calculate the
 cross-correlated brightness of those two channels for each pixel.
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
   package = "nandb"
 ))
@@ -71,4 +72,5 @@ ijtiff::display(b[, , 1, 1])
 ijtiff::display(b[, , 2, 1])
 cc_b <- cc_brightness(img, thresh = "Huang")
 ijtiff::display(cc_b[, , 1, 1])
+}
 }

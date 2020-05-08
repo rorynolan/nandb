@@ -61,6 +61,7 @@ Given a time stack of images  and two channels, calculate the
 cross-correlated number of those two channels for each pixel.
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
   package = "nandb"
 ))
@@ -71,4 +72,5 @@ ijtiff::display(n[, , 1, 1])
 ijtiff::display(n[, , 2, 1])
 cc_n <- cc_number(img, thresh = "Huang")
 ijtiff::display(cc_n[, , 1, 1])
+}
 }

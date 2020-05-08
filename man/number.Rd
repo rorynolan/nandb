@@ -73,10 +73,12 @@ Given a time stack of images, \code{number()} performs a calculation of the numb
 for each pixel.
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 ijtiff::display(img[, , 1, 1])
 num <- number(img, "N", thresh = "Huang")
 num <- number(img, "n", thresh = "tri")
+}
 }
 \references{
 Digman MA, Dalal R, Horwitz AF, Gratton E. Mapping the Number of

@@ -1,3 +1,9 @@
+# `nandb` 2.0.7
+
+## BUG FIXES
+* Cope with `ijtiff` not working on 32-bit Windows.
+
+
 # `nandb` 2.0.6
 
 ## BUG FIXES

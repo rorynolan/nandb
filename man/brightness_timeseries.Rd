@@ -94,8 +94,10 @@ selected, it is performed on the whole image stack before the sectioning is
 done for calculation of numbers.
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 bts <- brightness_timeseries(img, "e", frames_per_set = 20, thresh = "Huang")
+}
 }
 \seealso{
 \code{\link[=brightness]{brightness()}}.

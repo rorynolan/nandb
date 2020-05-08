@@ -96,6 +96,7 @@ the value of \code{mat[i, j]} and the \eqn{x} axis points right and the
 \eqn{y} axis points down (see 'Details').
 }
 \examples{
+\donttest{
 img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 ijtiff::display(img[, , 1, 1])
 matrix_raster_plot(img[, , 1, 1])
@@ -137,4 +138,5 @@ matrix_raster_plot(b,
   scale_name = "brightness",
   include_breaks = 1.25
 )
+}
 }

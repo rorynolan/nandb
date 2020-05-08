@@ -65,6 +65,7 @@
 #'   represented as pixel colours, with a named scale bar.
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' ijtiff::display(img[, , 1, 1])
 #' matrix_raster_plot(img[, , 1, 1])
@@ -106,6 +107,7 @@
 #'   scale_name = "brightness",
 #'   include_breaks = 1.25
 #' )
+#' }
 #' @import ggplot2
 #' @export
 matrix_raster_plot <- function(mat, scale_name = "scale", limits = NULL,
@@ -171,10 +173,12 @@ matrix_raster_plot <- function(mat, scale_name = "scale", limits = NULL,
     ranges <- ranges %>% {
       cbind(.[-length(.)], .[-1])
     } # adjacent pairs
-    ranges_typeset <- apply(ranges, 1, function(x) paste(round(
+    ranges_typeset <- apply(ranges, 1, function(x) {
+      paste(round(
         x,
         2
-      ), collapse = "-"))
+      ), collapse = "-")
+    })
     colours_ranges <- factor(df$value %>% vapply(
       which_interval, integer(1),
       ranges
@@ -194,12 +198,15 @@ matrix_raster_plot <- function(mat, scale_name = "scale", limits = NULL,
     } else {
       range_names <- levels(colours_ranges)
     }
-    ggplot(df, aes(x, y, fill = colour)) + scale_fill_manual(scale_name,
-      values = magrittr::set_names(colours, seq_along(colours)),
-      na.value = na_colour,
-      labels = magrittr::set_names(range_names, seq_along(colours))
-    ) +
-      geom_raster() + plain_theme + coord_fixed()
+    ggplot(df, aes(x, y, fill = colour)) +
+      scale_fill_manual(scale_name,
+        values = magrittr::set_names(colours, seq_along(colours)),
+        na.value = na_colour,
+        labels = magrittr::set_names(range_names, seq_along(colours))
+      ) +
+      geom_raster() +
+      plain_theme +
+      coord_fixed()
   } else {
     if (is.null(limits)) {
       if (is.null(include_breaks)) {
@@ -254,11 +261,14 @@ matrix_raster_plot <- function(mat, scale_name = "scale", limits = NULL,
         }
       }
     }
-    ggplot(df, aes(x, y, fill = value)) + scale_fill_gradientn(scale_name,
-      limits = limits, colours = colours, na.value = na_colour,
-      trans = ifelse(log_trans, "log", "identity"), breaks = breaks
-    ) +
-      geom_raster() + plain_theme + coord_fixed()
+    ggplot(df, aes(x, y, fill = value)) +
+      scale_fill_gradientn(scale_name,
+        limits = limits, colours = colours, na.value = na_colour,
+        trans = ifelse(log_trans, "log", "identity"), breaks = breaks
+      ) +
+      geom_raster() +
+      plain_theme +
+      coord_fixed()
   }
 }
 

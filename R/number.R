@@ -57,10 +57,12 @@
 #'   Photodepletion. PLoS ONE 9(5): e97440. \doi{10.1371/journal.pone.0097440}.
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' ijtiff::display(img[, , 1, 1])
 #' num <- number(img, "N", thresh = "Huang")
 #' num <- number(img, "n", thresh = "tri")
+#' }
 #' @export
 number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
                    filt = NULL, s = 1, offset = 0, readout_noise = 0, gamma = 1,
@@ -173,8 +175,10 @@ number <- function(img, def, thresh = NULL, detrend = FALSE, quick = FALSE,
 #' @seealso [number()].
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
 #' nts <- number_timeseries(img, "n", frames_per_set = 20, thresh = "Huang")
+#' }
 #' @export
 number_timeseries <- function(img, def, frames_per_set, overlap = FALSE,
                               thresh = NULL,

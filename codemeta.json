@@ -14,14 +14,14 @@
   ],
   "issueTracker": "https://github.com/rorynolan/nandb/issues",
   "license": "https://spdx.org/licenses/BSD-3-Clause",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
-    "version": "3.6.1",
+    "version": "4.0.0",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.6.1 (2019-07-05)",
+  "runtimePlatform": "R version 4.0.0 (2020-04-24)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -528,5 +528,5 @@
       }
     }
   ],
-  "fileSize": "557.274KB"
+  "fileSize": "557.643KB"
 }

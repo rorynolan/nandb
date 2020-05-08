@@ -30,6 +30,7 @@
 #' @return A numeric matrix, the cross-correlated number image.
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
 #'   package = "nandb"
 #' ))
@@ -40,6 +41,7 @@
 #' ijtiff::display(n[, , 2, 1])
 #' cc_n <- cc_number(img, thresh = "Huang")
 #' ijtiff::display(cc_n[, , 1, 1])
+#' }
 #' @export
 cc_number <- function(img, ch1 = 1, ch2 = 2,
                       thresh = NULL, detrend = FALSE, quick = FALSE,
@@ -157,6 +159,7 @@ cc_number <- function(img, ch1 = 1, ch2 = 2,
 #' @seealso [number()].
 #'
 #' @examples
+#' \donttest{
 #' img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
 #'   package = "nandb"
 #' ))
@@ -165,6 +168,7 @@ cc_number <- function(img, ch1 = 1, ch2 = 2,
 #'   filt = "median", parallel = 2
 #' )
 #' ijtiff::display(cc_nts[, , 1, 1])
+#' }
 #' @export
 cc_number_timeseries <- function(img, frames_per_set, overlap = FALSE,
                                  ch1 = 1, ch2 = 2,
