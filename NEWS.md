@@ -1,6 +1,12 @@
 # `nandb` 2.0.7
 
 ## BUG FIXES
+* Insist on bug-fixed `filesstrings` >= 3.2.
+
+
+# `nandb` 2.0.7
+
+## BUG FIXES
 * Cope with `ijtiff` not working on 32-bit Windows.
 
 

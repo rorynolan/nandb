@@ -48,12 +48,12 @@ you can set the names which will label each range in the legend.}
 colors you wish to colour each range. It must have the same length as the
 number of intervals you have specified in \code{ranges}.  If you have not
 specified \code{ranges}, here you may specify the colours (to be passed to
-\code{\link[ggplot2:scale_fill_gradientn]{ggplot2::scale_fill_gradientn()}}) to create the continuous
+\code{\link[ggplot2:scale_gradient]{ggplot2::scale_fill_gradientn()}}) to create the continuous
 colour band. It is specified as a character vector, with the colors
 specified either as the values in \code{\link[=colors]{colors()}} or as in the value
 of the \code{\link[=rgb]{rgb()}} function. Note that this allows the use of
-\code{\link[grDevices:rainbow]{grDevices::rainbow()}} and friends. The default uses
-\code{\link[viridis:viridis]{viridis::viridis()}}.}
+\code{\link[grDevices:palettes]{grDevices::rainbow()}} and friends. The default uses
+\code{\link[viridis:reexports]{viridis::viridis()}}.}
 
 \item{na_colour}{Which colour should the \code{NA} pixels be? Default is
 black.}
@@ -86,7 +86,7 @@ those specific ones here.}
 }
 \value{
 In the graphics console, a raster plot (via
-\code{\link[ggplot2:geom_raster]{ggplot2::geom_raster()}}) will appear with the matrix values
+\code{\link[ggplot2:geom_tile]{ggplot2::geom_raster()}}) will appear with the matrix values
 represented as pixel colours, with a named scale bar.
 }
 \description{

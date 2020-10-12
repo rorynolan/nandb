@@ -42,7 +42,7 @@ overlapped, the frame sets are 1-5, 2-6, 3-7, 4-8 and so on up to 16-20.}
 detrending and number calculations. If there are many channels, this may be
 specified as a vector or list, one element for each channel.}
 
-\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+\item{detrend}{Detrend your data with \code{\link[detrendr:detrending]{detrendr::img_detrend_rh()}}. This is
 the best known detrending method for brightness analysis. For more
 fine-grained control over your detrending, use the \code{detrendr} package. If
 there are many channels, this may be specified as a vector, one element for

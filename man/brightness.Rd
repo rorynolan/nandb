@@ -30,7 +30,7 @@ or a 3-dimensional array which is a single channel of an
 \code{\link[autothresholdr:mean_stack_thresh]{autothresholdr::mean_stack_thresh()}}) to use on the image prior to
 detrending and brightness calculations.}
 
-\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+\item{detrend}{Detrend your data with \code{\link[detrendr:detrending]{detrendr::img_detrend_rh()}}. This is
 the best known detrending method for brightness analysis. For more
 fine-grained control over your detrending, use the \code{detrendr} package. If
 there are many channels, this may be specified as a vector, one element for

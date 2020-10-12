@@ -31,7 +31,7 @@ both channels. If this is a length-2 vector or list, then these two
 thresholds will be applied to channels 1 and 2 respectively. A value of
 \code{NA} for either channel gives no thresholding for that channel.}
 
-\item{detrend}{Detrend your data with \code{\link[detrendr:img_detrend_rh]{detrendr::img_detrend_rh()}}. This is
+\item{detrend}{Detrend your data with \code{\link[detrendr:detrending]{detrendr::img_detrend_rh()}}. This is
 the best known detrending method for brightness analysis. For more
 fine-grained control over your detrending, use the \code{detrendr} package. To
 detrend one channel and not the other, specify this as a length 2 vector.}
