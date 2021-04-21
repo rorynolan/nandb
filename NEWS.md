@@ -1,7 +1,8 @@
-# `nandb` 2.0.7
+# `nandb` 2.0.8
 
 ## BUG FIXES
 * Insist on bug-fixed `filesstrings` >= 3.2.
+* Remove `LazyData` from `DESCRIPTION` (was causing CRAN note).
 
 
 # `nandb` 2.0.7
@@ -95,6 +96,3 @@
 # `nandb` 0.2.0
 
 * The first version that I consider CRAN-worthy.
-
-
-

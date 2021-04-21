@@ -2,11 +2,11 @@
 
 ## Test environments
 
-* local mac OS X install, R 3.6.1
-* ubuntu 16.04 (on travis-ci), R 3.6.1
-* Windows Server 2012 (on AppVeyor), R 3.6.1
-* debian (on r-hub), R 3.6.1
-* fedora (on r-hub), R 3.6.1
+* local mac OS X install, R 4.0.2
+* ubuntu 16.04 (on travis-ci), R 4.0.2
+* Windows Server 2012 (on AppVeyor), R 4.0.2
+* debian (on r-hub), R 4.0.2
+* fedora (on r-hub), R 4.0.2
 * win-builder (devel and release)
 
 

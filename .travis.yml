@@ -17,8 +17,6 @@ matrix:
             - libtiff5-dev
             - libfftw3-dev
             - libmagick++-dev
-      r_build_args: --no-build-vignettes --no-manual
-      r_check_args: --no-build-vignettes --no-manual
       warnings_are_errors: false
       after_success: Rscript -e 'covr::codecov()'
       before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
@@ -27,8 +25,8 @@ matrix:
         script: Rscript -e 'pkgdown::deploy_site_github()'
         skip_cleanup: true
     - os: osx
+      osx_image: xcode12.2
       env: _R_CHECK_LENGTH_1_CONDITION_=true
       r_build_args: --no-build-vignettes --no-manual
       r_check_args: --no-build-vignettes --no-manual
       warnings_are_errors: false
-

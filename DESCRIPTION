@@ -26,7 +26,7 @@ Description: Calculation of molecular number and brightness from
     A review of the technique was published in 2017
     <doi:10.1016/j.ymeth.2017.12.001>.
 License: BSD_3_clause + file LICENSE
-URL: https://rorynolan.github.io/nandb,
+URL: https://rorynolan.github.io/nandb/,
     https://github.com/rorynolan/nandb
 BugReports: https://github.com/rorynolan/nandb/issues
 Depends: 
@@ -68,6 +68,5 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Language: en-US
-LazyData: TRUE
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

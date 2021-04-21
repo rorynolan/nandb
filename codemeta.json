@@ -10,7 +10,8 @@
   "codeRepository": "https://github.com/rorynolan/nandb",
   "relatedLink": [
     "https://rorynolan.github.io/nandb",
-    "https://CRAN.R-project.org/package=nandb"
+    "https://CRAN.R-project.org/package=nandb",
+    "https://rorynolan.github.io/nandb/"
   ],
   "issueTracker": "https://github.com/rorynolan/nandb/issues",
   "license": "https://spdx.org/licenses/BSD-3-Clause",
@@ -459,7 +460,7 @@
   "releaseNotes": "https://github.com/rorynolan/nandb/blob/master/NEWS.md",
   "readme": "https://github.com/rorynolan/nandb/blob/master/README.md",
   "contIntegration": ["https://travis-ci.org/rorynolan/nandb", "https://ci.appveyor.com/project/rorynolan/nandb", "https://codecov.io/github/rorynolan/nandb?branch=master"],
-  "developmentStatus": ["http://www.repostatus.org/#active", "https://www.tidyverse.org/lifecycle/#stable"],
+  "developmentStatus": ["https://www.repostatus.org/", "https://lifecycle.r-lib.org/articles/stages.html"],
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -520,5 +521,5 @@
       }
     }
   ],
-  "fileSize": "2683914.761KB"
+  "fileSize": "2683914.553KB"
 }

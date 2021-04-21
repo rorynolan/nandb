@@ -20,12 +20,11 @@ Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](htt
 ![RStudio CRAN
 downloads](http://cranlogs.r-pkg.org/badges/grand-total/nandb) ![RStudio
 CRAN monthly downloads](http://cranlogs.r-pkg.org/badges/nandb)
-[![Rdocumentation](http://www.rdocumentation.org/badges/version/nandb)](http://www.rdocumentation.org/packages/nandb)
 
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
-developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+developed.](http://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 
 ## Installation
 
@@ -48,7 +47,7 @@ for the ultra-curious and should be thought of as unreliable.
 
 ## How to use the package
 
-See the package website at <https://rorynolan.github.io/nandb>.
+See the package website at <https://rorynolan.github.io/nandb/>.
 
 ## Contribution
 
