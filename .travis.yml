@@ -18,6 +18,9 @@ matrix:
             - libtiff5-dev
             - libfftw3-dev
             - libmagick++-dev
+            - libgit2-dev
+            - libharfbuzz-dev
+            - libfribidi-dev
       warnings_are_errors: false
       after_success: Rscript -e 'covr::codecov()'
       before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
