@@ -19,15 +19,8 @@ matrix:
             - libfftw3-dev
             - libmagick++-dev
             - libgit2-dev
-            - libharfbuzz-dev
-            - libfribidi-dev
       warnings_are_errors: false
       after_success: Rscript -e 'covr::codecov()'
-      before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
-      deploy:
-        provider: script
-        script: Rscript -e 'pkgdown::deploy_site_github()'
-        skip_cleanup: true
     - os: osx
       osx_image: xcode12.2
       env: _R_CHECK_LENGTH_1_CONDITION_=true
