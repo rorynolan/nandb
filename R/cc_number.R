@@ -182,7 +182,7 @@ cc_number_timeseries <- function(img, frames_per_set, overlap = FALSE,
   if (length(detrend) == 1) detrend %<>% rep(2)
   thresh %<>% prepare_thresh()
   filt %<>% prepare_filt()
-  if (is.character(img)) img %<>% ijtiff::read_tif()
+  if (is.character(img)) img %<>% ijtiff::read_tif(msg = FALSE)
   checkmate::assert_array(img, d = 4)
   if (dim(img)[4] < frames_per_set) {
     custom_stop("
@@ -312,7 +312,7 @@ cc_number_file <- function(path, ch1 = 1, ch2 = 2, thresh = NULL,
   path %<>% filesstrings::before_last_dot() %>%
     paste0("cc_number", "/", ., make_cc_nb_filename_ending(cc_n)) %>%
     deduplicate_cc_nb_filename()
-  ijtiff::write_tif(cc_n, path)
+  ijtiff::write_tif(cc_n, path, msg = FALSE)
 }
 
 cc_number_timeseries_file <- function(path, frames_per_set,
@@ -343,7 +343,7 @@ cc_number_timeseries_file <- function(path, frames_per_set,
       make_cc_nb_filename_ending(cc_n_ts)
     ) %>%
     deduplicate_cc_nb_filename()
-  ijtiff::write_tif(cc_n_ts, path)
+  ijtiff::write_tif(cc_n_ts, path, msg = FALSE)
 }
 
 #' Cross-correlated number calculations for every image in a folder.

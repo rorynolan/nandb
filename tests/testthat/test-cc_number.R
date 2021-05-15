@@ -1,13 +1,12 @@
-context("cc_number()")
 test_that("cc_number() works", {
   img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
     package = "nandb"
-  ))
+  ), msg = FALSE)
   set.seed(1)
   cc_n <- cc_number(img, thresh = "Huang", detrend = TRUE, filt = "median")
   expect_equal(median(cc_n, na.rm = TRUE), 24, tolerance = 25)
   cc_n <- cc_number(img, thresh = "Huang", filt = "smooth")
-  expect_equal(median(cc_n, na.rm = TRUE), 4, tolerance = 10)
+  expect_equal(median(cc_n, na.rm = TRUE), 4, tolerance = 20)
   expect_error(
     cc_number(img, ch2 = 3),
     paste0(
@@ -56,17 +55,16 @@ test_that("cc_number() works", {
   )
 })
 
-context("cc_number_timeseries()")
 test_that("cc_number_timeseries() works", {
   img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
     package = "nandb"
-  ))
+  ), msg = FALSE)
   set.seed(1)
   cc_n_ts <- cc_number_timeseries(img, 10,
     thresh = "Huang", detrend = TRUE,
     filt = "median", parallel = 2
   )
-  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 2)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), 0, tolerance = 5)
   cc_n_ts <- cc_number_timeseries(img, 10,
     thresh = "Huang", detrend = FALSE,
     filt = "smooth", parallel = 2
@@ -146,42 +144,40 @@ test_that("cc_number_timeseries() works", {
 })
 
 
-context("cc_number_folder()")
 test_that("cc_number_folder() works", {
   img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
     package = "nandb"
-  ))
+  ), msg = FALSE)
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
-  ijtiff::write_tif(img, "a.tif")
+  ijtiff::write_tif(img, "a.tif", msg = FALSE)
   set.seed(1)
   cc_number_folder(thresh = "Huang", detrend = FALSE)
   cc_n <- dir(pattern = "cc_number", recursive = TRUE) %>%
-    ijtiff::read_tif()
+    ijtiff::read_tif(msg = FALSE)
   expect_equal(median(cc_n, na.rm = TRUE), 24, tolerance = 25)
-  filesstrings::dir.remove("cc_number")
+  suppressMessages(filesstrings::dir.remove("cc_number"))
   dir.create("dir")
-  ijtiff::write_tif(img, "dir/a.tif")
+  ijtiff::write_tif(img, "dir/a.tif", msg = FALSE)
   set.seed(1)
   cc_number_file("dir/a.tif", thresh = "Huang", detrend = FALSE)
   cc_n <- dir(pattern = "cc_number", recursive = TRUE) %>%
-    ijtiff::read_tif()
+    ijtiff::read_tif(msg = FALSE)
   expect_equal(median(cc_n, na.rm = TRUE), 22.2, tolerance = 3)
-  filesstrings::dir.remove("dir")
+  suppressMessages(filesstrings::dir.remove("dir"))
   file.remove("a.tif")
   setwd(cwd)
 })
 
-context("cc_number_timeseries_folder()")
 test_that("cc_number_timeseries_folder() works", {
   img <- ijtiff::read_tif(system.file("extdata", "two_ch.tif",
     package = "nandb"
-  ))
+  ), msg = FALSE)
   cwd <- getwd()
   on.exit(setwd(cwd))
   setwd(tempdir())
-  ijtiff::write_tif(img, "a.tif")
+  ijtiff::write_tif(img, "a.tif", msg = FALSE)
   set.seed(1)
   cc_number_timeseries_folder(
     thresh = "Huang", frames_per_set = 10, detrend = FALSE,
@@ -193,11 +189,11 @@ test_that("cc_number_timeseries_folder() works", {
   ) %>%
     purrr::map(~ dir(pattern = paste0(., ".*tif$"), recursive = TRUE)) %>%
     unlist() %>%
-    ijtiff::read_tif()
-  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 2)
-  filesstrings::dir.remove("cc_number_timeseries")
+    ijtiff::read_tif(msg = FALSE)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), 0, tolerance = 5)
+  suppressMessages(filesstrings::dir.remove("cc_number_timeseries"))
   dir.create("dir")
-  ijtiff::write_tif(img, "dir/a.tif")
+  ijtiff::write_tif(img, "dir/a.tif", msg = FALSE)
   set.seed(1)
   cc_number_timeseries_file("dir/a.tif",
     thresh = "Huang", detrend = FALSE,
@@ -210,8 +206,8 @@ test_that("cc_number_timeseries_folder() works", {
   ) %>%
     purrr::map(~ dir(pattern = paste0(., ".*tif$"), recursive = TRUE)) %>%
     unlist() %>%
-    ijtiff::read_tif()
-  expect_equal(median(cc_n_ts, na.rm = TRUE), -1.8, tolerance = 2)
+    ijtiff::read_tif(msg = FALSE)
+  expect_equal(median(cc_n_ts, na.rm = TRUE), 0, tolerance = 5)
   filesstrings::dir.remove("dir")
   file.remove("a.tif")
   setwd(cwd)

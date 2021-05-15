@@ -376,7 +376,7 @@ nb_get_img <- function(img) {
     checkmate::check_file_exists(img)
   )
   if (is.character(img)) {
-    img %<>% ijtiff::read_tif()
+    img %<>% ijtiff::read_tif(msg = FALSE)
   }
   checkmate::assert_numeric(img, lower = 0)
   if (!isTRUE(all.equal(img, floor(img), check.attributes = FALSE))) {

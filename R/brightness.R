@@ -288,7 +288,7 @@ brightness_file <- function(path, def,
   path %<>% filesstrings::before_last_dot() %>%
     paste0("brightness", "/", ., make_nb_filename_ending(b)) %>%
     deduplicate_nb_filename()
-  ijtiff::write_tif(b, path)
+  ijtiff::write_tif(b, path, msg = FALSE)
 }
 
 brightness_timeseries_file <- function(path, def, frames_per_set,
@@ -323,7 +323,7 @@ brightness_timeseries_file <- function(path, def, frames_per_set,
   path %<>% filesstrings::before_last_dot() %>%
     paste0("brightness_timeseries", "/", ., make_nb_filename_ending(bts)) %>%
     deduplicate_nb_filename()
-  ijtiff::write_tif(bts, path)
+  ijtiff::write_tif(bts, path, msg = FALSE)
 }
 
 

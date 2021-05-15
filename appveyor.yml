@@ -13,10 +13,12 @@ install:
 # Adapt as necessary starting from here
 
 environment:
-  global:
-    R_VERSION: release
-    R_ARCH: x64
-    NOT_CRAN: true
+  BIOC_USE_DEVEL: FALSE
+  R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+  matrix:
+    - R_VERSION: oldrel
+    - R_VERSION: release
+    - R_VERSION: devel
 
 build_script:
   - travis-tool.sh install_deps

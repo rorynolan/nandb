@@ -1,25 +1,23 @@
-context("Graphics")
-
 test_that("matrix_raster_plot is ggplot", {
   img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
   brightness <- brightness(img, def = "B")
-  expect_is(matrix_raster_plot(brightness, scale_name = "brightness"), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness, scale_name = "brightness"), "ggplot")
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     log_trans = TRUE
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     log_trans = TRUE, breaks = 1:3
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     ranges = seq(0.5, 3, length.out = 6), range_names = paste0(
       1:5,
       "mer"
     )
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     ranges = seq(0.5, 3, length.out = 6),
     range_names = paste0(1:5, "mer"), log_trans = TRUE
@@ -34,30 +32,30 @@ test_that("matrix_raster_plot is ggplot", {
     ranges = seq(0.5, 3, length.out = 6), colours = viridis::viridis(999),
     range_names = paste0(1:59, "mer"), log_trans = TRUE
   ))
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     ranges = seq(0.5, 3, length.out = 6), include_breaks = 1.25,
     range_names = NULL, log_trans = TRUE
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     ranges = seq(0.5, 3, length.out = 6), include_breaks = 1.25,
     range_names = NULL, log_trans = FALSE
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     limits = c(1, 1.25), clip = TRUE
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     limits = c(1, 1.25), clip = TRUE,
     include_breaks = 1.2
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     include_breaks = 1.25
   ), "ggplot")
-  expect_is(matrix_raster_plot(brightness,
+  expect_s3_class(matrix_raster_plot(brightness,
     scale_name = "brightness",
     include_breaks = 1.25, log_trans = TRUE
   ), "ggplot")
@@ -73,7 +71,7 @@ test_that("matrix_raster_plot is ggplot", {
       "therefore not a matrix."
     )
   )
-  expect_is(matrix_raster_plot(brightness), "ggplot")
+  expect_s3_class(matrix_raster_plot(brightness), "ggplot")
 })
 
 test_that("`which_interval()` errors correctly", {

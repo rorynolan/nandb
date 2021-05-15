@@ -1,5 +1,3 @@
-context("Cross var")
-
 test_that("cross_var_pillars() works", {
   x <- array(1:27, dim = rep(3, 3))
   y <- array(0:26, dim = rep(3, 3))

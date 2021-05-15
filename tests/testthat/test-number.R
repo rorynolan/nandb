@@ -1,12 +1,15 @@
 test_that("number works", {
   set.seed(1)
-  context("number()")
   img <- system.file("extdata", "50.tif", package = "nandb")
-  number <- number(img, "n", thresh = "Huang", filt = "median", detrend = TRUE)
-  expect_equal(median(number, na.rm = TRUE), 0, tolerance = 20)
-  number <- number(img, "N", thresh = "Huang", filt = "mean")
+  number <- suppressMessages(
+    number(img, "n", thresh = "Huang", filt = "median", detrend = TRUE)
+  )
+  expect_equal(median(number, na.rm = TRUE), 0, tolerance = 40)
+  number <- suppressMessages(
+    number(img, "N", thresh = "Huang", filt = "mean")
+  )
   expect_equal(mean(number, na.rm = TRUE), 17.4, tolerance = 0.01)
-  img %<>% ijtiff::read_tif()
+  img <- ijtiff::read_tif(img, msg = FALSE)
   number <- number(img, "n", filt = "median", detrend = FALSE)
   skip_if_not_installed("abind")
   two_channel_img <- abind::abind(img, img, along = 3)
@@ -17,7 +20,7 @@ test_that("number works", {
   abind::abind(number, number, along = 3) %>% {
     list(dim(.), as.vector(.))
   },
-  check.attributes = FALSE
+  ignore_attr = TRUE
   )
   expect_error(
     number(img, def = "rory"),
@@ -30,13 +33,12 @@ test_that("number works", {
 
 test_that("number_folder works", {
   set.seed(1)
-  context("number_folder()")
   img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
   cwd <- setwd(tempdir())
   on.exit(setwd(cwd))
-  ijtiff::write_tif(img, "50.tif")
-  ijtiff::write_tif(img, "50again.tif")
-  ijtiff::write_tif(array(4, dim = rep(3, 4)), "const.tif")
+  ijtiff::write_tif(img, "50.tif", msg = FALSE)
+  ijtiff::write_tif(img, "50again.tif", msg = FALSE)
+  ijtiff::write_tif(array(4, dim = rep(3, 4)), "const.tif", msg = FALSE)
   expect_error(
     number_folder(def = "rory", detrend = FALSE),
     paste0(
@@ -57,7 +59,7 @@ test_that("number_folder works", {
       list.files("number"))
   )
   filesstrings::create_dir("tempwithintemp")
-  ijtiff::write_tif(img, "tempwithintemp/50.tif")
+  ijtiff::write_tif(img, "tempwithintemp/50.tif", msg = FALSE)
   expect_error(
     number_file("tempwithintemp/50.tif", def = "rory"),
     paste0(
@@ -77,7 +79,6 @@ test_that("number_folder works", {
 
 test_that("number_timeseries works", {
   set.seed(1)
-  context("number_timeseries()")
   img <- system.file("extdata", "50.tif", package = "nandb")
   n <- number(img, "N")
   expect_error(
@@ -164,10 +165,10 @@ test_that("number_timeseries works", {
   )
   cwd <- setwd(tempdir())
   on.exit(setwd(cwd))
-  ijtiff::write_tif(img, "50.tif")
-  ijtiff::write_tif(img, "50again.tif")
+  ijtiff::write_tif(img, "50.tif", msg = FALSE)
+  ijtiff::write_tif(img, "50again.tif", msg = FALSE)
   filesstrings::create_dir("tempwithintemp")
-  ijtiff::write_tif(img, "tempwithintemp/50.tif")
+  ijtiff::write_tif(img, "tempwithintemp/50.tif", msg = FALSE)
   expect_error(
     number_timeseries_file("tempwithintemp/50.tif",
       def = "rory",

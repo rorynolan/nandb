@@ -1,5 +1,3 @@
-context("Filters")
-
 test_that("median and smooth filters work", {
   m <- matrix(1:9, nrow = 3)
   m[2:3, 2:3] <- NA

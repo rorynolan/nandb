@@ -1,3 +1,12 @@
+# `nandb` 2.1.0
+
+## MINOR IMPROVEMENTS
+* No more messages from `ijtiff` I/O.
+
+## BUG FIXES
+* Insist on bug-fixed `autothresholdr`.
+
+
 # `nandb` 2.0.8
 
 ## BUG FIXES

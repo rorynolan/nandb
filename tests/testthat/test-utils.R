@@ -1,5 +1,3 @@
-context("Utils")
-
 test_that("nb_get_img() errors correctly", {
   set.seed(1)
   img <- array(runif(8), dim = rep(2, 3))

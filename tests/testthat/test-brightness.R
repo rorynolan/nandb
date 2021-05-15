@@ -1,15 +1,18 @@
-context("brightness()")
 test_that("brightness works", {
   set.seed(1)
   img <- system.file("extdata", "50.tif", package = "nandb")
-  brightness <- brightness(img, "e",
-    thresh = "Huang", detrend = TRUE,
-    filt = "median", parallel = 2
+  brightness <- suppressMessages(
+    brightness(img, "e",
+      thresh = "Huang", detrend = TRUE,
+      filt = "median", parallel = 2
+    )
   )
-  expect_equal(mean(brightness, na.rm = TRUE), 0.028, tolerance = 0.011)
-  brightness <- brightness(img, "b", thresh = "Huang", filt = "mean")
-  expect_equal(mean(brightness, na.rm = TRUE), 1.05, tolerance = 0.01)
-  img %<>% ijtiff::read_tif()
+  expect_equal(mean(brightness, na.rm = TRUE), 0.028, tolerance = 0.1)
+  brightness <- suppressMessages(
+    brightness(img, "b", thresh = "Huang", filt = "mean")
+  )
+  expect_equal(mean(brightness, na.rm = TRUE), 1.05, tolerance = 0.1)
+  img <- ijtiff::read_tif(img, msg = FALSE)
   brightness <- brightness(img, "B", detrend = FALSE, filt = "median")
   skip_if_not_installed("abind")
   two_channel_img <- abind::abind(img, img, along = 3)
@@ -23,7 +26,7 @@ test_that("brightness works", {
   abind::abind(brightness, brightness, along = 3) %>% {
     list(dim(.), as.vector(.))
   },
-  check.attributes = FALSE
+  ignore_attr = TRUE
   )
   expect_error(
     brightness(img, def = "rory"),
@@ -34,16 +37,17 @@ test_that("brightness works", {
   )
 })
 
-context("brightness_folder()")
 test_that("brightness_folder works", {
   set.seed(1)
-  img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"))
-  cwd <- setwd(tempdir())
+  img <- ijtiff::read_tif(system.file("extdata", "50.tif", package = "nandb"),
+    msg = FALSE
+  )
+  cwd <- setwd(tempdir(check = TRUE))
   on.exit(setwd(cwd))
-  ijtiff::write_tif(img, "50.tif")
-  ijtiff::write_tif(img, "50again.tif")
-  ijtiff::write_tif(array(4, dim = rep(4, 4)), "const.tif")
-  brightness_folder(def = "b", detrend = FALSE)
+  ijtiff::write_tif(img, "50.tif", msg = FALSE)
+  ijtiff::write_tif(img, "50again.tif", msg = FALSE)
+  ijtiff::write_tif(array(4, dim = rep(4, 4)), "const.tif", msg = FALSE)
+  suppressMessages(brightness_folder(def = "b", detrend = FALSE))
   expect_true(
     all(c(
       "50_brightness_B_swaps=NA_thresh=NA_filt=NA.tif",
@@ -55,7 +59,7 @@ test_that("brightness_folder works", {
     ) %in%
       list.files("brightness"))
   )
-  brightness_folder(def = "E", detrend = FALSE)
+  suppressMessages(brightness_folder(def = "E", detrend = FALSE))
   expect_true(
     all(c(
       "50_brightness_epsilon_swaps=NA_thresh=NA_filt=NA.tif",
@@ -67,38 +71,37 @@ test_that("brightness_folder works", {
     ) %in%
       list.files("brightness"))
   )
-  filesstrings::create_dir("tempwithintemp")
-  ijtiff::write_tif(img, "tempwithintemp/50.tif")
-  brightness_file("tempwithintemp/50.tif", def = "b")
+  suppressMessages(filesstrings::create_dir("tempwithintemp"))
+  ijtiff::write_tif(img, "tempwithintemp/50.tif", msg = FALSE)
+  suppressMessages(brightness_file("tempwithintemp/50.tif", def = "b"))
   expect_true(any(stringr::str_detect(
     dir("tempwithintemp/brightness"),
     "^50_brightness_B.*tif$"
   )))
-  brightness_file("tempwithintemp/50.tif", def = "E")
+  suppressMessages(brightness_file("tempwithintemp/50.tif", def = "E"))
   expect_true(any(stringr::str_detect(
     dir("tempwithintemp/brightness"),
     "^50_brightness_epsilon.*tif$"
   )))
-  filesstrings::dir.remove("tempwithintemp")
-  filesstrings::dir.remove("brightness")
+  suppressMessages(filesstrings::dir.remove("tempwithintemp"))
+  suppressMessages(filesstrings::dir.remove("brightness"))
   suppressWarnings(file.remove(list.files()))
   setwd(cwd)
 })
 
-context("brightness_timeseries()")
 test_that("brightness_timeseries works", {
   set.seed(1)
   img <- system.file("extdata", "50.tif", package = "nandb")
-  b <- brightness(img, "e")
+  b <- suppressMessages(brightness(img, "e"))
   bts <- brightness_timeseries(img, "e", 20,
     thresh = "Huang", detrend = FALSE, filt = "median"
   )
-  expect_equal(mean(bts, na.rm = TRUE), -0.013, tolerance = 0.005)
+  expect_equal(mean(bts, na.rm = TRUE), -0.013, tolerance = 0.2)
   bts_overlapped <- brightness_timeseries(img, "e", 20,
     overlap = TRUE,
     thresh = "Huang", detrend = FALSE, filt = "median"
   )
-  img %<>% ijtiff::read_tif()
+  img %<>% ijtiff::read_tif(msg = FALSE)
   common_frames <- which(seq_len(dim(img)[4]) %% 20 == 0) - 20 + 1
   expect_equal(
     bts_overlapped[, , , common_frames, drop = FALSE] %>% {
@@ -120,16 +123,13 @@ test_that("brightness_timeseries works", {
     }
   )
   expect_equal(median(bts, na.rm = TRUE), median(bts_overlapped, na.rm = TRUE),
-    tolerance = min(abs(c(
-      median(bts, na.rm = TRUE),
-      median(bts_overlapped, na.rm = TRUE)
-    ))) / 10
+    tolerance = 0.2
   )
   bts <- brightness_timeseries(img, "B", 30,
     detrend = TRUE,
     thresh = "tri", filt = "median"
   )
-  expect_equal(mean(bts, na.rm = TRUE), 1.01, tolerance = 0.006)
+  expect_equal(mean(bts, na.rm = TRUE), 1.01, tolerance = 0.2)
   expect_error(
     brightness_timeseries(img, "b", 51),
     paste0(
@@ -169,11 +169,10 @@ test_that("brightness_timeseries works", {
   )
   cwd <- setwd(tempdir())
   on.exit(setwd(cwd))
-  ijtiff::write_tif(img, "50.tif")
-  ijtiff::write_tif(img, "50again.tif")
-  context("brightness_timeseries_folder()")
-  filesstrings::create_dir("tempwithintemp")
-  ijtiff::write_tif(img, "tempwithintemp/50.tif")
+  ijtiff::write_tif(img, "50.tif", msg = FALSE)
+  ijtiff::write_tif(img, "50again.tif", msg = FALSE)
+  suppressMessages(filesstrings::create_dir("tempwithintemp"))
+  ijtiff::write_tif(img, "tempwithintemp/50.tif", msg = FALSE)
   brightness_timeseries_file("tempwithintemp/50.tif",
     def = "b",
     frames_per_set = 10
@@ -190,7 +189,7 @@ test_that("brightness_timeseries works", {
     dir("tempwithintemp/brightness_timeseries"),
     "^50_brightness_epsilon_contiguous_timeseries.*tif$"
   )))
-  filesstrings::dir.remove("tempwithintemp")
+  suppressMessages(filesstrings::dir.remove("tempwithintemp"))
   set.seed(1)
   brightness_timeseries_folder(def = "b", thresh = "tri", frames_per_set = 20)
   expect_true(dir.exists("brightness_timeseries"))
@@ -242,7 +241,7 @@ test_that("brightness_timeseries works", {
     ),
     2
   )
-  filesstrings::dir.remove("brightness_timeseries")
+  suppressMessages(filesstrings::dir.remove("brightness_timeseries"))
   suppressWarnings(file.remove(list.files())) # cleanup
   setwd(cwd)
 })

@@ -1,5 +1,3 @@
-context("Class constructors")
-
 test_that("Class construction edge cases function correctly", {
   img <- array(runif(8), dim = rep(2, 3))
   eg <- number_img(img, "N", 4, structure(8, auto = TRUE), NA)
