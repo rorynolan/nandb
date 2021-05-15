@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nandb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Calculating brightness with single images</h1>
                         <h4 class="author">Rory Nolan</h4>
             
-            <h4 class="date">2021-04-21</h4>
+            <h4 class="date">2021-05-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rorynolan/nandb/blob/master/vignettes/single-images.Rmd"><code>vignettes/single-images.Rmd</code></a></small>
       <div class="hidden name"><code>single-images.Rmd</code></div>
@@ -133,6 +133,8 @@
 <h3 class="hasAnchor">
 <a href="#the-need-for-detrending" class="anchor"></a>The need for detrending</h3>
 <p>Plotting the mean intensities of the frames in the two channels, we can see that the second channel has more obvious bleaching.</p>
+<pre><code>#&gt; Warning: Removed 1 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>#&gt; Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="single-images_files/figure-html/plot-mean-profile-1.png" width="672"></p>
 <p>The presence of bleaching in this image series tells us that we should employ a detrending routine as part of our calculations. Often it’s not obvious whether or not detrending is required. <code>nandb</code> includes <em>Robin Hood</em> detrending which won’t interfere too much with images that don’t need detrending, whilst effictively detrending images that do need it. Hence, it’s pretty safe to have this detrending option turned on in general, and you should only leave it off if you’re sure it’s not needed. To turn on detrending, use <code>detrend = TRUE</code> in the <code><a href="../reference/brightness.html">brightness()</a></code> functions.</p>
 </div>
@@ -158,19 +160,19 @@
 <h3 class="hasAnchor">
 <a href="#calculation-including-thresholding-and-detrending" class="anchor"></a>Calculation including thresholding and detrending</h3>
 <p>To calculate the brightness of this image with <em>Huang</em> thresholding and <em>Robin Hood</em> detrending, with the <em>epsilon</em> definition of brightness, run</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_brightness_img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brightness.html">brightness</a></span><span class="op">(</span><span class="va">my_img</span>, def <span class="op">=</span> <span class="st">"e"</span>, 
                                 thresh <span class="op">=</span> <span class="st">"Huang"</span>, detrend <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <div id="timeseries-calculation" class="section level4">
 <h4 class="hasAnchor">
 <a href="#timeseries-calculation" class="anchor"></a>Timeseries calculation</h4>
 <p>To calculate a brightness timeseries with 50 frames per set, run</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_brightness_ts_img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brightness_timeseries.html">brightness_timeseries</a></span><span class="op">(</span><span class="va">my_img</span>, def <span class="op">=</span> <span class="st">"e"</span>, 
                                               frames_per_set <span class="op">=</span> <span class="fl">50</span>,
                                               thresh <span class="op">=</span> <span class="st">"Huang"</span>, detrend <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>To calculate an overlapped brightness timeseries with 50 frames per set, run</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_brightness_ts_img_overlapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brightness_timeseries.html">brightness_timeseries</a></span><span class="op">(</span><span class="va">my_img</span>, def <span class="op">=</span> <span class="st">"e"</span>, 
                                                          frames_per_set <span class="op">=</span> <span class="fl">50</span>,
                                                          overlap <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -182,7 +184,7 @@
 <h3 class="hasAnchor">
 <a href="#saving-images" class="anchor"></a>Saving Images</h3>
 <p>We can save the brightness images with <code>write_tif()</code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">write_tif</span><span class="op">(</span><span class="va">my_brightness_img</span>, <span class="st">"desired/path/of/my-brightness-img"</span><span class="op">)</span>
 <span class="fu">write_tif</span><span class="op">(</span><span class="va">my_brightness_ts_img</span>, <span class="st">"desired/path/of/my-brightness-ts-img"</span><span class="op">)</span>
 <span class="fu">write_tif</span><span class="op">(</span><span class="va">my_brightness_ts_img_overlapped</span>, 
@@ -192,7 +194,7 @@
 <h3 class="hasAnchor">
 <a href="#studying-the-distribution-of-brightnesses" class="anchor"></a>Studying the Distribution of Brightnesses</h3>
 <p>We can take a look at the distribution of brightnesses in channel 1 of the brightness image:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">my_brightness_img</span><span class="op">[</span>, , <span class="fl">1</span>, <span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span>
 <span class="fu">ggplot</span><span class="op">(</span><span class="va">db</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -200,7 +202,7 @@
   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Channel 1 brightness distribution"</span><span class="op">)</span></code></pre></div>
 <p><img src="single-images_files/figure-html/brightness%20density-1.png" width="672"></p>
 <p>We can compare that to the distribution of brightnesses from immobile particles:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">immobile_brightnesses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span><span class="op">(</span><span class="fl">50</span> <span class="op">*</span> <span class="fl">10</span><span class="op">^</span><span class="fl">6</span>, <span class="fl">50</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">6</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="op">{</span><span class="fu">matrixStats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/matrixStats/man/rowVars.html">rowVars</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowMeans</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">}</span>
 <span class="va">di</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">immobile_brightnesses</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">.</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">}</span>
