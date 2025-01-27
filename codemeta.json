@@ -1,27 +1,20 @@
 {
-  "@context": [
-    "https://doi.org/10.5063/schema/codemeta-2.0",
-    "http://schema.org"
-  ],
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "nandb",
-  "description": "Calculation of molecular number and brightness from\n    fluorescence microscopy image series. The software was published in a\n    2016 paper <doi:10.1093/bioinformatics/btx434>. The seminal paper for\n    the technique is Digman et al. 2008 <doi:10.1529/biophysj.107.114645>.\n    A review of the technique was published in 2017\n    <doi:10.1016/j.ymeth.2017.12.001>.",
+  "description": "Calculation of molecular number and brightness from fluorescence microscopy image series. The software was published in a 2016 paper <doi:10.1093/bioinformatics/btx434>. The seminal paper for the technique is Digman et al. 2008 <doi:10.1529/biophysj.107.114645>. A review of the technique was published in 2017 <doi:10.1016/j.ymeth.2017.12.001>.",
   "name": "nandb: Number and Brightness Image Analysis",
+  "relatedLink": ["https://rorynolan.github.io/nandb/", "https://CRAN.R-project.org/package=nandb"],
   "codeRepository": "https://github.com/rorynolan/nandb",
-  "relatedLink": [
-    "https://rorynolan.github.io/nandb",
-    "https://CRAN.R-project.org/package=nandb",
-    "https://rorynolan.github.io/nandb/"
-  ],
   "issueTracker": "https://github.com/rorynolan/nandb/issues",
   "license": "https://spdx.org/licenses/BSD-3-Clause",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.2 (2020-06-22)",
+  "runtimePlatform": "R version 4.4.0 (2024-04-24)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -83,7 +76,6 @@
       "@id": "https://orcid.org/0000-0002-8010-9481"
     }
   ],
-  "funder": {},
   "maintainer": [
     {
       "@type": "Person",
@@ -141,6 +133,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "magick",
+      "name": "magick",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=magick"
     },
     {
       "@type": "SoftwareApplication",
@@ -217,14 +221,14 @@
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     }
   ],
-  "softwareRequirements": [
-    {
+  "softwareRequirements": {
+    "1": {
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
       "version": ">= 3.1"
     },
-    {
+    "2": {
       "@type": "SoftwareApplication",
       "identifier": "assertthat",
       "name": "assertthat",
@@ -236,7 +240,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=assertthat"
     },
-    {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "autothresholdr",
       "name": "autothresholdr",
@@ -249,7 +253,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=autothresholdr"
     },
-    {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "BBmisc",
       "name": "BBmisc",
@@ -261,7 +265,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=BBmisc"
     },
-    {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "checkmate",
       "name": "checkmate",
@@ -274,7 +278,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=checkmate"
     },
-    {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "detrendr",
       "name": "detrendr",
@@ -287,7 +291,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=detrendr"
     },
-    {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -299,7 +303,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "filesstrings",
       "name": "filesstrings",
@@ -312,7 +316,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=filesstrings"
     },
-    {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "ggplot2",
       "name": "ggplot2",
@@ -324,7 +328,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=ggplot2"
     },
-    {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "glue",
       "name": "glue",
@@ -337,7 +341,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=glue"
     },
-    {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "ijtiff",
       "name": "ijtiff",
@@ -350,7 +354,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=ijtiff"
     },
-    {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "magrittr",
       "name": "magrittr",
@@ -363,7 +367,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=magrittr"
     },
-    {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
@@ -375,7 +379,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "Rcpp",
       "name": "Rcpp",
@@ -388,7 +392,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=Rcpp"
     },
-    {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "reshape2",
       "name": "reshape2",
@@ -400,7 +404,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=reshape2"
     },
-    {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
@@ -413,7 +417,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rlang"
     },
-    {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "stringr",
       "name": "stringr",
@@ -426,12 +430,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringr"
     },
-    {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "viridis",
       "name": "viridis",
@@ -443,7 +447,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=viridis"
     },
-    {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "withr",
       "name": "withr",
@@ -455,12 +459,10 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=withr"
-    }
-  ],
-  "releaseNotes": "https://github.com/rorynolan/nandb/blob/master/NEWS.md",
-  "readme": "https://github.com/rorynolan/nandb/blob/master/README.md",
-  "contIntegration": ["https://travis-ci.org/rorynolan/nandb", "https://ci.appveyor.com/project/rorynolan/nandb", "https://codecov.io/github/rorynolan/nandb?branch=master"],
-  "developmentStatus": ["https://www.repostatus.org/", "https://lifecycle.r-lib.org/articles/stages.html"],
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "791.308KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -488,7 +490,7 @@
         },
         {
           "@type": "Person",
-          "givenName": ["G.", "Maria"],
+          "givenName": "G. Maria",
           "familyName": "Jakobsdottir"
         },
         {
@@ -498,7 +500,7 @@
         },
         {
           "@type": "Person",
-          "givenName": ["A.", "Radu"],
+          "givenName": "A. Radu",
           "familyName": "Aricescu"
         },
         {
@@ -507,7 +509,7 @@
           "familyName": "Padilla-Parra"
         }
       ],
-      "name": "{nandb}---number and brightness in R with a novel automatic detrending algorithm",
+      "name": "{nandb}--—number and brightness in R with a novel automatic detrending algorithm",
       "identifier": "10.1093/bioinformatics/btx434",
       "@id": "https://doi.org/10.1093/bioinformatics/btx434",
       "sameAs": "https://doi.org/10.1093/bioinformatics/btx434",
@@ -521,5 +523,8 @@
       }
     }
   ],
-  "fileSize": "3153.628KB"
+  "releaseNotes": "https://github.com/rorynolan/nandb/blob/master/NEWS.md",
+  "readme": "https://github.com/rorynolan/nandb/blob/master/README.md",
+  "contIntegration": ["https://github.com/rorynolan/nandb/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/rorynolan/nandb"],
+  "developmentStatus": ["https://www.repostatus.org/", "https://lifecycle.r-lib.org/articles/stages.html"]
 }

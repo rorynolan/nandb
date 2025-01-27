@@ -1,3 +1,9 @@
+# `nandb` 2.1.1
+
+## BUG FIXES
+* Prep for new `ijtiff::display()`.
+
+
 # `nandb` 2.1.0
 
 ## MINOR IMPROVEMENTS

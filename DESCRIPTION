@@ -1,7 +1,7 @@
 Type: Package
 Package: nandb
 Title: Number and Brightness Image Analysis
-Version: 2.1.0
+Version: 2.1.1
 Authors@R: 
     c(person(given = "Rory",
              family = "Nolan",
@@ -56,6 +56,7 @@ Suggests:
     covr,
     gridExtra,
     knitr,
+    magick,
     matrixStats (>= 0.50),
     pacman,
     rmarkdown,

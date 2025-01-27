@@ -13,7 +13,9 @@ In this vignette, we will look at calculating the brightness of single images in
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = "#>", 
-                      fig.width = 7, fig.height = 6)
+                      fig.width = 7, fig.height = 6,
+                      crop = TRUE)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
 set.seed(1)
 pacman::p_load(ggplot2, dplyr, tidyr)
 ```
@@ -74,7 +76,7 @@ The presence of bleaching in this image series tells us that we should employ a 
 
 ### Thresholding
 
-You can see here that this is an image of part of a cell, with the edge of the cell across the top left and hence the top left corner of the image is not cell, just background. It's important to _threshold_ away this background part: the detrending routine assumes that all parts of the image are part of the region of interest (the cell) and later, when you calculate summary statistics like mean/median brightness, you also want to background regions to be excluded. Hence, you need to set the background parts to `NA` before detrending and brightness calculations. `nandb` has all of the thresholding functionality of the _ImageJ Auto Threshold_ plugin. You can read more about this at https://imagej.net/Auto_Threshold. My favourite method is _Huang_. Let's look at both of these channels with _Huang_ thresholding.
+You can see here that this is an image of part of a cell, with the edge of the cell across the top left and hence the top left corner of the image is not cell, just background. It's important to _threshold_ away this background part: the detrending routine assumes that all parts of the image are part of the region of interest (the cell) and later, when you calculate summary statistics like mean/median brightness, you also want to background regions to be excluded. Hence, you need to set the background parts to `NA` before detrending and brightness calculations. `nandb` has all of the thresholding functionality of the _ImageJ Auto Threshold_ plugin. You can read more about this at https://imagej.net/plugins/auto-threshold. My favourite method is _Huang_. Let's look at both of these channels with _Huang_ thresholding.
 
 ```{r display-thresholded-mean, echo=FALSE, fig.height=4}
 graphics::par(mfrow = c(1, 2))

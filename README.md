@@ -9,22 +9,21 @@ al. 2008](https://doi.org/10.1529/biophysj.107.114645). A
 [review](https://doi.org/10.1016/j.ymeth.2017.12.001) of the technique
 was published in [2017](https://doi.org/10.1016/j.ymeth.2017.12.001).
 
-[![Travis-CI Build
-Status](https://travis-ci.org/rorynolan/nandb.svg?branch=master)](https://travis-ci.org/rorynolan/nandb)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/rorynolan/nandb?branch=master&svg=true)](https://ci.appveyor.com/project/rorynolan/nandb)
-[![Coverage
-Status](https://img.shields.io/codecov/c/github/rorynolan/nandb/master.svg)](https://codecov.io/github/rorynolan/nandb?branch=master)
+<!-- badges: start -->
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
+[![R-CMD-check](https://github.com/rorynolan/nandb/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rorynolan/nandb/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/rorynolan/nandb/graph/badge.svg)](https://app.codecov.io/gh/rorynolan/nandb)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/nandb)](https://cran.r-project.org/package=nandb)
 ![RStudio CRAN
-downloads](http://cranlogs.r-pkg.org/badges/grand-total/nandb) ![RStudio
-CRAN monthly downloads](http://cranlogs.r-pkg.org/badges/nandb)
-
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/nandb)
+![RStudio CRAN monthly
+downloads](https://cranlogs.r-pkg.org/badges/nandb) [![Project Status:
+Active – The project has reached a stable, usable state and is being
+actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+<!-- badges: end -->
 
 ## Installation
 
